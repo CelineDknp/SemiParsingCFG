@@ -76,24 +76,24 @@ def fuzzy_parse(input, anchors):
                 pos = next_val+len(n_anchor)
         elif n_anchor == anchors[0]: #Found a if, take note
             # print('>>> FOUND IF')
-            if_depth += 1
             pos = next_val+len(re.search(n_anchor, input[pos:]).group(0))
             node = ConditionNode(if_depth, "IF")
             pos = node.find_condition(input, pos)
+            if_depth += 1
             # print(node)
             lot.append(node)
             # print(f">>>>>> COND:{cond}")
         elif n_anchor == anchors[1]:
             # print('>>> FOUND ELSE')
-            node = ConditionNode(if_depth, "ELSE")
+            node = ConditionNode(if_depth-1, "ELSE")
             lot.append(node)
 
             pos = next_val+len(n_anchor)
         elif n_anchor == anchors[2]: #Found a end-if, take note
             # print('>>> FOUND END-IF')
+            if_depth -= 1
             node = ConditionNode(if_depth, "END-IF")
             lot.append(node)
-            if_depth -= 1
             pos = next_val+len(n_anchor)
         elif n_anchor == anchors[3]:
             while if_depth != 0:
@@ -119,9 +119,9 @@ def fuzzy_parse(input, anchors):
 def main(argv):
     with open(argv[1], "r") as f:
         lot = fuzzy_parse(f.read(), def_anchors())
-        print(lot)
-        # for tree in lot:
-            # ParseTreeWalker.DEFAULT.walk(WriteTreeListener(), tree)
+        # print(lot)
+        for node in lot:
+            print(str(node))
 
 
 def parse(input, lexer_base, parser_base):    

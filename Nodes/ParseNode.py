@@ -6,8 +6,11 @@ import re
 
 class ParseNode(Node):
 
+    def __str__(self):
+        return f"Node {self.type} ({self.parsable})"
+
     def find_parse_text(self, input, pos):
-        self.parsable = input[pos+8:input.find("END-EXEC", pos)]
+        self.parsable = input[pos+8:input.find("END-EXEC", pos)].strip()
         return input.find("END-EXEC", pos)+8
 
     def parse(self, lexer_base, parser_base):    

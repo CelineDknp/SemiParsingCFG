@@ -3,9 +3,16 @@ import re
 
 class ConditionNode(Node):
 
+    def __init__(self, depth, type):
+        super().__init__(depth, type)
+        if self.type != "IF":
+            self.condition = ""
+
     def __str__(self):
-        res = super().__str__()
-        return res+"\n"+self.condition
+        if self.type == 'IF':
+            return self.depth*"\t"+f"Node IF {self.condition}"
+        else:
+            return self.depth*"\t"+f"Node {self.type}"
 
     def is_anchor(self, input, anchors):
         for val in anchors:
