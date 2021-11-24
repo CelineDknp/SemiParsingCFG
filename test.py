@@ -1,11 +1,13 @@
 import sys
 from antlr4 import *
-import MySqlLexer
-import MySqlParser
+from Parse.MySqlLexer import MySqlLexer
+from Parse.MySqlParser import MySqlParser
 import re
+from Nodes.ConditionNode import ConditionNode
+from Nodes.ParseNode import ParseNode
 
-SQLL = MySqlLexer.MySqlLexer
-SQLP = MySqlParser.MySqlParser
+SQLL = MySqlLexer
+SQLP = MySqlParser
 
 class WriteTreeListener(ParseTreeListener):
     def visitTerminal(self, node:TerminalNode):
@@ -74,28 +76,39 @@ def fuzzy_parse(input, anchors):
                 pos = next_val+len(n_anchor)
         elif n_anchor == anchors[0]: #Found a if, take note
             # print('>>> FOUND IF')
-            lot.append("if node")
             if_depth += 1
             pos = next_val+len(re.search(n_anchor, input[pos:]).group(0))
+            node = ConditionNode(if_depth, "IF")
+            pos = node.find_condition(input, pos)
+            # print(node)
+            lot.append(node)
+            # print(f">>>>>> COND:{cond}")
         elif n_anchor == anchors[1]:
             # print('>>> FOUND ELSE')
-            lot.append("else node")
+            node = ConditionNode(if_depth, "ELSE")
+            lot.append(node)
+
             pos = next_val+len(n_anchor)
         elif n_anchor == anchors[2]: #Found a end-if, take note
             # print('>>> FOUND END-IF')
-            lot.append("end-if node")
+            node = ConditionNode(if_depth, "END-IF")
+            lot.append(node)
             if_depth -= 1
             pos = next_val+len(n_anchor)
         elif n_anchor == anchors[3]:
             while if_depth != 0:
-                lot.append("end-if node")
+                node = ConditionNode(if_depth, "END-IF")
+                lot.append(node)
                 if_depth -= 1
             pos = next_val+len(n_anchor)
 
         elif n_anchor == anchors[4]:
-            lot.append("EXEC NODE")
-            lot.append(parse(input[next_val+8:], SQLL, SQLP))
-            pos = input.find("END-EXEC", pos)+8
+            # lot.append("EXEC NODE")
+            node = ParseNode(if_depth, "EXEC")
+            lot.append(node)
+            pos = node.find_parse_text(input, pos)
+            # lot.append(parse(input[next_val+8:], SQLL, SQLP))
+            # pos = input.find("END-EXEC", pos)+8
             # print('>>> FOUND EXEC')
         else:
             pos += 1
