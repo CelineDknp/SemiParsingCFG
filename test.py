@@ -209,10 +209,9 @@ def cleanup_graph(graph):
             current_node = start_node[0]
             print(f">>> Looking into {current_node} with childs {current_node.get_childs()}")
             if current_node.get_type() == "CONTROL":
+                print(f">>> Found a control node !")
                 children = current_node.get_childs()
-                print(f">>> Found control node ! len children: {len(children)} len grand_children: {len(children[0].get_childs())}")
-                if len(children[0].get_childs()) == 1:
-                    print(f">>> type: {children[0].get_type()}")
+                # print(f">>> Found control node ! len children: {len(children)} len grand_children: {len(children[0].get_childs())}")
                 if len(children) == 2:
                     print(f">>> It has two children !")
                     if children[0] == children[1]: #Two links pointing the same direction
@@ -227,7 +226,7 @@ def cleanup_graph(graph):
                         cleanup_triangle(current_node, children[0])
                         cleaned = True
                     print(f"Cleaned: {cleaned}")
-                elif len(children) == 1 and len(children[0].get_childs()) == 1 and children[0].get_type() == "CONTROL":
+                elif len(children) == 1:
                     print(f">>> It has one child !") 
                     #We are in a control node having a single child of a control node 
                     parent_node = current_node.get_parent()
