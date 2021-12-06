@@ -41,6 +41,7 @@ def def_anchors():
 	return anchors
 
 def next_anchor(input, pos, anchors):
+	# print(f"Searching from: {input[pos:pos+50]}")
 	next_pos = []
 	for val in anchors:
 		res = re.search(val, input[pos:])
@@ -86,9 +87,8 @@ def fuzzy_parse(input, anchors):
 			node = ConditionNode(if_depth, "IF")
 			pos = node.find_condition(input, pos)
 			if_depth += 1
-			# print(node)
+			print(node)
 			lot.append(node)
-			# print(f">>>>>> COND:{cond}")
 		elif n_anchor == anchors[1]:
 			# print('>>> FOUND ELSE')
 			node = ConditionNode(if_depth-1, "ELSE")
@@ -141,6 +141,7 @@ def main(argv):
 	with open(argv[1], "r") as f:
 		lot = fuzzy_parse(f.read(), def_anchors())
 		# print(lot)
+		print(">>> WTF")
 		for node in lot:
 			print(str(node))
 		#Contruct and clean the graph

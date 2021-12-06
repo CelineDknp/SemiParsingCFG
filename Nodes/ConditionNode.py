@@ -138,9 +138,11 @@ class ConditionNode(Node):
         new_line = input.find("\n", pos)
         next_line = input[pos:new_line]
         while go:
+            # print(next_line)
             if self.is_anchor(next_line, ["\sIF(\s)+", "ELSE", "END-IF","EXEC SQL", "\*"]):
                 go = False
-            elif re.search('^(\s)+(\S)+(\s)*$', next_line): #Special case of just one thing to finish the line
+            elif re.search('^(\s)*(\S)+(\s)*$', next_line): #Special case of just one thing to finish the line
+                # print(f">>> HERE")
                 if any(x in next_line for x in ["MOVE", "DISPLAY"]):
                     go = False
                 else:

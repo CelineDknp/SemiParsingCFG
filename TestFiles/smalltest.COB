@@ -1,200 +1,192 @@
-      *=================================================================
-       LINKAGE SECTION.
-      *=================================================================
-       01 ZY01-YPCBIO.
-      *SD: ZY BIB: 9B SEL: 05=01___ FORM: I DESC: 1 NIV: 3 ORG: _ SS: _
-         02 ZY00.
-       COPY CXTI9B05 REPLACING
-             ==01 :PREF:== BY ==03 ZY01==
-             ==:PREF:== BY ==ZY01==.
-       COPY WCISLCAW.
-      ******************************************************************
-       PROCEDURE DIVISION USING ZY01-YPCBIO.
-      ******************************************************************
-      *N0A.           *************************************.
-      *               *ARCHITECTURE                       *
-      *               *************************************.
-       F0A.
-      *-----------------------------------------------------------------
-      *N0A-A.  APPINIT WCIS
-      *-----------------------------------------------------------------
-           PERFORM WCIS-INIT-TRAITEMENT
-      *-----------------------------------------------------------------
-      *N0AZD. APPEL  MXTU1450 POUR 9B02-YDAJOU
-      *-----------------------------------------------------------------
-           MOVE SPACES                    TO W-DD00-ENVU045
-           MOVE '1'                       TO W-DD00-ZA001H
-           MOVE '1'                       TO W-DD00-ZA001D
-           MOVE 'S'                       TO W-DD00-ZA001K
-           PERFORM F97DD
-           MOVE W-DD00-DATE8              TO 9B02-YDAJOU
-           MOVE 9B02-YDAJOU               TO DAT8E DAT6C
-           MOVE DAT83E                    TO DAT61C
-           MOVE DAT81E                    TO DAT63C
-           MOVE DAT82E                    TO DAT62C
-           MOVE DAT6C                     TO DAT8
-           MOVE DAT8                      TO DAT8E DAT6C
-           MOVE DAT61C                    TO DAT81C
-           MOVE DAT62C                    TO DAT82C
-           MOVE DAT63C                    TO DAT83C
-           MOVE W-DD00-HESOR              TO 9B02-YHESYS
-           MOVE 9B02-YHESYS               TO DAT8E DAT6C
-      *APPEL MXTU1450  POUR 9B02-YDABAT
-           MOVE SPACES                    TO W-DD00-ENVU045
-           MOVE '1'                       TO W-DD00-ZA001H
-           MOVE '1'                       TO W-DD00-ZA001D
-           MOVE 'L'                       TO W-DD00-ZA001K
-           PERFORM F97DD
-           MOVE W-DD00-DATE8              TO 9B02-YDABAT
-           MOVE 9B02-YDABAT               TO DAT8E DAT6C
-           MOVE DAT83E                    TO DAT61C
-           MOVE DAT81E                    TO DAT63C
-           MOVE DAT82E                    TO DAT62C
-           MOVE DAT6C                     TO DAT8
-           MOVE DAT8                      TO DAT8E DAT6C
-           MOVE DAT61C                    TO DAT81C
-           MOVE DAT62C                    TO DAT82C
-           MOVE DAT63C                    TO DAT83C
-           MOVE DAT8C                     TO 9B02-YDABA2
-           MOVE '.'                       TO 9B02-YDABA2 (3 : 1)
-                                             9B02-YDABA2 (6 : 1)
-           MOVE W-DD00-HESOR              TO 9B02-YHEUL1
-           MOVE 9B02-YHEUL1               TO DAT8E DAT6C
-           .
-       F0D.
-      *+------------------------------+
-      *I     INITIALISATIONS DB2      I
-      *+------------------------------+
-           MOVE 0                         TO SQLCODE IK
-           EXEC SQL WHENEVER SQLWARNING CONTINUE END-EXEC
-           EXEC SQL WHENEVER SQLERROR CONTINUE END-EXEC
-      *-----------------------------------------------------------------
-      *N0DDB. DISPLAY DEBUT PROGRAMME
-      *-----------------------------------------------------------------
-           DISPLAY '******************************'
-                   '******************************'
-                   '******************************'
-           DISPLAY 'DEBUT PGM : ' PROGE
-                   ' NOM PAC : ' PROGR ' / '
-                   APPLI ' GENERE LE : ' DATGN
-                   ' PAR : ' CODUTI ' SESSION : '
-                   NUGNA
-           .
-      *N01.           *************************************.
-      *               *INITIALISATIONS                    *
-      *               *************************************.
-       F01-INITIALISATIONS.
-      *-----------------------------------------------------------------
-      *N01AL. INITIALISATION FICHIER  AL-FICHIER
-      *-----------------------------------------------------------------
-           OPEN OUTPUT AL-FICHIER
-      *-----------------------------------------------------------------
-      *N01CR. INITIALISATION FICHIER  CR-FICHIER
-      *-----------------------------------------------------------------
-           OPEN OUTPUT CR-FICHIER
-           PERFORM WITH TEST AFTER UNTIL TE-FT = '1'
-             PERFORM F95TE
-             IF TE-FT NOT = '1'
-               ADD 1                      TO ITE00L
-               IF ITE00L <= 0500
-                 MOVE TE00                TO 1-TE00 (ITE00L)
-               END-IF
-             END-IF
-           END-PERFORM
-           IF ITE00L > ITE00M
-             MOVE ITE00L                  TO ITE00R
-             MOVE ITE00M                  TO ITE00L
+MOVE 'ALC00003'                TO Z004-COTABC
+           MOVE QT47-CORRCO               TO Z004-COIDTC
+           IF W-QT47-YCOSRV NOT = SPACE OR Z004-YCOSRV = SPACE
+             MOVE '1'                     TO Z004-YCOSRV
            END-IF
-      *-----------------------------------------------------------------
-      *N01UA. INITIALISATION FICHIER  UA-FICHIER
-      *-----------------------------------------------------------------
-           OPEN INPUT UA-FICHIER
-           READ UA-FICHIER
-             AT END
-             MOVE 1                       TO UA-FI
-           END-READ
-      *-----------------------------------------------------------------
-      *N01UB. INITIALISATION FICHIER  UB-FICHIER
-      *-----------------------------------------------------------------
-           OPEN OUTPUT UB-FICHIER
-           .
-      *N02.           *************************************.
-      *               *TRAITEMENT INITIAL                 *
-      *               *************************************.
-       F02.
-      *-----------------------------------------------------------------
-      *N02BB. INITIALISATION DU TOP TRAITEMENT
-      *-----------------------------------------------------------------
-           MOVE 'O'                       TO WC00-ZA001E
-           INITIALIZE WE00-COICTA
-             WE00-CTOPI2
-             WE00-CODMCC
-             WE00-CENOSH
-             WE00-COCART
-             WE00-CELGC2
-             WE00-ZN002
-      *-----------------------------------------------------------------
-      *N02BE. CALCUL DES DATES PIVOTS
-      *-----------------------------------------------------------------
-      *-----------------------------------------------------------------
-      *N02BF. DATE DE TRAITEMENT - 1 AN
-      *-----------------------------------------------------------------
-      *-----------------------------------------------------------------
-      *N02BJ. APPEL AU MODULE RTRU004
-      *-----------------------------------------------------------------
-           INITIALIZE BC01
-           MOVE 'CAL'                     TO BC01-COCOM
-           MOVE SPACE                     TO BC01-CTFDAT
-           MOVE 'ECO'                     TO BC01-COETBL
-           MOVE '9999'                    TO BC01-COTYCA
-           MOVE '3'                       TO BC01-COENV
-           MOVE 9B02-YDABAT               TO BC01-DATEES (1)
-           MOVE -1                        TO BC01-QTJSM
-           MOVE 'A'                       TO BC01-CEUNIT
-           PERFORM F96DB
-      *-----------------------------------------------------------------
-      *N02BN. CONTROLE DU CODE RETOUR : KO
-      *-----------------------------------------------------------------
-           IF BC01-YGREG NOT = SPACE
-             DISPLAY '******************************'
-             DISPLAY 'PROBLEME SUR APPEL A RTRU004'
-             DISPLAY 'CODE RETOUR  : ' BC01-YGREG
-             DISPLAY 'DATE TRAITEE : ' BC01-DATEES (1)
-             DISPLAY 'LIBELLE ERREUR : ' BC01-YLIER2
-             DISPLAY '******************************'
-             PERFORM F98BX
-           ELSE
-      *-----------------------------------------------------------------
-      *N02BR. CONTROLE DU CODE RETOUR : OK
-      *       MEMO DE LA DATE TRAIT - 1 AN
-      *-----------------------------------------------------------------
-             MOVE BC01-DATEES (2)         TO WE00-DATEFI
-      *-----------------------------------------------------------------
-      *N02BT. DATE DE TRAITEMENT - 1 AN ET 67J
-      *-----------------------------------------------------------------
-             INITIALIZE BC01
-             MOVE SPACE                   TO BC01-CTFDAT
-             MOVE 'CAL'                   TO BC01-COCOM
-             MOVE 'J'                     TO BC01-CEUNIT
-             MOVE -67                     TO BC01-QTJSM
-             MOVE WE00-DATEFI             TO BC01-DATEES (1)
-             PERFORM F96DB
-      *-----------------------------------------------------------------
-      *N02BV. CONTROLE DU CODE RETOUR : KO
-      *-----------------------------------------------------------------
-             IF BC01-YGREG NOT = SPACE
-               DISPLAY '******************************'
-               DISPLAY 'PROBLEME SUR APPEL A RTRU004'
-               DISPLAY 'CODE RETOUR  : ' BC01-YGREG
-               DISPLAY 'DATE TRAITEE : ' BC01-DATEES (1)
-               DISPLAY 'LIBELLE ERREUR : ' BC01-YLIER2
-               DISPLAY '******************************'
-               PERFORM F98BX
+           IF Z004-YCOSRV = '1' OR 'A' OR 'D'
+      *****SERVICE INDISPONIBLE******
+             IF W-QT47-COETBI NOT = QT47-COETBI
+             OR W-QT47-COEXSE NOT = QT47-COEXSE
+             OR W-QT47-COTYPI NOT = QT47-COTYPI
+      *- - - - - - - - - - - - - - - -
+      *CHANGEMENT GROUPE UTILISATEUR
+      *- - - - - - - - - - - - - - - -
+               MOVE ZERO                  TO QT47-COINTE
+               MOVE QT47-COETBI           TO W-QT47-COETBI
+               MOVE QT47-COEXSE           TO W-QT47-COEXSE
+               MOVE QT47-COTYPI           TO W-QT47-COTYPI
+             END-IF
+      *- - - - - - - - - - - - - - - -.
+             MOVE QT47-COINTE             TO Z004-COINTE
+             MOVE QT47-COHORO             TO Z004-COHORO
+             MOVE QT47-CEACTF             TO Z004-CEACTF
+             MOVE QT47-COETBI             TO Z004-COETBI
+             MOVE QT47-COEXSE             TO Z004-COEXSE
+             MOVE QT47-COTYPI             TO Z004-COTYPI
+             MOVE W-QT00-DAVAG1           TO Z004-DAVAG1
+             MOVE '0'                     TO IK
+             PERFORM F92RC
+             IF Z004-YCORET = '0'
+               MOVE Z004-ZD600            TO W-QT47-ZD600
+               MOVE W-QT47                TO QT47
+               MOVE Z004-COIDTC           TO QT47-CORRCO
+               MOVE Z004-COINTE           TO QT47-COINTE
+               MOVE Z004-COHORO           TO QT47-COHORO
+               MOVE Z004-CEACTF           TO QT47-CEACTF
+               MOVE Z004-DAVAG1           TO W-QT00-DAVAG1
              ELSE
-      *-----------------------------------------------------------------
-      *N02BX. CONTROLE DU CODE RETOUR : OK
-      *       MEMO DE LA DATE TT - 1 AN ET 67J
-      *-----------------------------------------------------------------
-               MOVE BC01-DATEES (2)       TO WE05-DATEFI
+               MOVE '1'                   TO IK
+               MOVE Z004-YCORET           TO W-QT00-YCORET
+             END-IF
+             IF QTER1-U914
+               DISPLAY 'F96QT TABLE ' Z004-COTABC
+                       ' ERREUR DE PARAMETRAGE   CODE '
+                       'RETOUR : ' Z004-YCORET
              END-IF
            END-IF
+           .
+      *-----------------------------------------------------------------
+      *N96TB. APPEL DU SOUS PROGRAMME
+      *-----------------------------------------------------------------
+       F96TB.
+           MOVE SPACES                    TO S-SPCB-XCORET W-Z900-COSSPG
+           MOVE 'ALCU100'                 TO W-Z900-COSSPG
+           CALL W-Z900-COSSPG USING SQLCA
+                                    S-SPCB
+                                    W-9T99-YCOFCT
+                                    Z93P
+      *SI ABEND DB2
+           IF SQLCODE NOT = ZERO AND SQLCODE NOT = 100
+             MOVE '1'                     TO FT
+      *'E'     CATG
+             MOVE W-Z900-COSSPG           TO PROGE
+      *F81ES   F80-FN
+             PERFORM F98BD THRU F98BD-FN
+           END-IF
+      *SI ABEND DL1
+           IF S-SPCB-XCORET NOT = SPACE
+      *F80-ER  F80-FN
+             PERFORM F99ER
+           END-IF
+           .
+      *N97.           *************************************.
+      *               *FONCTIONS UTILISATEURS             *
+      *               *************************************.
+      *+------------------------------+
+      *I         PLAGE 97             I
+      *I   FONCTIONS PRE/POST SQL     I
+      *+------------------------------+
+      *-----------------------------------------------------------------
+      *N97DD. APPEL A MXTU1450 (DATES / HEURE)
+      *-----------------------------------------------------------------
+       F97DD.
+           CALL W-DD00-CODSOUPRO USING W-DD00-ENVU045
+           IF W-DD00-YCORET NOT = SPACE
+             DISPLAY '******************************'
+             DISPLAY '*ERREUR MXTU145               '
+             DISPLAY '*CODE RETOUR = ' W-DD00-YCORET
+             DISPLAY ' ZONE DE LIEN =' W-DD00-ENVU045
+             DISPLAY '******************************'
+             MOVE ALL '1'                 TO FT
+             GO TO F20-FIN-TRAITEMENT
+           END-IF
+           .
+      *N98.           *************************************.
+      *               *FONCTIONS TECHNIQUES ARCHI.        *
+      *               *************************************.
+      *+------------------------------+
+      *I          PLAGE 98            I
+      *I   RESERVEE A L'ARCHITECTURE  I
+      *+------------------------------+
+      *-----------------------------------------------------------------
+      *N98BD. TRAITEMENT DES ERREURS DB2
+      *-----------------------------------------------------------------
+       F98BD.
+           EVALUATE SQLCODE
+      *-----------------------------------------------------------------
+      *N98BF. FIN DE LECTURE
+      *-----------------------------------------------------------------
+             WHEN 0
+               MOVE 0                     TO IK
+               GO TO F98BD-FN
+             WHEN 100
+               MOVE 1                     TO IK
+               GO TO F98BD-FN
+             WHEN OTHER
+               CONTINUE
+           END-EVALUATE
+           MOVE 2                         TO IK
+      *-----------------------------------------------------------------
+      *N98BN. DSNTIAR
+      *-----------------------------------------------------------------
+      *+------------------------------+
+      *I      MESSAGE DSNTIAR         I
+      *+------------------------------+
+           CALL W-CALL-DSNTIAR USING SQLCA
+                                     W-MESS
+                                     W-MESS-YQSQLS
+      *-----------------------------------------------------------------
+      *N98BP. EMISSION MESSAGE DSNTIAR
+      *-----------------------------------------------------------------
+           DISPLAY '--------------------------'
+           DISPLAY '* ERREUR GRAVE DB2  PROGRAMME'
+                   ' : ' PROGE
+                   '  SEGMENT : ' W-9T99-YCSEG
+                   '   ETIQUETTE : ' W-9T99-YCFON
+           DISPLAY '--------------------------'
+      *-----------------------------------------------------------------
+      *N98BQ. EMISSION MESSAGE DSNTIAR
+      *-----------------------------------------------------------------
+           PERFORM VARYING J98BQR FROM 1 BY 1
+                     UNTIL 10 < J98BQR
+             DISPLAY W-MESS-YLSQLM (J98BQR)
+           END-PERFORM
+           .
+      *-----------------------------------------------------------------
+      *N98BX. ROLL  CANCEL
+      *-----------------------------------------------------------------
+       F98BX.
+      *+------------------------------+
+      *I  ROLL / ABORT   PROGRAMME    I
+      *+------------------------------+.
+           CALL W-9T99-COPROG
+           .
+       F98BD-FN.
+           EXIT
+           .
+      *-----------------------------------------------------------------
+      *N99ER. TEST CODE RETOUR  DL1
+      *-----------------------------------------------------------------
+       F99ER.
+           IF S-SPCB-XCORET NOT = SPACE
+           AND S-SPCB-XCORET NOT = 'GE'
+           AND S-SPCB-XCORET NOT = 'GB'
+           AND S-SPCB-XCORET NOT = 'GK'
+           AND S-SPCB-XCORET NOT = 'GA'
+           AND S-SPCB-XCORET NOT = 'II'
+           AND S-SPCB-XCORET NOT = 'GG'
+      *-----------------------------------------------------------------
+      *N99EU. DISPLAYS  ABEND   DL1
+      *-----------------------------------------------------------------
+             DISPLAY '*'
+             DISPLAY '******************************'
+             DISPLAY '*******  ERREUR  DL1  ********'
+             DISPLAY '*'
+             DISPLAY 'PROGRAMME   : ' PROGR ' ' PROGE
+             DISPLAY 'GENERE LE   : ' DATGN
+             DISPLAY '*'
+             DISPLAY 'FONCTION PAC   : ' S-SPCB-IPAC
+             DISPLAY '*'
+             DISPLAY 'CODE APPEL DL1 : ' S-SPCB-XFONC
+             DISPLAY 'CODE RETOUR   : ' S-SPCB-XCORET
+             DISPLAY '*'
+             DISPLAY 'INFOS PCB      : ' S-SPCB
+             DISPLAY '*'
+             DISPLAY '******************************'
+             DISPLAY '******************************'
+             DISPLAY '*'
+             PERFORM F98BX
+           END-IF
+           .
+        COPY  WCISPAC.
+       END PROGRAM ALCP519.
