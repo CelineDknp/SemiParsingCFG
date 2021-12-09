@@ -125,12 +125,16 @@ class ConditionNode(Node):
             print(f">>> Closed False branch. Current if branches:{self.branch_open} and childs: {self.get_childs()}")
         print(f">>> ENDED CLOSE. true_child: {self.true_child} and false_child: {self.false_child}")
 
+    def point_to_one(self):
+        return self.true_child == self.false_child
+
     def is_anchor(self, input, anchors):
         for val in anchors:
             res = re.search(val, input)
             if res != None:
                 return True
         return False
+
 
     def find_condition(self, input, pos):
         go = True

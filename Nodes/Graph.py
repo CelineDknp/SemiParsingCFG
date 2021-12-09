@@ -1,4 +1,5 @@
 from Nodes.Node import Node
+from Nodes.FusedNode import FusedNode
 import graphviz
 
 class Graph:
@@ -135,6 +136,67 @@ class Graph:
 						start_node.append(child)
 				start_node.remove(current_node)
 
+	def fuse(self, node_up, node_down):
+		print(f">>> Fusing {[node_up]} and {[node_down]}")
+		print(f">>> Parent of node up: {node_up.get_parent()}")
+		print(f">>> Children of node down: {node_down.get_childs()}")
+		if node_down.get_type() == "FUSED":
+			print(">>> Fusing with node fused")
+			node_down.fuse_node(node_up, up = True)
+			return node_down
+		elif node_up.get_type() == "FUSED":
+			node_up.fuse_node(node_down, down = True)
+		else:
+			node = FusedNode(node_up.get_depth(), "FUSED")
+			print(">>> Created")
+			node.fuse_node(node_up, up=True)
+			# print(">>> One fused")
+			node.fuse_node(node_down, down=True)
+			# print(">>> Two fused")
+			return node
+
+
+	def squish(self): #Sqwish if nodes that go to a singe node
+		squished = True
+		while squished:
+			squished = False
+			start_node = []
+			start_node.append(self.get_start_node())
+			while len(start_node) != 0:
+				# print(start_node)
+				current_node = start_node[0]
+				print([current_node])
+				if (current_node.get_type() == "IF" or current_node.get_type() == "FUSED") and current_node.point_to_one(): #We are in a if node that points to a single node
+					child = current_node.get_childs()[0]
+					print(">>> Trying to fuse two nodes !")
+					if child.get_type() != "END" and child.get_type() != "EXEC":
+						merge = True
+						for c in child.get_childs():
+							if c.get_type() == "EXEC":
+								merge = False
+						if merge:
+							res = self.fuse(current_node, child)
+							# print(res)
+							# print(res.get_parent())
+							# print(res.get_childs())
+							squished = True
+							break
+				# elif current_node.get_type() == "FUSED" and current_node.point_to_one():
+					# print("Trying to fuse a fused node !")
+					# self.fuse(current_node, current_node.get_childs()[0])
+					# squished = True
+					# break
+					
+
+
+				for child in current_node.get_childs():
+					# print(child)
+					if child not in start_node:
+						start_node.append(child)
+				start_node.remove(current_node)
+
+
+
 	def save_as_file(self):
 		dot = graphviz.Digraph('control-flow')
 		start_node = []
@@ -145,20 +207,28 @@ class Graph:
 			all_nodes.append(current_node)
 			start_node.remove(current_node)
 			if current_node.get_type() == "IF":
+				dot.attr('node', shape='ellipse')
 				dot.node(str(current_node.id), "IF "+current_node.condition) 
 			elif current_node.get_type() == "EXEC":
+				dot.attr('node', shape='box')
 				dot.node(str(current_node.id), current_node.parsable)
 			elif current_node.get_type() == "CONTROL":
 				dot.node(str(current_node.id), str(current_node.id))
 			elif current_node.get_type() == "START":
+				dot.attr('node', shape='diamond')
 				dot.node(str(current_node.id), 'START')
 			elif current_node.get_type() == "END":
+				dot.attr('node', shape='diamond')
 				dot.node(str(current_node.id), 'END')
+			elif current_node.get_type() == "FUSED":
+				dot.attr('node', shape='circle') 
+				dot.node(str(current_node.id), str(current_node.amount_contained()))
 			for c in current_node.get_childs():
 				if c not in all_nodes and c not in start_node:
 					start_node.append(c)
 		for n in all_nodes:
 			if n.get_type() == "IF":
+				# print(f">>> DEBUG {n.get_childs()}")
 				dot.edge(str(n.id), str(n.true_child.id), label='True')
 				dot.edge(str(n.id), str(n.false_child.id), label='False')
 			else:

@@ -37,7 +37,7 @@ def def_anchors():
 	identifier = "(\S)+" #At least one character, no whitespace
 	operators = "(NOT|=|NOT =|>|>=|<|<=)"
 	logic_links = "AND|OR"
-	anchors = ["\sIF(\s)+", "ELSE", "END-IF", "\.(\s)+","EXEC SQL","'", "\*"]
+	anchors = ["\sIF(\s)+", "ELSE", "END-IF", "\.(\s)+","EXEC SQL", "'", "\*"]
 	return anchors
 
 def next_anchor(input, pos, anchors):
@@ -67,6 +67,7 @@ def fuzzy_parse(input, anchors):
 	pos = 0
 	lot = []
 	if_depth = 0
+	# print(f">>> TEST: {input[0:15]}")
 	[next_val, n_anchor] = next_anchor(input, pos, anchors)
 	while next_val != len(input)+1:
 		if n_anchor == anchors[-1]: #Found a comment, skip the whole line !
@@ -77,17 +78,25 @@ def fuzzy_parse(input, anchors):
 				pos = next_val+len(n_anchor)
 		elif n_anchor == anchors[5]:
 			# print(">>> Found string")
-			if input.find("'", next_val+1) != -1:
-				pos = input.find("'", next_val+1) +1
+			# print(f">>> Looking at: {input[next_val-1:pos+20]}")
+			old = pos-1
+			next_quote = input.find("'", next_val+1)
+			next_line = input.find("\n", next_val+1)
+			if next_quote <= next_line:
+				pos = next_quote+1
+			elif next_line < next_quote:
+				pos = next_line+1
 			else:
 				pos = next_val+len(n_anchor)
+			# print(f">>> Selected at: {input[old:pos]}")
 		elif n_anchor == anchors[0]: #Found a if, take note
 			# print('>>> FOUND IF')
 			pos = next_val+len(re.search(n_anchor, input[pos:]).group(0))
 			node = ConditionNode(if_depth, "IF")
 			pos = node.find_condition(input, pos)
 			if_depth += 1
-			print(node)
+			# print(f"IN IF, adding depth: if_depth: {if_depth}")
+			# print(node)
 			lot.append(node)
 		elif n_anchor == anchors[1]:
 			# print('>>> FOUND ELSE')
@@ -98,14 +107,17 @@ def fuzzy_parse(input, anchors):
 		elif n_anchor == anchors[2]: #Found a end-if, take note
 			# print('>>> FOUND END-IF')
 			if_depth -= 1
+			# print(f"IN END-IF, removing depth: if_depth: {if_depth}")
 			node = ConditionNode(if_depth, "END-IF")
 			lot.append(node)
 			pos = next_val+len(n_anchor)
 		elif n_anchor == anchors[3]:
-			while if_depth != 0:
+			# print(f"HERE: if_depth: {if_depth}")
+			while if_depth > 0:
 				node = ConditionNode(if_depth, "END-IF")
 				lot.append(node)
 				if_depth -= 1
+			if_depth = 0
 			pos = next_val+len(n_anchor)
 
 		elif n_anchor == anchors[4]:
@@ -143,10 +155,12 @@ def main(argv):
 		# print(lot)
 		print(">>> WTF")
 		for node in lot:
-			print(str(node))
+			if node.get_type() == "EXEC":
+				print(str(node))
 		#Contruct and clean the graph
 		g = construct_graph(lot)
 		g.cleanup()
+		g.squish()
 		g.save_as_file()
 
 
