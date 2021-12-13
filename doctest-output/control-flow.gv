@@ -1,11 +1,60 @@
 digraph "control-flow" {
 	node [shape=diamond]
-	3 [label=START]
+	62 [label=START]
+	node [shape=circle]
+	97 [label=19]
 	node [shape=ellipse]
-	0 [label="IF ITE00R > 0 "]
+	43 [label="IF C004-CUSTOMERID-FILTER = 0 "]
+	node [shape=box]
+	46 [label="open CUR-F8"]
+	node [shape=ellipse]
+	47 [label="IF SQLCODE = 0 "]
+	node [shape=box]
+	48 [label="FETCH CUR-F8 INTO
+		   :CUSTOMERID,
+		   :FIRSTNAME,
+		   :LASTNAME,
+		   :ZIPCODE,
+		   :BIRTHDATE"]
+	node [shape=box]
+	51 [label="CLOSE CUR-F8"]
+	node [shape=ellipse]
+	52 [label="IF C004-CUSTOMERID-FILTER = 0 "]
+	node [shape=box]
+	55 [label="open CUR-F7"]
+	node [shape=ellipse]
+	56 [label="IF SQLCODE = 0 "]
+	node [shape=box]
+	57 [label="FETCH CUR-F7 INTO
+		   :CUSTOMERID,
+		   :FIRSTNAME,
+		   :LASTNAME,
+		   :ZIPCODE,
+		   :BIRTHDATE"]
+	node [shape=box]
+	60 [label="CLOSE CUR-F7"]
+	node [shape=box]
+	61 [label="SELECT City
+           INTO :CITY
+		   FROM dbo.zipcode
+           WHERE zipcode = :ZIPCODE"]
 	node [shape=diamond]
-	6 [label=END]
-	3 -> 0
-	0 -> 6 [label=True]
-	0 -> 6 [label=False]
+	95 [label=END]
+	62 -> 97
+	97 -> 43
+	43 -> 46 [label=True]
+	43 -> 46 [label=False]
+	46 -> 47
+	47 -> 48 [label=True]
+	47 -> 51 [label=False]
+	48 -> 51
+	51 -> 52
+	52 -> 55 [label=True]
+	52 -> 55 [label=False]
+	55 -> 56
+	56 -> 57 [label=True]
+	56 -> 60 [label=False]
+	57 -> 60
+	60 -> 61
+	61 -> 95
 }

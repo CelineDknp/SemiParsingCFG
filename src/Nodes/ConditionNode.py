@@ -1,5 +1,5 @@
 from Nodes.Node import Node
-from utils import *
+from Utils.utils import *
 import re
 
 class ConditionNode(Node):

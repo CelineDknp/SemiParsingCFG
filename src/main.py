@@ -1,7 +1,4 @@
 import sys
-from antlr4 import *
-from Parse.MySqlLexer import MySqlLexer
-from Parse.MySqlParser import MySqlParser
 import re
 from Nodes.ConditionNode import ConditionNode
 from Nodes.ParseNode import ParseNode
@@ -10,27 +7,12 @@ from Nodes.Graph import Graph
 import graphviz
 
 
-SQLL = MySqlLexer
-SQLP = MySqlParser
+# SQLL = MySqlLexer
+# SQLP = MySqlParser
 
-class WriteTreeListener(ParseTreeListener):
-	def visitTerminal(self, node:TerminalNode):
-		print ("Visit Terminal: " + str(node) + " - " + repr(node))
-
-
-class CaseChangingStream():
-	def __init__(self, stream, upper):
-		self._stream = stream
-		self._upper = upper
-
-	def __getattr__(self, name):
-		return self._stream.__getattribute__(name)
-
-	def LA(self, offset):
-		c = self._stream.LA(offset)
-		if c <= 0:
-			return c
-		return ord(chr(c).upper() if self._upper else chr(c).lower())
+# class WriteTreeListener(ParseTreeListener):
+	# def visitTerminal(self, node:TerminalNode):
+		# print ("Visit Terminal: " + str(node) + " - " + repr(node))
 
 def def_anchors():
 	#GOTO, PERFORM, IF, EVALUATE
@@ -130,13 +112,13 @@ def fuzzy_parse(input, anchors):
 		[next_val, n_anchor] = next_anchor(input, pos, anchors)
 	return lot
 
-def parse(input, lexer_base, parser_base):    
-	input_stream = InputStream(input)
-	lexer = lexer_base(input_stream)
-	stream = CommonTokenStream(CaseChangingStream(lexer, True))
-	parser = parser_base(stream)
-	tree = parser.root()
-	return tree
+#def parse(input, lexer_base, parser_base):
+#	input_stream = InputStream(input)
+#	lexer = lexer_base(input_stream)
+#	stream = CommonTokenStream(CaseChangingStream(lexer, True))
+#	parser = parser_base(stream)
+#	tree = parser.root()
+#	return tree
 
 
 def construct_graph(node_array):

@@ -10,11 +10,11 @@ class Graph:
 		self.open_ifs = []
 
 	def match_if(self, else_node):
+		res = None
 		for if_node in self.open_ifs:
-			res = None
 			if if_node.get_depth() == else_node.get_depth():
 				res = if_node
-		return if_node
+		return res
 
 	def add_node(self, node):
 		print(f">>> Adding {node} of type {node.get_type()}")

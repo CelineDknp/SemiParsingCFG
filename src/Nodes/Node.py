@@ -7,10 +7,6 @@ class Node:
 		self.parents = []
 		self.id = Node.id 
 		Node.id += 1
-		# if type == "START":
-			# self.parents = None
-		# if type == "END":
-			# self.childs = None
 
 	def __str__(self):
 		return self.depth*"\t"+f"Node {self.id} {self.type} at depth {self.depth}"
