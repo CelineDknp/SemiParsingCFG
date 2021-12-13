@@ -7,13 +7,6 @@ from Nodes.Graph import Graph
 import graphviz
 
 
-# SQLL = MySqlLexer
-# SQLP = MySqlParser
-
-# class WriteTreeListener(ParseTreeListener):
-	# def visitTerminal(self, node:TerminalNode):
-		# print ("Visit Terminal: " + str(node) + " - " + repr(node))
-
 def def_anchors():
 	#GOTO, PERFORM, IF, EVALUATE
 	identifier = "(\S)+" #At least one character, no whitespace
@@ -33,14 +26,14 @@ def next_anchor(input, pos, anchors):
 			next_pos.append({val:-1})
 	min_val = len(input)+1
 	min_key = ""
-	# print(f"Found next anchors: {next_pos}")
+	print(f"Found next anchors: {next_pos}")
 	for index in range(len(next_pos)):
 		for key in next_pos[index]:
 			val = next_pos[index][key]
 			if val < min_val and val != -1:
 				min_val = val 
 				min_key = key
-	# print(f"Picked {min_val} and {min_key}")
+	print(f"Picked {min_val} and {min_key}")
 	return [min_val, min_key]
 
 
@@ -49,17 +42,16 @@ def fuzzy_parse(input, anchors):
 	pos = 0
 	lot = []
 	if_depth = 0
-	# print(f">>> TEST: {input[0:15]}")
 	[next_val, n_anchor] = next_anchor(input, pos, anchors)
 	while next_val != len(input)+1:
 		if n_anchor == anchors[-1]: #Found a comment, skip the whole line !
-			# print(">>> FOUND Comment")
+			print(">>> FOUND Comment")
 			if input.find("\n", next_val) != -1:
 				pos = input.find("\n", next_val) +1
 			else:
 				pos = next_val+len(n_anchor)
 		elif n_anchor == anchors[5]:
-			# print(">>> Found string")
+			print(">>> Found string")
 			# print(f">>> Looking at: {input[next_val-1:pos+20]}")
 			old = pos-1
 			next_quote = input.find("'", next_val+1)
@@ -72,7 +64,7 @@ def fuzzy_parse(input, anchors):
 				pos = next_val+len(n_anchor)
 			# print(f">>> Selected at: {input[old:pos]}")
 		elif n_anchor == anchors[0]: #Found a if, take note
-			# print('>>> FOUND IF')
+			print('>>> FOUND IF')
 			pos = next_val+len(re.search(n_anchor, input[pos:]).group(0))
 			node = ConditionNode(if_depth, "IF")
 			pos = node.find_condition(input, pos)
@@ -81,35 +73,42 @@ def fuzzy_parse(input, anchors):
 			# print(node)
 			lot.append(node)
 		elif n_anchor == anchors[1]:
-			# print('>>> FOUND ELSE')
+			print('>>> FOUND ELSE')
 			node = ConditionNode(if_depth-1, "ELSE")
 			lot.append(node)
 
 			pos = next_val+len(n_anchor)
 		elif n_anchor == anchors[2]: #Found a end-if, take note
-			# print('>>> FOUND END-IF')
+			print('>>> FOUND END-IF')
 			if_depth -= 1
 			# print(f"IN END-IF, removing depth: if_depth: {if_depth}")
 			node = ConditionNode(if_depth, "END-IF")
 			lot.append(node)
 			pos = next_val+len(n_anchor)
 		elif n_anchor == anchors[3]:
+			print(">>> FOUND DOT")
 			# print(f"HERE: if_depth: {if_depth}")
 			while if_depth > 0:
+				if_depth -= 1
 				node = ConditionNode(if_depth, "END-IF")
 				lot.append(node)
-				if_depth -= 1
-			if_depth = 0
-			pos = next_val+len(n_anchor)
+			pos = next_val+1
 
 		elif n_anchor == anchors[4]:
-			# print('>>> FOUND EXEC')
+			print('>>> FOUND EXEC')
 			node = ParseNode(if_depth, "EXEC")
 			lot.append(node)
 			pos = node.find_parse_text(input, next_val)
 		else:
 			pos += 1
+		print(f">>> Looking at inpit from: {input[pos:pos+20]}")
 		[next_val, n_anchor] = next_anchor(input, pos, anchors)
+	if input[-1] == ".": #If last character of input is a dot, close any remaining open things
+		print(f">>> Found last point ! depth was: {if_depth}")
+		while if_depth > 0:
+				if_depth -= 1
+				node = ConditionNode(if_depth, "END-IF")
+				lot.append(node)
 	return lot
 
 #def parse(input, lexer_base, parser_base):
@@ -137,13 +136,13 @@ def main(argv):
 		# print(lot)
 		print(">>> WTF")
 		for node in lot:
-			if node.get_type() == "EXEC":
-				print(str(node))
+			# if node.get_type() == "EXEC":
+			print(str(node))
 		#Contruct and clean the graph
-		g = construct_graph(lot)
-		g.cleanup()
-		g.squish()
-		g.save_as_file()
+		# g = construct_graph(lot)
+		# g.cleanup()
+		# g.squish()
+		# g.save_as_file()
 
 
 
