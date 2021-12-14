@@ -1,112 +1,15 @@
 digraph "control-flow" {
 	node [shape=diamond]
-	64 [label=START]
-	node [shape=box]
-	0 [label="DECLARE CUR-F8 CURSOR FOR
-		 SELECT CustomerId, FirstName, LastName, C.ZipCode, 
-         BirthDate
-		 FROM 
-             dbo.Customer C,
-             dbo.ZipCode Z
-         WHERE 
-             CustomerId > :C004-CUSTOMERID-LAST AND
-             CustomerId 
-                 BETWEEN 
-                     :W-CUSTOMERID-MIN AND 
-                     :W-CUSTOMERID-MAX AND
-             LastName
-                 LIKE RTRIM(:C004-LASTNAME-FILTER) || '%' AND
-             Firstname
-                 LIKE RTRIM(:C004-FIRSTNAME-FILTER) || '%' AND
-             C.ZipCode
-                 LIKE RTRIM(:C004-ZIPCODE-FILTER) || '%' AND
-             BirthDate
-                 LIKE RTRIM(:C004-BIRTHDATE-FILTER) || '%' AND
-             Z.City
-                 LIKE RTRIM(:C004-CITY-FILTER) || '%' AND
-             Z.ZipCode = C.ZipCode
-		 ORDER BY CustomerId"]
-	node [shape=box]
-	1 [label="DECLARE CUR-F7 CURSOR FOR
-		 SELECT CustomerId, FirstName, LastName, C.ZipCode, 
-         BirthDate
-		 FROM 
-             dbo.Customer C,
-             dbo.ZipCode Z
-         WHERE 
-             CustomerId < :C004-CUSTOMERID-FIRST AND
-             CustomerId 
-                 BETWEEN 
-                     :W-CUSTOMERID-MIN AND 
-                     :W-CUSTOMERID-MAX AND
-             LastName
-                 LIKE RTRIM(:C004-LASTNAME-FILTER) || '%' AND
-             Firstname 
-                 LIKE RTRIM(:C004-FIRSTNAME-FILTER) || '%' AND
-             C.ZipCode
-                 LIKE RTRIM(:C004-ZIPCODE-FILTER) || '%' AND
-             BirthDate
-                 LIKE RTRIM(:C004-BIRTHDATE-FILTER) || '%' AND
-             Z.City
-                 LIKE RTRIM(:C004-CITY-FILTER) || '%' AND
-             Z.ZipCode = C.ZipCode
-		 ORDER BY CustomerId desc"]
-	node [shape=circle]
-	99 [label=19]
+	5 [label=START]
 	node [shape=ellipse]
-	45 [label="IF C004-CUSTOMERID-FILTER = 0 "]
-	node [shape=box]
-	48 [label="open CUR-F8"]
+	0 [label="IF A > 0"]
 	node [shape=ellipse]
-	49 [label="IF SQLCODE = 0 "]
-	node [shape=box]
-	50 [label="FETCH CUR-F8 INTO
-		   :CUSTOMERID,
-		   :FIRSTNAME,
-		   :LASTNAME,
-		   :ZIPCODE,
-		   :BIRTHDATE"]
-	node [shape=box]
-	53 [label="CLOSE CUR-F8"]
-	node [shape=ellipse]
-	54 [label="IF C004-CUSTOMERID-FILTER = 0 "]
-	node [shape=box]
-	57 [label="open CUR-F7"]
-	node [shape=ellipse]
-	58 [label="IF SQLCODE = 0 "]
-	node [shape=box]
-	59 [label="FETCH CUR-F7 INTO
-		   :CUSTOMERID,
-		   :FIRSTNAME,
-		   :LASTNAME,
-		   :ZIPCODE,
-		   :BIRTHDATE"]
-	node [shape=box]
-	62 [label="CLOSE CUR-F7"]
-	node [shape=box]
-	63 [label="SELECT City
-           INTO :CITY
-		   FROM dbo.zipcode
-           WHERE zipcode = :ZIPCODE"]
+	1 [label="IF B > 0"]
 	node [shape=diamond]
-	97 [label=END]
-	64 -> 0
-	0 -> 1
-	1 -> 99
-	99 -> 45
-	45 -> 48 [label=True]
-	45 -> 48 [label=False]
-	48 -> 49
-	49 -> 50 [label=True]
-	49 -> 53 [label=False]
-	50 -> 53
-	53 -> 54
-	54 -> 57 [label=True]
-	54 -> 57 [label=False]
-	57 -> 58
-	58 -> 59 [label=True]
-	58 -> 62 [label=False]
-	59 -> 62
-	62 -> 63
-	63 -> 97
+	9 [label=END]
+	5 -> 0
+	0 -> 1 [label=True]
+	0 -> 9 [label=False]
+	1 -> 9 [label=True]
+	1 -> 9 [label=False]
 }

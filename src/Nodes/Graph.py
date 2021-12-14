@@ -8,6 +8,7 @@ class Graph:
 		self.start_node = start_node
 		self.last_node = start_node
 		self.open_ifs = []
+		self.all_nodes = [start_node]
 
 	def match_if(self, else_node):
 		res = None
@@ -23,10 +24,12 @@ class Graph:
 			self.last_node.add_child(node)
 			self.last_node = node
 			self.open_ifs.append(node)
+			self.all_nodes.append(node)
 		elif node.get_type() == "EXEC":
 			print(">>> In EXEC")
 			self.last_node.add_child(node)
 			self.last_node = node
+			self.all_nodes.append(node)
 		elif node.get_type() == "ELSE":
 			print(">>> In ELSE")
 			corr_if = self.match_if(node)
@@ -35,6 +38,7 @@ class Graph:
 			# print(f">>> In ELSE ! Closed one branch: {corr_if.branch_open} and childs: {corr_if.get_childs()}")
 			temp = Node(corr_if.get_depth(), "CONTROL")
 			corr_if.add_child(temp)
+			self.all_nodes.append(temp)
 			# print(f">>> In ELSE ! childs post adding: {corr_if.get_childs()}")
 			self.last_node = temp
 		elif node.get_type() == "END-IF":
@@ -44,16 +48,27 @@ class Graph:
 			corr_if.close(temp)
 			self.open_ifs.remove(corr_if)
 			self.last_node = temp
+			self.all_nodes.append(temp)
 		elif node.get_type() == "END": #Adding the end_node
 			self.last_node.add_child(node)
 			self.last_node = node
+			self.all_nodes.append(node)
 			print("Added the last_node")
+		else:
+			print("Issue during adding node")
 
 	def get_start_node(self):
 		return self.start_node
 
+	def get_size(self):
+		return len(self.all_nodes)
+
+	def get_all_nodes(self):
+		return self.all_nodes
+
 
 	def replace_child(self, target, old_child, new_child):
+		# print(">>> REPLACE CHILD !")
 		if target.get_type() == "IF":
 			if target.true_child == old_child:
 				target.remove_child(old_child)
@@ -64,6 +79,8 @@ class Graph:
 		else:
 			target.remove_child(old_child)
 			target.add_child(new_child)
+		if old_child in self.all_nodes:
+			self.all_nodes.remove(old_child)
 
 	def cleanup_triangle(self, current_node, new_child):
 		replace_child(current_node.get_parent()[0], current_node, new_child)

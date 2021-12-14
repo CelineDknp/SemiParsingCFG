@@ -139,10 +139,13 @@ def main(argv):
 			# if node.get_type() == "EXEC":
 			print(str(node))
 		#Contruct and clean the graph
-		# g = construct_graph(lot)
-		# g.cleanup()
+		g = construct_graph(lot)
+		g.cleanup()
 		# g.squish()
-		# g.save_as_file()
+		print(f">>> SIZE {g.get_size()}")
+		# for n in g.get_all_nodes():
+			# print(n)
+		g.save_as_file()
 
 
 
