@@ -139,25 +139,28 @@ class ConditionNode(Node):
     def find_condition(self, input, pos):
         go = True
         cond = ""
-        new_line = input.find("\n", pos)
+        new_line = input.upper().find("\n", pos)
         next_line = input[pos:new_line]
         while go:
             # print(next_line)
-            if self.is_anchor(next_line, ["\sIF(\s)+", "ELSE", "END-IF","EXEC SQL", "\*"]):
+            if self.is_anchor(next_line.upper(), [r"\sIF(\s)+", "ELSE", "END-IF","EXEC SQL", r"\*"]):
                 go = False
-            elif re.search('^(\s)*(\S)+(\s)*$', next_line): #Special case of just one thing to finish the line
+            elif re.search(r'^(\s)*(\S)+(\s)*$', next_line.upper()): #Special case of just one thing to finish the line
                 # print(f">>> HERE")
-                if any(x in next_line for x in ["MOVE", "DISPLAY"]):
+                if any(x in next_line.upper() for x in ["MOVE", "DISPLAY"]):
                     go = False
                 else:
                     cond += next_line.lstrip()
                     pos = new_line+1
-            elif any(x in next_line for x in [">", "<", "=", "NOT", "OR", "AND", "NUMERIC"]):
+            elif any(x in next_line.upper() for x in [">", "<", "=", "NOT", "OR", "AND", "NUMERIC"]):
                 cond += next_line.strip()+" "
                 pos = new_line+1
             else:
                 go = False
             new_line = input.find("\n", pos)
             next_line = input[pos:new_line]
-        self.condition = cond
+        self.condition = cond.strip()
         return pos
+
+    def get_condition(self):
+        return self.condition

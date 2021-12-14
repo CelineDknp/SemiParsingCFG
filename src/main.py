@@ -9,19 +9,19 @@ import graphviz
 
 def def_anchors():
 	#GOTO, PERFORM, IF, EVALUATE
-	identifier = "(\S)+" #At least one character, no whitespace
+	identifier = r"(\S)+" #At least one character, no whitespace
 	operators = "(NOT|=|NOT =|>|>=|<|<=)"
 	logic_links = "AND|OR"
-	anchors = ["\sIF(\s)+", "ELSE", "END-IF", "\.(\s)+","EXEC SQL", "'", "\*"]
+	anchors = [r"\sIF(\s)+", "ELSE", "END-IF", r"\.(\s)+","EXEC SQL", "'", r"\*"]
 	return anchors
 
 def next_anchor(input, pos, anchors):
 	# print(f"Searching from: {input[pos:pos+50]}")
 	next_pos = []
 	for val in anchors:
-		res = re.search(val, input[pos:])
+		res = re.search(val, input[pos:].upper())
 		if res != None:
-			next_pos.append({val:input.find(res.group(0), pos)})
+			next_pos.append({val:input.upper().find(res.group(0), pos)})
 		else:
 			next_pos.append({val:-1})
 	min_val = len(input)+1

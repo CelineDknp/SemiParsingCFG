@@ -1,5 +1,5 @@
            IF A > 0
+              AND B = 10 AND
+              C
              DISPLAY 'IF CONTENT' 
-           ELSE
-             EXEC SQL OPEN DB END-EXEC
            END-IF

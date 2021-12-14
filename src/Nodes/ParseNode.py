@@ -29,8 +29,8 @@ class ParseNode(Node):
         return f"Node {self.type} ({self.parsable})"
 
     def find_parse_text(self, input_str, pos):
-        self.parsable = input_str[pos + 8:input_str.lower().find("end-exec", pos)].strip()
-        return input_str.lower().find("end-exec", pos) + 8
+        self.parsable = input_str[pos + 8:input_str.upper().find("END-EXEC", pos)].strip()
+        return input_str.upper().find("END-EXEC", pos) + 8
 
     def parse(self):
         input_stream = InputStream(input)

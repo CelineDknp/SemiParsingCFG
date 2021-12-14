@@ -117,6 +117,39 @@ def test_fuzzy_parse_base_if_nested_both_branch():
 		assert node_array[5].get_depth() == 1
 		assert node_array[6].get_depth() == 0
 
+#Testing the conditions of ifs
+def test_fuzzy_parse_base_if_condition():
+	with open("TestFiles/pytest/if_condition_base_test_file.COB", "r") as f:
+		node_array = fuzzy_parse(f.read(), def_anchors())
+		assert len(node_array) == 2
+		assert node_array[0].get_type() == "IF"
+		assert node_array[1].get_type() == "END-IF"
+		assert node_array[0].get_condition() == "A > 0"
+
+def test_fuzzy_parse_if_condition_two_lines():
+	with open("TestFiles/pytest/if_condition_two_lines_test_file.COB", "r") as f:
+		node_array = fuzzy_parse(f.read(), def_anchors())
+		assert len(node_array) == 2
+		assert node_array[0].get_type() == "IF"
+		assert node_array[1].get_type() == "END-IF"
+		assert node_array[0].get_condition() == "A > 0 AND B = 10"
+
+def test_fuzzy_parse_if_condition_three_lines():
+	with open("TestFiles/pytest/if_condition_three_lines_test_file.COB", "r") as f:
+		node_array = fuzzy_parse(f.read(), def_anchors())
+		assert len(node_array) == 2
+		assert node_array[0].get_type() == "IF"
+		assert node_array[1].get_type() == "END-IF"
+		assert node_array[0].get_condition() == "A > 0 AND B = 10 AND C"
+
+def test_fuzzy_parse_if_condition_case_insensitive():
+	with open("TestFiles/pytest/if_condition_case_insensitive_test_file.COB", "r") as f:
+		node_array = fuzzy_parse(f.read(), def_anchors())
+		assert len(node_array) == 2
+		assert node_array[0].get_type() == "IF"
+		assert node_array[1].get_type() == "END-IF"
+		assert node_array[0].get_condition() == "A > 0 and B > 0"
+
 #Testing the comment part of parsing
 def test_fuzzy_parse_comment():
 	with open("TestFiles/pytest/comment_normal_test_file.COB", "r") as f:
