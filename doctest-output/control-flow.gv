@@ -1,15 +1,17 @@
 digraph "control-flow" {
 	node [shape=diamond]
-	5 [label=START]
+	11 [label=START]
+	node [shape=circle]
+	18 [label=4]
 	node [shape=ellipse]
-	0 [label="IF A > 0"]
-	node [shape=ellipse]
-	1 [label="IF B > 0"]
+	8 [label="IF E > 0"]
+	node [shape=box]
+	10 [label="OPEN DB"]
 	node [shape=diamond]
-	9 [label=END]
-	5 -> 0
-	0 -> 1 [label=True]
-	0 -> 9 [label=False]
-	1 -> 9 [label=True]
-	1 -> 9 [label=False]
+	17 [label=END]
+	11 -> 18
+	18 -> 8
+	8 -> 10 [label=True]
+	8 -> 10 [label=False]
+	10 -> 17
 }

@@ -141,7 +141,7 @@ def main(argv):
 		#Contruct and clean the graph
 		g = construct_graph(lot)
 		g.cleanup()
-		# g.squish()
+		g.squish()
 		print(f">>> SIZE {g.get_size()}")
 		# for n in g.get_all_nodes():
 			# print(n)

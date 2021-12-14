@@ -160,15 +160,20 @@ class Graph:
 		if node_down.get_type() == "FUSED":
 			print(">>> Fusing with node fused")
 			node_down.fuse_node(node_up, up = True)
+			self.all_nodes.remove(node_up)
 			return node_down
 		elif node_up.get_type() == "FUSED":
 			node_up.fuse_node(node_down, down = True)
+			self.all_nodes.remove(node_down)
 		else:
 			node = FusedNode(node_up.get_depth(), "FUSED")
+			self.all_nodes.append(node)
 			print(">>> Created")
 			node.fuse_node(node_up, up=True)
+			self.all_nodes.remove(node_up)
 			# print(">>> One fused")
 			node.fuse_node(node_down, down=True)
+			self.all_nodes.remove(node_down)
 			# print(">>> Two fused")
 			return node
 
