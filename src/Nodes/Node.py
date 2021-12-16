@@ -24,12 +24,9 @@ class Node:
 		return len(self.childs) == 1
 
 	def get_last_childs(self):
-		print(f">>> Getting last childs of node: {self}")
-		print(f">>> With childs {self.get_childs()}")
 		if len(self.get_childs()) == 0:
 			return [self]
 		else:
-			print(f">>> Node has childerns ! help !")
 			return [childs.get_last_childs() for childs in self.get_childs()]
 
 	def get_childs(self):
@@ -47,8 +44,6 @@ class Node:
 
 	def remove_child(self, node):
 		self.childs.remove(node)
-		print(f">>> Removing child {[node]} of {[self]}")
-		print(f"New childrens: {self.get_childs()}")
 		node.remove_parent(self)
 
 	def get_parent(self):
@@ -65,4 +60,3 @@ class Node:
 	def remove_parent(self, node):
 		if node in self.parents:
 			self.parents.remove(node)
-			print(f">>> Removing parent {[node]} of {[self]}")

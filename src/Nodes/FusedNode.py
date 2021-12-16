@@ -19,7 +19,6 @@ class FusedNode(Node):
             target.add_child(new_child)
 
     def fuse_node(self, node, up = False, down = False):
-        print(f">>> Fusing node ! Up: {up} Down: {down}")
         if node.get_type() == "IF":
             self.node_contained.append(node)
         elif node.get_type() == "FUSED":
@@ -28,7 +27,6 @@ class FusedNode(Node):
                 self.remove_child(node)
         if node in self.get_parent():
                 self.remove_parent(node)
-        print(f">>> In self child: {self.get_childs()} and parent: {self.get_parent()}")
         if up:
             all_p = node.get_parent().copy()
             for p in all_p:
@@ -36,7 +34,6 @@ class FusedNode(Node):
             if node in self.get_parent():
                 self.remove_parent(node)
 
-            print(f">>> In self child: {self.get_childs()} and parent: {self.get_parent()}")
         if down:
             all_p = node.get_parent().copy()
             for p in all_p:
@@ -48,7 +45,6 @@ class FusedNode(Node):
             if node in self.get_childs():
                 self.remove_child(node)
 
-            print(f">>> In self child: {self.get_childs()} and parent: {self.get_parent()}")
 
     def get_contained_nodes(self):
         return self.node_contained

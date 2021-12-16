@@ -102,28 +102,20 @@ class ConditionNode(Node):
 
 
     def close(self, control_node): #Function to close an IF node
-        print(f">>> Closing node {self} with a proposed control: {control_node}")
-        print(f">>> True child is: {self.true_child}")
         if self.true_child == None: #If I don't have a child on my true branch, add the control node
             self.add_child(control_node, end=True, branch=True)
         else:
             for child in flatten(self.true_child.get_last_childs()):
                 child.add_child(control_node)
-        print(f">>> True child is: {self.true_child}")
         if self.true_branch_open():
             self.close_branch() #Close my True branch
-            print(f">>> Closed True branch. Current if branches:{self.branch_open} and childs: {self.get_childs()}")
-        print(f">>> False child is: {self.false_child}")
         if self.false_child == None: #If I don't have a child on my false branch, add the control node
             self.add_child(control_node, end=True, branch=False)
         else:
             for child in flatten(self.false_child.get_last_childs()):
                 child.add_child(control_node)
-        print(f">>> False child is: {self.false_child}")
         if self.false_branch_open():
             self.close_branch()
-            print(f">>> Closed False branch. Current if branches:{self.branch_open} and childs: {self.get_childs()}")
-        print(f">>> ENDED CLOSE. true_child: {self.true_child} and false_child: {self.false_child}")
 
     def point_to_one(self):
         return self.true_child == self.false_child
@@ -142,11 +134,9 @@ class ConditionNode(Node):
         new_line = input.upper().find("\n", pos)
         next_line = input[pos:new_line]
         while go:
-            # print(next_line)
             if self.is_anchor(next_line.upper(), [r"\sIF(\s)+", "ELSE", "END-IF","EXEC SQL", r"\*"]):
                 go = False
             elif re.search(r'^(\s)*(\S)+(\s)*$', next_line.upper()): #Special case of just one thing to finish the line
-                # print(f">>> HERE")
                 if any(x in next_line.upper() for x in ["MOVE", "DISPLAY"]):
                     go = False
                 else:
