@@ -7,9 +7,9 @@
 	   end-exec
 
 	   exec sql
-	     CLOSE DB1
+	     CLOSE DB3
 	   END-EXEC
 
 	   exec sql
-	     CLOSE DB1
+	     CLOSE DB4
 	   end-exec

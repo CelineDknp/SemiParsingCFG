@@ -40,6 +40,7 @@ class Graph:
 		elif node.get_type() == "END-IF":
 			# print(">>> In END-IF")
 			corr_if = self.match_if(node)
+			# print(f"Found matching if: {corr_if}", flush=True)
 			temp = Node(corr_if.get_depth(), "CONTROL")
 			corr_if.close(temp)
 			self.open_ifs.remove(corr_if)
@@ -152,7 +153,7 @@ class Graph:
 			return node
 
 
-	def squish(self): #Sqwish if nodes that go to a singe node
+	def squish(self): 
 		squished = True
 		while squished:
 			squished = False
@@ -172,6 +173,15 @@ class Graph:
 							res = self.fuse(current_node, child)
 							squished = True
 							break	
+				elif current_node.get_type() == "FUSED" and any(child.get_type() == "FUSED" for child in current_node.get_childs()):
+					#We found a fused node having a FUSED child
+					to_fuse = None 
+					for child in current_node.get_childs():
+						if child.get_type() == "FUSED":
+							to_fuse = child
+					if to_fuse != None:
+						res = self.fuse(current_node, to_fuse)
+						squished = True
 				for child in current_node.get_childs():
 					if child not in start_node:
 						start_node.append(child)
@@ -179,8 +189,8 @@ class Graph:
 
 
 
-	def save_as_file(self):
-		dot = graphviz.Digraph('control-flow')
+	def save_as_file(self, filename, output_dir='doctest-output'):
+		dot = graphviz.Digraph(filename)
 		start_node = []
 		start_node.append(self.get_start_node())
 		all_nodes = []
@@ -215,4 +225,4 @@ class Graph:
 			else:
 				for link in n.get_childs():
 					dot.edge(str(n.id), str(link.id))
-		dot.render(directory='doctest-output', view=False) 
+		dot.render(directory=output_dir, view=False) 

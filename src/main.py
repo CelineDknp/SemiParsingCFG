@@ -47,6 +47,7 @@ def fuzzy_parse(input, anchors):
 	if_depth = 0
 	[next_val, n_anchor] = next_anchor(input, pos, anchors)
 	while next_val != len(input)+1:
+		# print(f"Looking at: {input[pos:pos+20]}")
 		if n_anchor == anchors[-1]: #Found a comment, skip the whole line !
 			# print(">>> FOUND Comment")
 			if input.find("\n", next_val) != -1:
@@ -58,9 +59,10 @@ def fuzzy_parse(input, anchors):
 			old = pos-1
 			next_quote = input.find("'", next_val+1)
 			next_line = input.find("\n", next_val+1)
+			dash = input[:next_line+30].find("-", next_line)
 			if next_quote <= next_line:
 				pos = next_quote+1
-			elif next_line < next_quote:
+			elif next_line < next_quote and dash != -1:
 				pos = next_line+1
 			else:
 				pos = next_val+len(n_anchor)
@@ -112,24 +114,25 @@ def construct_graph(node_array):
 	graph.add_node(Node(0, "END"))
 	return graph
 
+def process_file(filename, dir_path):
+	with open(filename, "r") as f:
+		print(f"Opened {filename}", flush=True)
+		lot = fuzzy_parse(f.read(), def_anchors())
+		print(f"Fuzzy parsing done !", flush=True)
+		g = construct_graph(lot)
+		print(f"Graph constructed !", flush=True)
+		g.cleanup()
+		print(f"Graph cleaned !", flush=True)
+		g.squish()
+		print(f"Graph squished !", flush=True)
+		g.save_as_file(os.path.basename(f.name), output_dir=dir_path)
+		print(f"Done !")
+
+
 
 
 def main(argv):
-	with open(argv[1], "r") as f:
-		lot = fuzzy_parse(f.read(), def_anchors())
-		# print(lot)
-		print(">>> WTF")
-		for node in lot:
-			# if node.get_type() == "EXEC":
-			print(str(node))
-		#Contruct and clean the graph
-		g = construct_graph(lot)
-		g.cleanup()
-		g.squish()
-		print(f">>> SIZE {g.get_size()}")
-		# for n in g.get_all_nodes():
-			# print(n)
-		g.save_as_file()
+	process_file(argv[1],"")
 
 
 

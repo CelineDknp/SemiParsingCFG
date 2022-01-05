@@ -102,11 +102,15 @@ class ConditionNode(Node):
 
 
     def close(self, control_node): #Function to close an IF node
+        # print("Closing !", flush=True)
+        # print(f"True: {self.true_child} False: {self.false_child}", flush=True)
         if self.true_child == None: #If I don't have a child on my true branch, add the control node
             self.add_child(control_node, end=True, branch=True)
         else:
+            # print("In else", flush=True)
             for child in flatten(self.true_child.get_last_childs()):
                 child.add_child(control_node)
+            # print("After for", flush=True)
         if self.true_branch_open():
             self.close_branch() #Close my True branch
         if self.false_child == None: #If I don't have a child on my false branch, add the control node

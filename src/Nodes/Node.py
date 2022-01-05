@@ -23,11 +23,21 @@ class Node:
 	def point_to_one(self):
 		return len(self.childs) == 1
 
-	def get_last_childs(self):
+	def get_last_childs_helper(self, visited):
+		if self not in visited:
+			visited.append(self)
 		if len(self.get_childs()) == 0:
 			return [self]
 		else:
-			return [childs.get_last_childs() for childs in self.get_childs()]
+			return [child.get_last_childs_helper(visited) for child in self.get_childs() if child not in visited]
+
+
+	def get_last_childs(self):
+		# print(f"Looking for children in {self}: {self.get_childs()} !", flush=True)
+		if len(self.get_childs()) == 0:
+			return [self]
+		else:
+			return self.get_last_childs_helper([])
 
 	def get_childs(self):
 		# print(f">>> In get_childs of Node {self}")
