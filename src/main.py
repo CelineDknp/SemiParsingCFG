@@ -28,7 +28,7 @@ def pre_process(file):
 			result += "      "+(line[6:-9])+"        \n" #Remove the first 6 char (line number) and last 9 (id + \n)
 		else:
 			result += "      "+(line[6:])#Remove the first 6 char (line number), but not the end
-	print(result)
+	# print(result)
 	return result
 
 def next_anchor(input, pos, anchors):
