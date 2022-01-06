@@ -17,8 +17,19 @@ def def_anchors():
 	identifier = r"(\S)+" #At least one character, no whitespace
 	operators = "(NOT|=|NOT =|>|>=|<|<=)"
 	logic_links = "AND|OR"
-	anchors = [r"\sIF(\s)+", "ELSE", "END-IF", r"\.(\s)+","EXEC SQL", "'", r"\*"]
+	dot = r"\.(\s)+"
+	anchors = [r"\sIF(\s)+", "ELSE", "END-IF", "EXEC SQL", "'", r"\*", r"\.(\s)+"]
 	return anchors
+
+def pre_process(file):
+	result = ""
+	for line in file.readlines():
+		if len(line) == 81:
+			result += "      "+(line[6:-9])+"        \n" #Remove the first 6 char (line number) and last 9 (id + \n)
+		else:
+			result += "      "+(line[6:])#Remove the first 6 char (line number), but not the end
+	print(result)
+	return result
 
 def next_anchor(input, pos, anchors):
 	# print(f"Searching from: {input[pos:pos+50]}")
@@ -37,7 +48,17 @@ def next_anchor(input, pos, anchors):
 			if val < min_val and val != -1:
 				min_val = val 
 				min_key = key
+	# print(f"Anchors: {next_pos}", flush=True)
+	# print(f"picked: {min_val}, {min_key}")
 	return [min_val, min_key]
+
+def clean_anchors(anchors, if_depth):
+	if if_depth == 0 and r"\.(\s)+" in anchors:
+		return anchors[:-1]
+	elif if_depth > 0 and r"\.(\s)+" not in anchors:
+		return anchors+[r"\.(\s)+"]
+	else:
+		return anchors
 
 
 
@@ -45,16 +66,16 @@ def fuzzy_parse(input, anchors):
 	pos = 0
 	lot = []
 	if_depth = 0
+	anchors = clean_anchors(anchors, if_depth)
 	[next_val, n_anchor] = next_anchor(input, pos, anchors)
 	while next_val != len(input)+1:
-		# print(f"Looking at: {input[pos:pos+20]}")
-		if n_anchor == anchors[-1]: #Found a comment, skip the whole line !
+		if n_anchor == r"\*": #Found a comment, skip the whole line !
 			# print(">>> FOUND Comment")
 			if input.find("\n", next_val) != -1:
 				pos = input.find("\n", next_val) +1
 			else:
 				pos = next_val+len(n_anchor)
-		elif n_anchor == anchors[5]:
+		elif n_anchor == "'":
 			# print(">>> Found string")
 			old = pos-1
 			next_quote = input.find("'", next_val+1)
@@ -66,32 +87,35 @@ def fuzzy_parse(input, anchors):
 				pos = next_line+1
 			else:
 				pos = next_val+len(n_anchor)
-		elif n_anchor == anchors[0]: #Found a if, take note
+		elif n_anchor == r"\sIF(\s)+": #Found a if, take note
 			# print('>>> FOUND IF')
 			pos = next_val+len(re.search(n_anchor, input[pos:]).group(0))
 			node = ConditionNode(if_depth, "IF")
 			pos = node.find_condition(input, pos)
 			if_depth += 1
 			lot.append(node)
-		elif n_anchor == anchors[1]:
+			anchors = clean_anchors(anchors, if_depth)
+		elif n_anchor == "ELSE":
 			# print('>>> FOUND ELSE')
 			node = ConditionNode(if_depth-1, "ELSE")
 			lot.append(node)
 			pos = next_val+len(n_anchor)
-		elif n_anchor == anchors[2]: #Found a end-if, take note
+		elif n_anchor == "END-IF": #Found a end-if, take note
 			# print('>>> FOUND END-IF')
 			if_depth -= 1
 			node = ConditionNode(if_depth, "END-IF")
 			lot.append(node)
 			pos = next_val+len(n_anchor)
-		elif n_anchor == anchors[3]:
+			anchors = clean_anchors(anchors, if_depth)
+		elif n_anchor == r"\.(\s)+":
 			# print(">>> FOUND DOT")
 			while if_depth > 0:
 				if_depth -= 1
 				node = ConditionNode(if_depth, "END-IF")
 				lot.append(node)
 			pos = next_val+1
-		elif n_anchor == anchors[4]:
+			anchors = clean_anchors(anchors, if_depth)
+		elif n_anchor == "EXEC SQL":
 			# print('>>> FOUND EXEC')
 			node = ParseNode(if_depth, "EXEC")
 			lot.append(node)
@@ -117,7 +141,9 @@ def construct_graph(node_array):
 def process_file(filename, dir_path):
 	with open(filename, "r") as f:
 		print(f"Opened {filename}", flush=True)
-		lot = fuzzy_parse(f.read(), def_anchors())
+		pre_processed_input = pre_process(f)
+		print(f"Pre-processed", flush=True)
+		lot = fuzzy_parse(pre_processed_input, def_anchors())
 		print(f"Fuzzy parsing done !", flush=True)
 		g = construct_graph(lot)
 		print(f"Graph constructed !", flush=True)
