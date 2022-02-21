@@ -1,0 +1,19 @@
+digraph "test.gvz" {
+	node [shape=diamond]
+	0 [label=START]
+	node [shape=ellipse]
+	1 [label="IF A Greater 0"]
+	node [shape=ellipse]
+	2 [label="IF B Greater 0"]
+	node [shape=ellipse]
+	4 [label="IF C Greater 0"]
+	node [shape=diamond]
+	7 [label=END]
+	0 -> 1
+	1 -> 2 [label=True]
+	1 -> 4 [label=False]
+	2 -> 7 [label=True]
+	2 -> 7 [label=False]
+	4 -> 7 [label=True]
+	4 -> 7 [label=False]
+}

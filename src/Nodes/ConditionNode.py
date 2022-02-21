@@ -59,12 +59,17 @@ class ConditionNode(Node):
             super().add_child(node)
 
     def add_child_branch(self, branch, node):
+        # print("Here")
         to_add = self.get_branch_childs(branch)
         if to_add == None: #No previous child, create it
+            # print("In if")
             self.add_single_child_branch(branch, node)
             return
+        if not isinstance(to_add, list):
+            to_add = [to_add]  
         # print(f">>> Got previous children ! {to_add}")
         for child in to_add:
+            print(child)
             child.add_child(node)
 
 
@@ -155,6 +160,9 @@ class ConditionNode(Node):
             next_line = input[pos:new_line]
         self.condition = cond.strip()
         return pos
+
+    def set_condition(self, cond):
+        self.condition = cond
 
     def get_condition(self):
         return self.condition

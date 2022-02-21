@@ -1,3 +1,8 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    IFs.
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       PROCEDURE DIVISION.
            IF A > 0
              IF B > 0
                 DISPLAY 'INNER IF1 CONTENT'

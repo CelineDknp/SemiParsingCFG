@@ -1,0 +1,10 @@
+digraph "if_squish_end_test_file.COB" {
+	node [shape=diamond]
+	10 [label=START]
+	node [shape=circle]
+	17 [label=5]
+	node [shape=diamond]
+	16 [label=END]
+	10 -> 17
+	17 -> 16
+}

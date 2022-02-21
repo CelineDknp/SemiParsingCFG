@@ -225,4 +225,14 @@ class Graph:
 			else:
 				for link in n.get_childs():
 					dot.edge(str(n.id), str(link.id))
-		dot.render(directory=output_dir, view=False) 
+		dot.render(directory=output_dir, view=False)
+	
+	def add_node_to_list(self, node):
+		self.all_nodes.append(node)
+
+	def __str__(self):
+		result = "Nodes in graph:\n"
+		for n in self.all_nodes:
+			# print(n.id)
+			result += n.__repr__()+"\n"
+		return result 

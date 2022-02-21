@@ -32,6 +32,9 @@ class ParseNode(Node):
         self.parsable = input_str[pos + 8:input_str.upper().find("END-EXEC", pos)].strip()
         return input_str.upper().find("END-EXEC", pos) + 8
 
+    def set_parse_text(self, value):
+        self.parsable = value
+
     def parse(self):
         input_stream = InputStream(input)
         lexer = self.SQLL(input_stream)
