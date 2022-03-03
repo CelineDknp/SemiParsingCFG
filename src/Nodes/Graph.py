@@ -1,5 +1,9 @@
 from Nodes.Node import Node
 from Nodes.FusedNode import FusedNode
+from Nodes.SimpleBranchConditionNode import SimpleBranchConditionNode
+from Nodes.MultipleBranchConditionNode import MultipleBranchConditionNode
+from Utils.config import *
+from Utils.utils import clean_regex
 import graphviz
 
 class Graph:
@@ -10,38 +14,51 @@ class Graph:
 		self.open_ifs = []
 		self.all_nodes = [start_node]
 
-	def match_if(self, else_node):
+	def match_if(self, branch_node):
 		res = None
-		for if_node in self.open_ifs:
-			if if_node.get_depth() == else_node.get_depth():
-				res = if_node
+		# print(f"Searching corr node for: {branch_node}")
+		for cond_node in self.open_ifs:
+			# print(f"Looking at {cond_node} at depth {cond_node.get_depth()}")
+			# print(f"{cond_node.get_regex()} VS {branch_node.get_regex()}")
+			if cond_node.get_depth() == branch_node.get_depth() and cond_node.get_regex() == branch_node.get_regex():
+				# print("match !")
+				res = cond_node
 		return res
 
 	def add_node(self, node):
-		if node.get_type() == "IF":
+		# print(f"Adding node if type: {type(node)}")
+		if node.get_type() == NODE_COND_START:
 			# print(">>> In IF")
 			self.last_node.add_child(node)
 			self.last_node = node
 			self.open_ifs.append(node)
 			self.all_nodes.append(node)
-		elif node.get_type() == "EXEC":
+		elif node.get_type() == NODE_SQL:
 			# print(">>> In EXEC")
 			self.last_node.add_child(node)
 			self.last_node = node
 			self.all_nodes.append(node)
-		elif node.get_type() == "ELSE":
+		elif node.get_type() == NODE_COND_BRANCH:
 			# print(">>> In ELSE")
 			corr_if = self.match_if(node)
+			if corr_if is None:
+				print(f"Was looking for node to match {node} in array {self.open_ifs}, but found none")
+				raise Exception('Missmatched condition branch')
+			temp = Node(corr_if.get_depth(), NODE_CONTROL)
+			if isinstance(node, MultipleBranchConditionNode): #We have a multiple condition, grab the condition
+				corr_if.add_branch_condition(node, temp)
 			corr_if.close_branch() #If we found an else, we should close the previous branch
-			temp = Node(corr_if.get_depth(), "CONTROL")
 			corr_if.add_child(temp)
 			self.all_nodes.append(temp)
 			self.last_node = temp
-		elif node.get_type() == "END-IF":
+		elif node.get_type() == NODE_COND_END:
 			# print(">>> In END-IF")
 			corr_if = self.match_if(node)
+			if corr_if is None:
+				print(f"Was looking for node to match {node} in array {self.open_ifs}, but found none")
+				raise Exception('Missmatched condition end')
 			# print(f"Found matching if: {corr_if}", flush=True)
-			temp = Node(corr_if.get_depth(), "CONTROL")
+			temp = Node(corr_if.get_depth(), NODE_CONTROL)
 			corr_if.close(temp)
 			self.open_ifs.remove(corr_if)
 			self.last_node = temp
@@ -65,7 +82,7 @@ class Graph:
 
 
 	def replace_child(self, target, old_child, new_child):
-		if target.get_type() == "IF":
+		if isinstance(target, SimpleBranchConditionNode):
 			if target.true_child == old_child:
 				target.remove_child(old_child)
 				target.add_child(new_child, end=True, branch=True)
@@ -75,11 +92,14 @@ class Graph:
 		else:
 			target.remove_child(old_child)
 			target.add_child(new_child)
+		for grand_child in old_child.get_childs():
+			grand_child.remove_parent(old_child)
+			grand_child.add_parent(target)
 		if old_child in self.all_nodes:
 			self.all_nodes.remove(old_child)
 
 	def cleanup_triangle(self, current_node, new_child):
-		replace_child(current_node.get_parent()[0], current_node, new_child)
+		self.replace_child(current_node.get_parent()[0], current_node, new_child)
 
 	def one_parent(self, node):
 		if len(node.get_parent()) == 0:
@@ -102,7 +122,7 @@ class Graph:
 			start_node.append(self.get_start_node())
 			while len(start_node) != 0:
 				current_node = start_node[0]
-				if current_node.get_type() == "CONTROL":
+				if current_node.get_type() == NODE_CONTROL:
 					children = current_node.get_childs()
 					# print(f">>> Found control node ! len children: {len(children)} len grand_children: {len(children[0].get_childs())}")
 					if len(children) == 2:
@@ -119,13 +139,13 @@ class Graph:
 							cleaned = True
 					elif len(children) == 1:
 						#We are in a control node having a single child of a control node 
-						parent_node = current_node.get_parent()
+						parent_node = current_node.get_parent().copy()
 						for p in parent_node:
 							self.replace_child(p, current_node, children[0])
 						cleaned = True
 				
-				for child in current_node.get_childs(): #Look at a node's childrens
-					if child.get_type() == "CONTROL": #When we find a control node
+				for child in current_node.get_childs().copy(): #Look at a node's childrens
+					if child.get_type() == NODE_CONTROL: #When we find a control node
 						if len(child.get_childs()) == 1 and self.one_parent(child): #Only one parent and one child
 							self.replace_child(current_node, child, child.get_childs()[0])
 							cleaned = True
@@ -136,15 +156,15 @@ class Graph:
 				start_node.remove(current_node)
 
 	def fuse(self, node_up, node_down):
-		if node_down.get_type() == "FUSED":
+		if node_down.get_type() == NODE_FUSED:
 			node_down.fuse_node(node_up, up = True)
 			self.all_nodes.remove(node_up)
 			return node_down
-		elif node_up.get_type() == "FUSED":
+		elif node_up.get_type() == NODE_FUSED:
 			node_up.fuse_node(node_down, down = True)
 			self.all_nodes.remove(node_down)
 		else:
-			node = FusedNode(node_up.get_depth(), "FUSED")
+			node = FusedNode(node_up.get_depth(), NODE_FUSED)
 			self.all_nodes.append(node)
 			node.fuse_node(node_up, up=True)
 			self.all_nodes.remove(node_up)
@@ -161,23 +181,23 @@ class Graph:
 			start_node.append(self.get_start_node())
 			while len(start_node) != 0:
 				current_node = start_node[0]
-				if (current_node.get_type() == "IF" or current_node.get_type() == "FUSED") and current_node.point_to_one(): 
+				if (current_node.get_type() == NODE_COND_START or current_node.get_type() == NODE_FUSED) and current_node.point_to_one(): 
 				#We are in a if node that points to a single node
 					child = current_node.get_childs()[0]
-					if child.get_type() != "END" and child.get_type() != "EXEC":
+					if child.get_type() != "END" and child.get_type() != NODE_SQL:
 						merge = True
 						for c in child.get_childs():
-							if c.get_type() == "EXEC":
+							if c.get_type() == NODE_SQL:
 								merge = False
 						if merge:
 							res = self.fuse(current_node, child)
 							squished = True
 							break	
-				elif current_node.get_type() == "FUSED" and any(child.get_type() == "FUSED" for child in current_node.get_childs()):
+				elif current_node.get_type() == NODE_FUSED and any(child.get_type() == NODE_FUSED for child in current_node.get_childs()):
 					#We found a fused node having a FUSED child
 					to_fuse = None 
 					for child in current_node.get_childs():
-						if child.get_type() == "FUSED":
+						if child.get_type() == NODE_FUSED:
 							to_fuse = child
 					if to_fuse != None:
 						res = self.fuse(current_node, to_fuse)
@@ -198,13 +218,13 @@ class Graph:
 			current_node = start_node[0]
 			all_nodes.append(current_node)
 			start_node.remove(current_node)
-			if current_node.get_type() == "IF":
+			if current_node.get_type() == NODE_COND_START:
 				dot.attr('node', shape='ellipse')
-				dot.node(str(current_node.id), "IF "+current_node.condition) 
-			elif current_node.get_type() == "EXEC":
+				dot.node(str(current_node.id), clean_regex(current_node)+" "+current_node.condition) 
+			elif current_node.get_type() == NODE_SQL:
 				dot.attr('node', shape='box')
 				dot.node(str(current_node.id), current_node.parsable)
-			elif current_node.get_type() == "CONTROL":
+			elif current_node.get_type() == NODE_CONTROL:
 				dot.node(str(current_node.id), str(current_node.id))
 			elif current_node.get_type() == "START":
 				dot.attr('node', shape='diamond')
@@ -212,16 +232,19 @@ class Graph:
 			elif current_node.get_type() == "END":
 				dot.attr('node', shape='diamond')
 				dot.node(str(current_node.id), 'END')
-			elif current_node.get_type() == "FUSED":
+			elif current_node.get_type() == NODE_FUSED:
 				dot.attr('node', shape='circle') 
 				dot.node(str(current_node.id), str(current_node.amount_contained()))
 			for c in current_node.get_childs():
 				if c not in all_nodes and c not in start_node:
 					start_node.append(c)
 		for n in all_nodes:
-			if n.get_type() == "IF":
+			if n.get_type() == NODE_COND_START and isinstance(n, SimpleBranchConditionNode):
 				dot.edge(str(n.id), str(n.true_child.id), label='True')
 				dot.edge(str(n.id), str(n.false_child.id), label='False')
+			elif n.get_type() == NODE_COND_START and isinstance(n, MultipleBranchConditionNode):
+				for condition in n.get_branch_childs().keys():
+					dot.edge(str(n.id), str(n.get_branch_child(condition).id), label=condition)
 			else:
 				for link in n.get_childs():
 					dot.edge(str(n.id), str(link.id))

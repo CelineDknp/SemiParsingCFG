@@ -1,0 +1,29 @@
+digraph "mix_if_evaluate_simple.COB" {
+	node [shape=diamond]
+	14 [label=START]
+	node [shape=ellipse]
+	0 [label="EVALUATE TRUE"]
+	node [shape=ellipse]
+	2 [label="IF B > 1"]
+	node [shape=box]
+	12 [label="OPEN DB3"]
+	node [shape=ellipse]
+	7 [label="IF B > 2"]
+	node [shape=box]
+	3 [label="OPEN DB1"]
+	node [shape=diamond]
+	23 [label=END]
+	node [shape=box]
+	9 [label="OPEN DB2"]
+	14 -> 0
+	0 -> 2 [label="A > 0"]
+	0 -> 7 [label="A < 0"]
+	0 -> 12 [label="A = 0"]
+	2 -> 3 [label=True]
+	2 -> 23 [label=False]
+	12 -> 23
+	7 -> 23 [label=True]
+	7 -> 9 [label=False]
+	3 -> 23
+	9 -> 23
+}

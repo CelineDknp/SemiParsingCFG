@@ -4,12 +4,12 @@ from Nodes.ConditionNode import ConditionNode
 from Nodes.ParseNode import ParseNode
 from Nodes.Node import Node
 from Nodes.Graph import Graph
-from config import *  
+from Utils.config import *  
 from FuzzyParser import FuzzyParser
 import graphviz
 #Windows-specific Graphiz import
 import os
-total_path = os.pathsep + 'C:\Program Files\Graphviz/bin/'
+total_path = os.pathsep + "C:\Program Files\Graphviz/bin/"
 if total_path not in os.environ["PATH"]:
 	os.environ["PATH"] += total_path
 
@@ -38,29 +38,31 @@ def process_and_parse(filename):
 		print(f"Pre-processed", flush=True)
 		parser = FuzzyParser(pre_processed_input)
 		lot = parser.fuzzy_parse()
-		print(f"Fuzzy parsing done !", flush=True)
+		print(f"Fuzzy parsing done!", flush=True)
 		return lot
 
 def process_and_create(filename):
 	lot = process_and_parse(filename)
+	# print(f"Final array of nodes: {lot}")
 	g = construct_graph(lot)
-	print(f"Graph constructed !", flush=True)
+	print(f"Graph constructed!", flush=True)
 	return g
 
 def process_and_cleanup(filename):
 	g = process_and_create(filename)
 	g.cleanup()
-	print(f"Graph cleaned !", flush=True)
+	print(f"Graph cleaned!", flush=True)
 	return g
 
 def process_and_squish(filename):
 	g = process_and_cleanup(filename)
 	g.squish()
-	print(f"Graph squished !", flush=True)
+	print(f"Graph squished!", flush=True)
 	return g
 
 def process_file(filename, dir_path):
-	g = process_and_squish(filename)
+	# g = process_and_create(filename)
+	g = process_and_cleanup(filename)
 	g.save_as_file(os.path.basename(filename), output_dir=dir_path)
 	print(f"Done !")
 

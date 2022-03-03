@@ -1,0 +1,21 @@
+digraph "evaluate_simple.COB" {
+	node [shape=diamond]
+	8 [label=START]
+	node [shape=ellipse]
+	0 [label="EVALUATE TRUE"]
+	node [shape=box]
+	2 [label="OPEN DB1"]
+	node [shape=box]
+	6 [label="OPEN DB3"]
+	node [shape=box]
+	4 [label="OPEN DB2"]
+	node [shape=diamond]
+	13 [label=END]
+	8 -> 0
+	0 -> 2 [label="A > 0"]
+	0 -> 4 [label="A < 0"]
+	0 -> 6 [label="A = 0"]
+	2 -> 13
+	6 -> 13
+	4 -> 13
+}
