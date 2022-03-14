@@ -5,15 +5,23 @@ digraph "if_nested_both_branch_test_file.COB" {
 	0 [label="IF A > 0"]
 	node [shape=ellipse]
 	1 [label="IF B > 0"]
+	8 [label=8]
+	9 [label=9]
 	node [shape=ellipse]
 	4 [label="IF C > 0"]
+	10 [label=10]
+	11 [label=11]
 	node [shape=diamond]
 	12 [label=END]
 	7 -> 0
 	0 -> 1 [label=True]
-	0 -> 4 [label=False]
-	1 -> 12 [label=True]
-	1 -> 12 [label=False]
-	4 -> 12 [label=True]
-	4 -> 12 [label=False]
+	0 -> 9 [label=False]
+	1 -> 8 [label=True]
+	1 -> 8 [label=False]
+	8 -> 11
+	9 -> 4
+	4 -> 10 [label=True]
+	4 -> 10 [label=False]
+	10 -> 11
+	11 -> 12
 }

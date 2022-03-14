@@ -1,4 +1,8 @@
-
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    IFTest13.
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       PROCEDURE DIVISION.
            IF A > 0
             DISPLAY 'IF 1'
            END-IF

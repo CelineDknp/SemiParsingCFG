@@ -1,3 +1,8 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    EVALUATETest2.
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       PROCEDURE DIVISION.
            EVALUATE TRUE
              WHEN A > 0
                IF B > 1

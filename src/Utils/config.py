@@ -1,4 +1,5 @@
 import re
+from Utils.constants import *
 
 #All structures that can contain code but should be ignored (typically, strings and comments)
 IGNORE = "ignore"
@@ -10,20 +11,12 @@ conditions = [{"start":r"\sIF(\s)+", "single_branch":"ELSE", "end":"END-IF"}, {"
 
 #Loops structures
 LOOP = "loop"
-loops = [{}]
+loops = [{"start":r"\sGO(\s)?TO(\s)+", "type":"label", "label-regex":r"^\s{7}([^\s*])+(\s)*\."}, {"start":r"\sNEXT\sSENTENCE(\s)*", "type":"control-flow", "control-type":NODE_COND_END_ANY}]
 
 PARSABLE = "parsable"
 parsable = [{"start":r"EXEC\sSQL", "end":"END-EXEC"}]
 
 #Language special case
 SPECIAL = "special"
-special = [{"regex":r"\.(\s)+", "effect":"close_all"}]
+special = [{"regex":r"(\s)*PROCEDURE\sDIVISION", "effect":"start_parse"}, {"regex":r"\.(\s)+", "effect":"close_all"}]
 
-#_____INTERNAL CONFIG, DO NOT CHANGE______
-NODE_CONTROL = "CONTROL"
-NODE_FUSED = "FUSED"
-NODE_COND_END_ANY = "END_"
-NODE_COND_START = "COND_START"
-NODE_COND_BRANCH = "COND_BRANCH"
-NODE_COND_END = "COND_END"
-NODE_SQL = "EXEC"

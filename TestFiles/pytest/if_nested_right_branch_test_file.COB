@@ -1,3 +1,8 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    IFTest9.
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       PROCEDURE DIVISION.
            IF A > 0
              DISPLAY 'ELSE CONTENT' 
            ELSE

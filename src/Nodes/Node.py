@@ -53,8 +53,9 @@ class Node:
 		node.add_parent(self)
 
 	def remove_child(self, node):
-		self.childs.remove(node)
-		node.remove_parent(self)
+		if node in self.childs:
+			self.childs.remove(node)
+			node.remove_parent(self)
 
 	def get_parent(self):
 		return self.parents

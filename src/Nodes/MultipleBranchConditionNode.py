@@ -53,12 +53,24 @@ class MultipleBranchConditionNode(ConditionNode):
     def add_branch_condition(self, node, child):
         self.branch_childs[node.get_condition()] = child
 
+    def add_branch_condition(self, condition):
+        self.branch_childs[condition] = None
+        # self.current_child = condition
+
+    def add_branch_condition(self, node, child):
+        self.branch_childs[node.get_condition()] = child
+ 
     def add_child_branch(self, node):
         to_add = self.current_child
         if to_add == None: #No previous child, create it
             # print("In if")
+            # print(self.branch_childs)
             super().add_child(node)
             self.current_child = node
+            for c in self.branch_childs:
+                if self.branch_childs[c] == None:
+                    self.branch_childs[c] = node 
+            # print(self.branch_childs)
             return
         if not isinstance(to_add, list):
             to_add = [to_add]

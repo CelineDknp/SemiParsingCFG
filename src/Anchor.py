@@ -1,6 +1,9 @@
 from Utils.config import *
+import re
 class Anchor():
 	def __init__(self, regex, type):
+		if isinstance(regex,str): 
+			self.pattern = re.compile(regex, re.MULTILINE) 
 		self.regex = regex
 		self.type = type
 
@@ -9,6 +12,9 @@ class Anchor():
 
 	def get_regex(self):
 		return self.regex
+
+	def get_pattern(self):
+		return self.pattern
 
 	def __str__(self):
 		return f"Anchor with {self.regex} of type {self.type}"

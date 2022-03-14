@@ -1,3 +1,8 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    IFTest15.
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       PROCEDURE DIVISION.
            EXEC SQL OPEN DB END-EXEC
            IF A > 0
             DISPLAY 'IF 1'

@@ -2,18 +2,20 @@ digraph "test.gvz" {
 	node [shape=diamond]
 	0 [label=START]
 	node [shape=ellipse]
-	1 [label="IF A Greater 0"]
-	node [shape=ellipse]
-	2 [label="IF B Greater 0"]
-	node [shape=ellipse]
-	4 [label="IF C Greater 0"]
+	1 [label="EVALUATE TRUE"]
+	node [shape=box]
+	2 [label="SqlOpen DB1"]
+	node [shape=box]
+	3 [label="SqlOpen DB2"]
+	node [shape=box]
+	4 [label="SqlOpen DB3"]
 	node [shape=diamond]
-	7 [label=END]
+	6 [label=END]
 	0 -> 1
-	1 -> 2 [label=True]
-	1 -> 4 [label=False]
-	2 -> 7 [label=True]
-	2 -> 7 [label=False]
-	4 -> 7 [label=True]
-	4 -> 7 [label=False]
+	1 -> 2 [label="A Greater 0"]
+	1 -> 3 [label="A Smaller 0"]
+	1 -> 4 [label="A Equal 0"]
+	2 -> 6
+	3 -> 6
+	4 -> 6
 }

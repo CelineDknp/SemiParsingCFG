@@ -1,25 +1,43 @@
 digraph "partial.COB" {
 	node [shape=diamond]
-	13 [label=START]
+	19 [label=START]
 	node [shape=ellipse]
-	0 [label="IF WE00-COCART NOT NUMERIC AND WA00-TOPCUP = ZERO"]
+	1 [label="IF RB-FT       = '0'"]
 	node [shape=ellipse]
-	2 [label="EVALUATE 1-UA43-COACCT"]
+	2 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	4 [label="GOTO F05RB-FN"]
+	node [shape=note]
+	6 [label="F05RB-10"]
+	node [shape=ellipse]
+	7 [label="IF RB-FT    = '1'"]
+	node [shape=ellipse]
+	8 [label="GOTO F05RB-FN"]
+	node [shape=note]
+	10 [label="F05RB-FN"]
+	node [shape=ellipse]
+	13 [label="IF WWBR-XRSTID NOT = SPACES AND   WWBR-ZA001 = '1'"]
+	node [shape=ellipse]
+	14 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	16 [label="GOTO F1090-FN"]
+	node [shape=note]
+	18 [label="F1090-FN"]
 	node [shape=diamond]
-	23 [label=END]
-	node [shape=ellipse]
-	5 [label="IF WW00-CTPREJ NOT = 'L'"]
-	node [shape=ellipse]
-	8 [label="IF WW00-CTPREJ NOT = 'L'"]
-	13 -> 0
-	0 -> 23 [label=True]
-	0 -> 2 [label=False]
-	2 -> 23 [label="'2'"]
-	2 -> 5 [label="'3'"]
-	2 -> 8 [label="'8'"]
-	2 -> 23 [label=OTHER]
-	5 -> 23 [label=True]
-	5 -> 23 [label=False]
-	8 -> 23 [label=True]
-	8 -> 23 [label=False]
+	25 [label=END]
+	19 -> 1
+	1 -> 2 [label=True]
+	1 -> 4 [label=False]
+	2 -> 6
+	4 -> 10
+	6 -> 7
+	7 -> 8 [label=True]
+	7 -> 10 [label=False]
+	8 -> 10
+	10 -> 13
+	13 -> 14 [label=True]
+	13 -> 16 [label=False]
+	14 -> 18
+	16 -> 18
+	18 -> 25
 }

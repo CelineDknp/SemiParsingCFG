@@ -1,4 +1,9 @@
-01 CONSTANTES-PAC.
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    STRTest1.
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       PROCEDURE DIVISION.
+         01 CONSTANTES-PAC.
          05 FILLER             PIC  X(87)        VALUE 
           'This is a string with code: IF A > 0'
             .

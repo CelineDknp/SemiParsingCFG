@@ -1,0 +1,28 @@
+digraph "ex3.cob" {
+	node [shape=diamond]
+	7 [label=START]
+	node [shape=note]
+	0 [label=P0]
+	node [shape=ellipse]
+	1 [label="GOTO P2"]
+	node [shape=note]
+	4 [label=P2]
+	node [shape=ellipse]
+	5 [label="GOTO P1"]
+	node [shape=note]
+	2 [label=P1]
+	node [shape=ellipse]
+	3 [label="GOTO PZ"]
+	node [shape=note]
+	6 [label=PZ]
+	node [shape=diamond]
+	8 [label=END]
+	7 -> 0
+	0 -> 1
+	1 -> 4
+	4 -> 5
+	5 -> 2
+	2 -> 3
+	3 -> 6
+	6 -> 8
+}

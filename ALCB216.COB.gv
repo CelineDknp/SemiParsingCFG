@@ -1,0 +1,381 @@
+digraph "ALCB216.COB" {
+	node [shape=diamond]
+	266 [label=START]
+	node [shape=box]
+	7 [label="WHENEVER SQLWARNING CONTINUE"]
+	node [shape=box]
+	8 [label="WHENEVER SQLERROR CONTINUE"]
+	node [shape=ellipse]
+	21 [label="IF ZY01-YCOPCB NOT = SPACES"]
+	node [shape=ellipse]
+	25 [label="IF WWBR-XRSTID NOT = SPACES"]
+	node [shape=ellipse]
+	26 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	28 [label="GOTO F0XHD-FN"]
+	node [shape=ellipse]
+	30 [label="IF PC00-YCTREP = 'ARRET'"]
+	node [shape=ellipse]
+	31 [label="GOTO F20"]
+	node [shape=note]
+	33 [label="F0XHD-FN"]
+	node [shape=ellipse]
+	35 [label="IF ZJ1A-YAIRET = 256 OR = 260"]
+	node [shape=ellipse]
+	36 [label="GOTO F99EA"]
+	node [shape=ellipse]
+	38 [label="IF ZJ1A-YAIRET = ZERO OR = 2304"]
+	node [shape=ellipse]
+	42 [label="IF WWBR-XRSTID = SPACES"]
+	node [shape=ellipse]
+	43 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	45 [label="GOTO F0ZRB-FN"]
+	node [shape=ellipse]
+	47 [label="IF Z101-YCOPCB NOT = SPACES"]
+	node [shape=note]
+	49 [label="F0ZRB-FN"]
+	node [shape=ellipse]
+	51 [label="IF WWBR-XRSTID = SPACES"]
+	node [shape=ellipse]
+	52 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	54 [label="GOTO F0Z90-FN"]
+	node [shape=note]
+	56 [label=F0Z92]
+	node [shape=note]
+	60 [label="F0Z90-FN"]
+	node [shape=ellipse]
+	64 [label="IF AP00 = SPACES OR    AP00 = LOW-VALUE OR    AP00-CERETV NOT NUMERIC"]
+	node [shape=ellipse]
+	65 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	67 [label="GOTO F04PC-FN"]
+	node [shape=note]
+	69 [label=F04PE]
+	node [shape=ellipse]
+	70 [label="IF AP00 = SPACES OR    AP00 = LOW-VALUE"]
+	node [shape=ellipse]
+	71 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	73 [label="GOTO F04PE-FN"]
+	node [shape=note]
+	75 [label="F04PE-900"]
+	node [shape=ellipse]
+	76 [label="GOTO F04PG-FN"]
+	node [shape=note]
+	77 [label="F04PE-FN"]
+	node [shape=note]
+	79 [label="F04PG-FN"]
+	node [shape=note]
+	80 [label="F04PC-FN"]
+	node [shape=note]
+	81 [label=F05]
+	node [shape=ellipse]
+	83 [label="IF RB-FT       = '0'"]
+	node [shape=ellipse]
+	84 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	86 [label="GOTO F05RB-FN"]
+	node [shape=note]
+	88 [label="F05RB-10"]
+	node [shape=ellipse]
+	89 [label="IF RB-FT    = '1'"]
+	node [shape=ellipse]
+	90 [label="GOTO F05RB-FN"]
+	node [shape=note]
+	92 [label="F05RB-FN"]
+	node [shape=ellipse]
+	95 [label="IF WWBR-XRSTID NOT = SPACES AND   WWBR-ZA001 = '1'"]
+	node [shape=ellipse]
+	96 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	98 [label="GOTO F1090-FN"]
+	node [shape=note]
+	100 [label="F1090-FN"]
+	node [shape=note]
+	101 [label=F20]
+	node [shape=ellipse]
+	102 [label="IF FT =            ALL '1'"]
+	node [shape=ellipse]
+	103 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	105 [label="GOTO F20-FN"]
+	node [shape=note]
+	107 [label=F20PC]
+	node [shape=ellipse]
+	112 [label="IF Z101-YCOPCB NOT = SPACES"]
+	node [shape=note]
+	120 [label="F20-FN"]
+	node [shape=ellipse]
+	126 [label="IF IK = 0"]
+	node [shape=ellipse]
+	127 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	129 [label="GOTO F50FF-FN"]
+	node [shape=note]
+	131 [label="F50FF-900"]
+	node [shape=ellipse]
+	132 [label="GOTO F50GL-FN"]
+	node [shape=note]
+	133 [label="F50FF-FN"]
+	node [shape=note]
+	135 [label="F50GL-FN"]
+	node [shape=ellipse]
+	143 [label="IF WWBR-YQTMAJ < WWBR-YQTRE9"]
+	node [shape=ellipse]
+	144 [label="GOTO F9R-FN"]
+	node [shape=ellipse]
+	151 [label="IF ZY01-YCOPCB NOT = SPACES AND   NOT = 'QC'"]
+	node [shape=note]
+	154 [label="F9R-FN"]
+	node [shape=ellipse]
+	156 [label="GOTO F05"]
+	node [shape=note]
+	157 [label="F9Z99-FN"]
+	node [shape=ellipse]
+	159 [label="GOTO F05"]
+	node [shape=note]
+	160 [label="F95-A"]
+	node [shape=ellipse]
+	162 [label="IF RB-FT = '0'"]
+	node [shape=ellipse]
+	163 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	165 [label="GOTO F95RB-FN"]
+	node [shape=ellipse]
+	167 [label="IF Z101-YCOPCB = 'GB'"]
+	node [shape=ellipse]
+	168 [label="GOTO F95RB-FN"]
+	node [shape=ellipse]
+	170 [label="IF Z101-YCOPCB NOT = SPACES"]
+	node [shape=note]
+	172 [label="F95RB-FN"]
+	node [shape=ellipse]
+	175 [label="IF 9-TQ00-YCFDB2 = '1'"]
+	node [shape=ellipse]
+	176 [label="GOTO F95-TQ00-RU-FN"]
+	node [shape=box]
+	178 [label="OPEN C-TQ00-U"]
+	node [shape=note]
+	179 [label="F95-TQ00-RU-FN"]
+	node [shape=box]
+	181 [label="FETCH C-TQ00-U INTO                                      
+                :TQ00-COETCF :V-TQ00-COETCF"]
+	node [shape=ellipse]
+	185 [label="IF 9-TQ00-YCFDB2 = '0'"]
+	node [shape=ellipse]
+	186 [label="GOTO F95-TQ00-CL-FN"]
+	node [shape=box]
+	188 [label="CLOSE C-TQ00-U"]
+	node [shape=note]
+	189 [label="F95-TQ00-CL-FN"]
+	node [shape=box]
+	192 [label="UPDATE ALCMDE                                            
+                       SET                                                      
+                       CERETV  =                                                
+                :TQ00-CERETV :V-TQ00-CERETV                                     
+                       WHERE CURRENT OF C-TQ00-U"]
+	node [shape=ellipse]
+	198 [label="IF W-DD00-YCORET NOT = SPACE"]
+	node [shape=ellipse]
+	199 [label="GOTO F20"]
+	node [shape=ellipse]
+	208 [label="IF SQLCODE = 0"]
+	node [shape=ellipse]
+	209 [label="GOTO F98BD-FN"]
+	node [shape=ellipse]
+	211 [label="IF SQLCODE = +100"]
+	node [shape=ellipse]
+	212 [label="GOTO F98BD-FN"]
+	node [shape=ellipse]
+	218 [label="IF SQLCODE = -803"]
+	node [shape=ellipse]
+	219 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	221 [label="GOTO F98BJ-FN"]
+	node [shape=note]
+	223 [label="F98BJ-FN"]
+	node [shape=ellipse]
+	225 [label="IF SQLCODE = -530 OR    = -531 OR = -532"]
+	node [shape=ellipse]
+	226 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	228 [label="GOTO F98BL-FN"]
+	node [shape=note]
+	230 [label="F98BL-FN"]
+	node [shape=ellipse]
+	235 [label="GOTO F98BQ-B"]
+	node [shape=note]
+	236 [label="F98BQ-A"]
+	node [shape=note]
+	237 [label="F98BQ-B"]
+	node [shape=ellipse]
+	238 [label="IF 10                       <  J98BQR"]
+	node [shape=ellipse]
+	239 [label="GOTO F98BQ-FN"]
+	node [shape=ellipse]
+	242 [label="GOTO F98BQ-A"]
+	node [shape=note]
+	243 [label="F98BQ-FN"]
+	node [shape=note]
+	253 [label="F98BD-FN"]
+	node [shape=note]
+	255 [label=F99EA]
+	node [shape=ellipse]
+	258 [label="IF S-SPCB-XCORET NOT = '  ' AND   'GE' AND 'GB' AND 'GK' AND   'GA' AND 'II' AND 'GG'"]
+	node [shape=ellipse]
+	259 [label="NEXT SENTENCE"]
+	node [shape=ellipse]
+	261 [label="GOTO F99ER-FN"]
+	node [shape=note]
+	263 [label=F99EU]
+	node [shape=note]
+	265 [label="F99ER-FN"]
+	node [shape=diamond]
+	311 [label=END]
+	266 -> 7
+	7 -> 8
+	8 -> 21
+	21 -> 25 [label=True]
+	21 -> 25 [label=False]
+	25 -> 26 [label=True]
+	25 -> 28 [label=False]
+	26 -> 30
+	28 -> 33
+	30 -> 31 [label=True]
+	30 -> 33 [label=False]
+	31 -> 101
+	33 -> 35
+	35 -> 36 [label=True]
+	35 -> 38 [label=False]
+	36 -> 255
+	38 -> 42 [label=True]
+	38 -> 42 [label=False]
+	42 -> 43 [label=True]
+	42 -> 45 [label=False]
+	43 -> 47
+	45 -> 49
+	47 -> 49 [label=True]
+	47 -> 49 [label=False]
+	49 -> 51
+	51 -> 52 [label=True]
+	51 -> 54 [label=False]
+	52 -> 56
+	54 -> 60
+	56 -> 60
+	60 -> 64
+	64 -> 65 [label=True]
+	64 -> 67 [label=False]
+	65 -> 69
+	67 -> 80
+	69 -> 70
+	70 -> 71 [label=True]
+	70 -> 73 [label=False]
+	71 -> 75
+	73 -> 77
+	75 -> 76
+	76 -> 79
+	77 -> 79
+	79 -> 80
+	80 -> 81
+	81 -> 83
+	83 -> 84 [label=True]
+	83 -> 86 [label=False]
+	84 -> 88
+	86 -> 92
+	88 -> 89
+	89 -> 90 [label=True]
+	89 -> 92 [label=False]
+	90 -> 92
+	92 -> 95
+	95 -> 96 [label=True]
+	95 -> 98 [label=False]
+	96 -> 100
+	98 -> 100
+	100 -> 101
+	101 -> 102
+	102 -> 103 [label=True]
+	102 -> 105 [label=False]
+	103 -> 107
+	105 -> 120
+	107 -> 112
+	112 -> 120 [label=True]
+	112 -> 120 [label=False]
+	120 -> 126
+	126 -> 127 [label=True]
+	126 -> 129 [label=False]
+	127 -> 131
+	129 -> 133
+	131 -> 132
+	132 -> 135
+	133 -> 135
+	135 -> 143
+	143 -> 144 [label=True]
+	143 -> 151 [label=False]
+	144 -> 154
+	151 -> 154 [label=True]
+	151 -> 154 [label=False]
+	154 -> 156
+	156 -> 81
+	157 -> 159
+	159 -> 81
+	160 -> 162
+	162 -> 163 [label=True]
+	162 -> 165 [label=False]
+	163 -> 167
+	165 -> 172
+	167 -> 168 [label=True]
+	167 -> 170 [label=False]
+	168 -> 172
+	170 -> 172 [label=True]
+	170 -> 172 [label=False]
+	172 -> 175
+	175 -> 176 [label=True]
+	175 -> 178 [label=False]
+	176 -> 179
+	178 -> 179
+	179 -> 181
+	181 -> 185
+	185 -> 186 [label=True]
+	185 -> 188 [label=False]
+	186 -> 189
+	188 -> 189
+	189 -> 192
+	192 -> 198
+	198 -> 199 [label=True]
+	198 -> 208 [label=False]
+	199 -> 101
+	208 -> 209 [label=True]
+	208 -> 211 [label=False]
+	209 -> 253
+	211 -> 212 [label=True]
+	211 -> 218 [label=False]
+	212 -> 253
+	218 -> 219 [label=True]
+	218 -> 221 [label=False]
+	219 -> 223
+	221 -> 223
+	223 -> 225
+	225 -> 226 [label=True]
+	225 -> 228 [label=False]
+	226 -> 230
+	228 -> 230
+	230 -> 235
+	235 -> 237
+	236 -> 237
+	237 -> 238
+	238 -> 239 [label=True]
+	238 -> 242 [label=False]
+	239 -> 243
+	242 -> 236
+	243 -> 253
+	253 -> 255
+	255 -> 258
+	258 -> 259 [label=True]
+	258 -> 261 [label=False]
+	259 -> 263
+	261 -> 265
+	263 -> 265
+	265 -> 311
+}
