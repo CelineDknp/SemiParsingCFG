@@ -8,4 +8,4 @@ def flatten(list_of_lists):
 def clean_regex(node):
     start = node.get_regex()
     result = start.replace("\s", " ")
-    return result.translate({ord(c): None for c in '()|*+'}).strip()
+    return result.translate({ord(c): None for c in '[]^.?!()|*+'}).strip()

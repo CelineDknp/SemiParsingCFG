@@ -5,6 +5,7 @@ from Nodes.ConditionNode import ConditionNode
 from Nodes.ParseNode import ParseNode
 from Nodes.LoopNode import LoopNode
 from Nodes.LabelLoopNode import LabelLoopNode
+from Nodes.MultipleLabelLoopNode import MultipleLabelLoopNode
 from Nodes.ControlLoopNode import ControlLoopNode
 from Nodes.LabelNode import LabelNode
 from Nodes.Node import Node
@@ -36,6 +37,9 @@ class FuzzyParser():
 				s = SpecialAnchor.from_explicit(elem["label-regex"], "label")
 				self.label_regex.append(elem["label-regex"])
 				self.anchors.append(s)
+			elif a.is_control_anchor():
+				s = SpecialAnchor.from_explicit(elem["control-regex"], "control", info=elem["control-type"])
+				self.special_anchors["control-regex"] = s
 		self.anchors_dict = self.current_anchors_and_regexes()
 
 	def __init__(self, input):
@@ -56,7 +60,7 @@ class FuzzyParser():
 		return result
 
 	def next_anchor(self):
-		#print(f"Searching from: |{self.input[self.pos:self.pos+50]}|")
+		#print(f"Searching from: |{self.input[self.pos:self.pos+150]}|")
 		next_pos = []
 		for val in self.anchors_dict.keys():
 			res = val.search(self.input[self.pos:].upper())
@@ -81,34 +85,39 @@ class FuzzyParser():
 				if val < min_val and val != -1:
 					min_val = val 
 					min_key = key
-		# print(f"Anchors: {next_pos}", flush=True)
-		# print(f"picked: {min_val}, {self.anchors_dict[min_key]}, {min_key}")
+		#print(f"Anchors: {next_pos}", flush=True)
 		if min_key != '':
+			#print(f"picked: {min_val}, {self.anchors_dict[min_key]}, {min_key}")
 			return min_val, self.anchors_dict[min_key], min_key
 		else:
 			return min_val, None, min_key
 
-	def len_next_match(self, anchor):
-		res = anchor.get_pattern().search(self.input[self.pos:].upper())
+	def len_next_match(self, pattern):
+		res = pattern.search(self.input[self.pos:].upper())
 		return self.input.upper().find(res.group(0), self.pos) + len(res.group(0))
 
-	def clean_anchors(self, start_parse=False):
+	def clean_anchors(self, start_parse=False, found_control=False):
 		if start_parse:
 			self.anchors.remove(self.special_anchors["start_parse"])
 			self.anchors_dict = self.current_anchors_and_regexes()
-		#Clean the close-all anchor
-		# print(f"Before: {self.anchors}")
-		if "close_all" in self.special_anchors:
-			if self.depth == 0 and self.special_anchors["close_all"] in self.anchors:
-				# print("removed dot !")
-				self.anchors.remove(self.special_anchors["close_all"])
-				self.anchors_dict = self.current_anchors_and_regexes()
-				# print(f"After: {self.anchors}")
-			elif self.depth > 0 and self.special_anchors["close_all"] not in self.anchors:
-				# print("added dot !")
-				self.anchors.append(self.special_anchors["close_all"])
-				# print(f"After: {self.anchors}")
-				self.anchors_dict = self.current_anchors_and_regexes()
+		elif found_control:
+			if self.special_anchors["control-regex"] in self.anchors:
+				self.anchors.remove(self.special_anchors["control-regex"])
+			else:
+				self.anchors.append(self.special_anchors["control-regex"])
+		else:
+			#Clean the close-all anchor
+			# print(f"Before: {self.anchors}")
+			if "close_all" in self.special_anchors:
+				if self.depth == 0 and self.special_anchors["close_all"] in self.anchors:
+					# print("removed dot !")
+					self.anchors.remove(self.special_anchors["close_all"])
+					# print(f"After: {self.anchors}")
+				elif self.depth > 0 and self.special_anchors["close_all"] not in self.anchors:
+					# print("added dot !")
+					self.anchors.append(self.special_anchors["close_all"])
+					# print(f"After: {self.anchors}")
+		self.anchors_dict = self.current_anchors_and_regexes()
 
 	def consume_ignore(self, n_anchor, next_val, actual_val):
 		# print(self.anchors_dict)
@@ -165,15 +174,15 @@ class FuzzyParser():
 
 	def consume_parsable(self, n_anchor, next_val, actual_val, lot):
 		# print('>>> FOUND EXEC')
-		node = ParseNode(self.depth, NODE_SQL)
+		node = ParseNode(self.depth, NODE_SQL, n_anchor.get_regex())
 		lot.append(node)
 		self.pos = node.find_parse_text(self.input, next_val)
 
 	def consume_special(self, n_anchor, next_val, actual_val, lot):
-		# print(f"special ! {actual_val}")
+		#print(f"special ! {actual_val} effect: {n_anchor.get_effect()}")
 		if n_anchor.get_effect() == "label":
 			# print("found label")
-			node = LabelNode(self.depth, NODE_LABEL)
+			node = LabelNode(self.depth, NODE_LABEL, n_anchor.get_regex())
 			self.pos = node.find_label(self.input, self.pos, n_anchor.get_pattern())
 			lot.append(node)
 			# print(f"label is : {node.get_label()}")
@@ -184,18 +193,32 @@ class FuzzyParser():
 				lot.append(node)
 			self.pos = next_val+1
 		elif n_anchor.get_effect() == "start_parse":
-			self.pos = self.len_next_match(n_anchor)
+			self.pos = self.len_next_match(n_anchor.get_pattern())
+		elif n_anchor.get_effect() == "control":
+			node = Node(self.depth, n_anchor.get_info())
+			lot.append(node)
+			self.pos += 1
+			self.clean_anchors(found_control=True)
 
 	def consume_loop(self, n_anchor, next_val, actual_val, lot):
 		# print("found loop !")
+		# print(f"Current state of input is: |{self.input[self.pos:self.pos+150]}|")
 		if n_anchor.is_label_anchor():
-			node = LabelLoopNode(self.depth, NODE_LOOP)
+			node = None
+			if n_anchor.is_multiple_anchor():
+				node = MultipleLabelLoopNode(self.depth, NODE_LOOP, n_anchor)
+			else:	
+				node = LabelLoopNode(self.depth, NODE_LOOP, n_anchor)
 			lot.append(node)
-			self.pos = node.find_label(self.input, next_val)
+			self.pos = self.len_next_match(n_anchor.get_start_regex())
+			# print(f"Current state of input is: |{self.input[self.pos:self.pos+150]}|")
+			self.pos = node.find_label(self.input, self.pos)
+			# print(f"Current state of input is: |{self.input[self.pos:self.pos+150]}|")
 		elif n_anchor.is_control_anchor():
-			node = ControlLoopNode(self.depth, NODE_LOOP, n_anchor.get_control())
+			node = ControlLoopNode(self.depth, NODE_LOOP, n_anchor)
 			lot.append(node)
-			self.pos = self.len_next_match(n_anchor)
+			self.clean_anchors(found_control=True)
+			self.pos = self.len_next_match(n_anchor.get_pattern())
 
 	def fuzzy_parse(self):
 		lot = []

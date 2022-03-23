@@ -1,506 +1,382 @@
 digraph "ALCB018.COB" {
 	node [shape=diamond]
-	304 [label=START]
+	127 [label=START]
+	node [shape=ellipse]
+	1 [label="PERFORM WCIS-INIT-TRAITEMENT"]
+	node [shape=ellipse]
+	2 [label="PERFORM F96BB"]
+	node [shape=ellipse]
+	3 [label="PERFORM F96BB"]
+	node [shape=note]
+	4 [label=F0D]
 	node [shape=box]
-	7 [label="WHENEVER SQLWARNING CONTINUE"]
+	5 [label="WHENEVER SQLWARNING CONTINUE"]
 	node [shape=box]
-	8 [label="WHENEVER SQLERROR CONTINUE"]
+	6 [label="WHENEVER SQLERROR CONTINUE"]
 	node [shape=ellipse]
-	19 [label="IF BC01-YGREG = SPACES"]
+	9 [label="PERFORM F94BB"]
 	node [shape=ellipse]
-	22 [label="IF BC01-YGREG NOT = SPACES"]
+	10 [label="IF BC01-YGREG = SPACES"]
 	node [shape=ellipse]
-	23 [label="NEXT SENTENCE"]
+	11 [label="PERFORM F9520-S"]
 	node [shape=ellipse]
-	25 [label="GOTO F04CC-FN"]
+	13 [label="PERFORM F98BX"]
+	node [shape=ellipse]
+	15 [label="PERFORM F94BB"]
+	node [shape=ellipse]
+	16 [label="IF BC01-YGREG = SPACES"]
+	node [shape=ellipse]
+	17 [label="PERFORM F9520-S"]
+	node [shape=ellipse]
+	19 [label="PERFORM F98BX"]
 	node [shape=note]
-	27 [label="F04CC-FN"]
+	21 [label="F05-LECTURES"]
 	node [shape=ellipse]
-	30 [label="IF BC01-YGREG = SPACES"]
+	22 [label="IF TR-FT = '0'"]
 	node [shape=ellipse]
-	33 [label="IF BC01-YGREG NOT = SPACES"]
+	23 [label="PERFORM F95TR THRU F95TR-FN"]
 	node [shape=ellipse]
-	34 [label="NEXT SENTENCE"]
-	node [shape=ellipse]
-	36 [label="GOTO F04JJ-FN"]
+	24 [label="IF TR-FT NOT = '1'"]
 	node [shape=note]
-	38 [label="F04JJ-FN"]
+	27 [label="F20-FIN-TRAITEMENT"]
+	node [shape=ellipse]
+	28 [label="IF FT = ALL '1'"]
+	node [shape=ellipse]
+	29 [label="PERFORM WCIS-FIN-TRAITEMENT"]
 	node [shape=note]
-	40 [label=F05]
+	31 [label=F40BC]
 	node [shape=ellipse]
-	42 [label="IF TR-FT       = '0'"]
+	32 [label="PERFORM F95-TR00-P"]
 	node [shape=ellipse]
-	43 [label="NEXT SENTENCE"]
+	33 [label="PERFORM UNTIL"]
 	node [shape=ellipse]
-	45 [label="GOTO F05TR-FN"]
+	34 [label="PERFORM F95-EN00-P"]
+	node [shape=ellipse]
+	35 [label="PERFORM F95-EN00-RN"]
+	node [shape=ellipse]
+	36 [label="PERFORM UNTIL"]
+	node [shape=ellipse]
+	37 [label="EVALUATE EN00-CEDEC5"]
+	node [shape=ellipse]
+	42 [label="PERFORM F95-EN00-RN"]
+	node [shape=ellipse]
+	43 [label="PERFORM F91BB"]
+	node [shape=ellipse]
+	44 [label="PERFORM F95-EN00-CL"]
+	node [shape=ellipse]
+	45 [label="PERFORM F95-TR00-RN"]
+	node [shape=ellipse]
+	46 [label="PERFORM F95-TR00-CL"]
 	node [shape=note]
-	47 [label="F05TR-10"]
+	47 [label="F90-ECRITURES"]
 	node [shape=ellipse]
-	48 [label="IF TR-FT    = '1'"]
-	node [shape=ellipse]
-	49 [label="GOTO F05TR-FN"]
+	48 [label="GO ?TO F05-LECTURES"]
 	node [shape=note]
-	51 [label="F05TR-FN"]
+	49 [label=F91BB]
 	node [shape=note]
-	53 [label=F20]
+	50 [label=F94BB]
 	node [shape=ellipse]
-	54 [label="IF FT =            ALL '1'"]
+	51 [label="IF SQLCODE NOT = ZERO AND SQLCODE NOT = 100"]
 	node [shape=ellipse]
-	55 [label="NEXT SENTENCE"]
+	52 [label="PERFORM F98BD THRU F98BD-FN"]
 	node [shape=ellipse]
-	57 [label="GOTO F20-FN"]
+	54 [label="IF S-SPCB-XCORET NOT = SPACE"]
+	node [shape=ellipse]
+	55 [label="PERFORM F99ER"]
 	node [shape=note]
-	59 [label=F20EN]
-	node [shape=note]
-	69 [label="F20-FN"]
-	node [shape=note]
-	71 [label=F40BE]
+	57 [label="F95-EN00-P"]
 	node [shape=ellipse]
-	72 [label="IF IK-TR = 0"]
-	node [shape=ellipse]
-	73 [label="NEXT SENTENCE"]
-	node [shape=ellipse]
-	75 [label="GOTO F40BE-FN"]
-	node [shape=note]
-	77 [label=F40BL]
-	node [shape=ellipse]
-	78 [label="IF IK-EN = 0"]
-	node [shape=ellipse]
-	79 [label="NEXT SENTENCE"]
-	node [shape=ellipse]
-	81 [label="GOTO F40BL-FN"]
-	node [shape=ellipse]
-	83 [label="IF EN00-CEDEC5 = 'C'"]
-	node [shape=ellipse]
-	85 [label="IF EN00-CEDEC5 = 'D'"]
-	node [shape=ellipse]
-	88 [label="GOTO F40BL"]
-	node [shape=note]
-	89 [label="F40BL-FN"]
-	node [shape=ellipse]
-	93 [label="GOTO F40BE"]
-	node [shape=note]
-	94 [label="F40BE-FN"]
-	node [shape=ellipse]
-	100 [label="IF IK NOT = IK"]
-	node [shape=ellipse]
-	101 [label="NEXT SENTENCE"]
-	node [shape=ellipse]
-	103 [label="GOTO F90SA-FN"]
-	node [shape=note]
-	105 [label=F90SR]
-	node [shape=note]
-	108 [label="F90SA-FN"]
-	node [shape=ellipse]
-	113 [label="GOTO F05"]
-	node [shape=note]
-	114 [label=F91BB]
-	node [shape=ellipse]
-	117 [label="IF SQLCODE NOT = ZERO AND   SQLCODE NOT = 100"]
-	node [shape=ellipse]
-	119 [label="IF S-SPCB-XCORET NOT = SPACE"]
-	node [shape=ellipse]
-	125 [label="IF 9-EN00-YCFDB2 = '1'"]
-	node [shape=ellipse]
-	126 [label="GOTO F95-EN00-P-FN"]
+	58 [label="IF 9-EN00-YCFDB2 NOT = '1'"]
 	node [shape=box]
-	128 [label="OPEN C-EN00"]
+	59 [label="OPEN C-EN00"]
+	node [shape=ellipse]
+	60 [label="PERFORM F98BD THRU F98BD-FN"]
 	node [shape=note]
-	129 [label="F95-EN00-P-FN"]
+	62 [label="F95-EN00-RN"]
 	node [shape=box]
-	131 [label="FETCH C-EN00   INTO                                      
-                :EN00-COETBB :V-EN00-COETBB ,                                   
-                :EN00-COCACC :V-EN00-COCACC ,                                   
-                :EN00-MTCPR3 :V-EN00-MTCPR3 ,                                   
-                :EN00-QTOPM1 :V-EN00-QTOPM1 ,                                   
-                :EN00-QTOPM2 :V-EN00-QTOPM2 ,                                   
-                :EN00-MTBRR1 :V-EN00-MTBRR1 ,                                   
-                :EN00-MTBRR2 :V-EN00-MTBRR2 ,                                   
-                :EN00-MTBRR3 :V-EN00-MTBRR3 ,                                   
-                :EN00-QTOPM3 :V-EN00-QTOPM3 ,                                   
-                :EN00-QTOPM4 :V-EN00-QTOPM4 ,                                   
-                :EN00-MTCPR1 :V-EN00-MTCPR1 ,                                   
-                :EN00-QTOPM5 :V-EN00-QTOPM5 ,                                   
-                :EN00-MTCPR2 :V-EN00-MTCPR2 ,                                   
-                :EN00-MTCORE :V-EN00-MTCORE ,                                   
-                :EN00-CEDEC5 :V-EN00-CEDEC5 ,                                   
-                :EN00-DAREGL :V-EN00-DAREGL ,                                   
-                :EN00-DATRA2 :V-EN00-DATRA2"]
+	63 [label="FETCH C-EN00 INTO
+               :EN00-COETBB :V-EN00-COETBB ,
+               :EN00-COCACC :V-EN00-COCACC ,
+               :EN00-MTCPR3 :V-EN00-MTCPR3 ,
+               :EN00-QTOPM1 :V-EN00-QTOPM1 ,
+               :EN00-QTOPM2 :V-EN00-QTOPM2 ,
+               :EN00-MTBRR1 :V-EN00-MTBRR1 ,
+               :EN00-MTBRR2 :V-EN00-MTBRR2 ,
+               :EN00-MTBRR3 :V-EN00-MTBRR3 ,
+               :EN00-QTOPM3 :V-EN00-QTOPM3 ,
+               :EN00-QTOPM4 :V-EN00-QTOPM4 ,
+               :EN00-MTCPR1 :V-EN00-MTCPR1 ,
+               :EN00-QTOPM5 :V-EN00-QTOPM5 ,
+               :EN00-MTCPR2 :V-EN00-MTCPR2 ,
+               :EN00-MTCORE :V-EN00-MTCORE ,
+               :EN00-CEDEC5 :V-EN00-CEDEC5 ,
+               :EN00-DAREGL :V-EN00-DAREGL ,
+               :EN00-DATRA2 :V-EN00-DATRA2"]
 	node [shape=ellipse]
-	132 [label="IF IK = 1"]
+	64 [label="PERFORM F98BD THRU F98BD-FN"]
 	node [shape=ellipse]
-	134 [label="IF IK = 0"]
+	65 [label="EVALUATE IK"]
+	node [shape=note]
+	71 [label="F95-EN00-CL"]
 	node [shape=ellipse]
-	136 [label="IF IK = 2"]
-	node [shape=ellipse]
-	141 [label="IF 9-EN00-YCFDB2 = '0'"]
-	node [shape=ellipse]
-	142 [label="GOTO F95-EN00-CL-FN"]
+	72 [label="IF 9-EN00-YCFDB2 NOT = '0'"]
 	node [shape=box]
-	144 [label="CLOSE C-EN00"]
+	73 [label="CLOSE C-EN00"]
+	node [shape=ellipse]
+	74 [label="PERFORM F98BD THRU F98BD-FN"]
 	node [shape=note]
-	145 [label="F95-EN00-CL-FN"]
+	76 [label=F95TR]
+	node [shape=note]
+	77 [label="F95-TR00-P"]
 	node [shape=ellipse]
-	148 [label="IF 9-TR00-YCFDB2 = '1'"]
-	node [shape=ellipse]
-	149 [label="GOTO F95-TR00-P-FN"]
+	78 [label="IF 9-TR00-YCFDB2 NOT = '1'"]
 	node [shape=box]
-	151 [label="OPEN C-TR00"]
+	79 [label="OPEN C-TR00"]
+	node [shape=ellipse]
+	80 [label="PERFORM F98BD THRU F98BD-FN"]
 	node [shape=note]
-	152 [label="F95-TR00-P-FN"]
+	82 [label="F95-TR00-RN"]
 	node [shape=box]
-	154 [label="FETCH C-TR00   INTO                                      
-                :TR00-COETBB :V-TR00-COETBB            ,                        
-                :TR00-COCACC :V-TR00-COCACC            ,                        
-                :TR00-MTCPR3 :V-TR00-MTCPR3            ,                        
-                :TR00-QTOPM1 :V-TR00-QTOPM1            ,                        
-                :TR00-QTOPM2 :V-TR00-QTOPM2            ,                        
-                :TR00-MTBRR1 :V-TR00-MTBRR1            ,                        
-                :TR00-MTBRR2 :V-TR00-MTBRR2            ,                        
-                :TR00-MTBRR3 :V-TR00-MTBRR3            ,                        
-                :TR00-QTOPM3 :V-TR00-QTOPM3            ,                        
-                :TR00-QTOPM4 :V-TR00-QTOPM4            ,                        
-                :TR00-MTCPR1 :V-TR00-MTCPR1            ,                        
-                :TR00-QTOPM5 :V-TR00-QTOPM5            ,                        
-                :TR00-MTCPR2 :V-TR00-MTCPR2"]
+	83 [label="FETCH C-TR00 INTO
+               :TR00-COETBB :V-TR00-COETBB ,
+               :TR00-COCACC :V-TR00-COCACC ,
+               :TR00-MTCPR3 :V-TR00-MTCPR3 ,
+               :TR00-QTOPM1 :V-TR00-QTOPM1 ,
+               :TR00-QTOPM2 :V-TR00-QTOPM2 ,
+               :TR00-MTBRR1 :V-TR00-MTBRR1 ,
+               :TR00-MTBRR2 :V-TR00-MTBRR2 ,
+               :TR00-MTBRR3 :V-TR00-MTBRR3 ,
+               :TR00-QTOPM3 :V-TR00-QTOPM3 ,
+               :TR00-QTOPM4 :V-TR00-QTOPM4 ,
+               :TR00-MTCPR1 :V-TR00-MTCPR1 ,
+               :TR00-QTOPM5 :V-TR00-QTOPM5 ,
+               :TR00-MTCPR2 :V-TR00-MTCPR2"]
 	node [shape=ellipse]
-	155 [label="IF SQLCODE = +100"]
+	84 [label="PERFORM F98BD THRU F98BD-FN"]
 	node [shape=ellipse]
-	157 [label="IF IK = 1"]
+	85 [label="IF SQLCODE = +100"]
 	node [shape=ellipse]
-	159 [label="IF IK = 2"]
+	87 [label="EVALUATE IK"]
+	node [shape=note]
+	93 [label="F95TR-FN"]
+	node [shape=note]
+	94 [label="F95-TR00-CL"]
 	node [shape=ellipse]
-	161 [label="IF IK = 3"]
-	node [shape=ellipse]
-	166 [label="IF 9-TR00-YCFDB2 = '0'"]
-	node [shape=ellipse]
-	167 [label="GOTO F95-TR00-CL-FN"]
+	95 [label="IF 9-TR00-YCFDB2 NOT = '0'"]
 	node [shape=box]
-	169 [label="CLOSE C-TR00"]
+	96 [label="CLOSE C-TR00"]
+	node [shape=ellipse]
+	97 [label="PERFORM F98BD THRU F98BD-FN"]
 	node [shape=note]
-	170 [label="F95-TR00-CL-FN"]
+	99 [label="F9520-S"]
 	node [shape=ellipse]
-	173 [label="GOTO F9520-T"]
+	100 [label="IF T-DAT (1) = '1'"]
+	node [shape=ellipse]
+	102 [label="IF T-DAT (2) = '1'"]
+	node [shape=ellipse]
+	104 [label="IF T-DAT (3) = '1'"]
+	node [shape=ellipse]
+	106 [label="IF T-DAT (4) = '1'"]
 	node [shape=note]
-	174 [label="F9520-D"]
+	108 [label=F96BB]
 	node [shape=ellipse]
-	175 [label="IF DAT-ADO < '1'           GO TO F9520-DT."]
+	109 [label="IF W-BB00-YCORET NOT = SPACE"]
 	node [shape=ellipse]
-	176 [label="IF DAT-ADO = '2'           GO TO F9520-D2."]
-	node [shape=ellipse]
-	177 [label="IF DAT73 < DAT-CTYT MOVE '19' TO DATCTY DAT73C"]
-	node [shape=ellipse]
-	182 [label="GOTO F9520-DT"]
+	110 [label="GO ?TO F20-FIN-TRAITEMENT"]
 	node [shape=note]
-	183 [label="F9520-D2"]
+	112 [label=F98BD]
 	node [shape=ellipse]
-	184 [label="IF DAT73 < DAT-CTYT MOVE '20' TO DATCTY DAT73C"]
+	113 [label="EVALUATE SQLCODE"]
+	node [shape=ellipse]
+	115 [label="GO ?TO F98BD-FN"]
+	node [shape=ellipse]
+	117 [label="GO ?TO F98BD-FN"]
+	node [shape=ellipse]
+	120 [label="PERFORM VARYING"]
 	node [shape=note]
-	187 [label="F9520-DT"]
-	node [shape=ellipse]
-	188 [label="GOTO F9520-T"]
+	121 [label=F98BX]
 	node [shape=note]
-	189 [label="F9520-E"]
-	node [shape=ellipse]
-	190 [label="IF DAT-ADO < '1'           GO TO F9520-ET."]
-	node [shape=ellipse]
-	191 [label="IF DAT-ADO = '2'           GO TO F9520-E2."]
-	node [shape=ellipse]
-	192 [label="IF DAT83 < DAT-CTYT MOVE '19' TO DATCTY DAT83CC"]
-	node [shape=ellipse]
-	197 [label="GOTO F9520-ET"]
+	122 [label="F98BD-FN"]
 	node [shape=note]
-	198 [label="F9520-E2"]
+	123 [label=F99ER]
 	node [shape=ellipse]
-	199 [label="IF DAT83 < DAT-CTYT MOVE '20' TO DATCTY DAT83CC"]
-	node [shape=note]
-	202 [label="F9520-ET"]
+	124 [label="IF S-SPCB-XCORET NOT = SPACE AND S-SPCB-XCORET NOT = 'GE' AND S-SPCB-XCORET NOT = 'GB' AND S-SPCB-XCORET NOT = 'GK' AND S-SPCB-XCORET NOT = 'GA' AND S-SPCB-XCORET NOT = 'II' AND S-SPCB-XCORET NOT = 'GG'"]
 	node [shape=ellipse]
-	203 [label="GOTO F9520-T"]
-	node [shape=note]
-	204 [label="F9520-G"]
-	node [shape=ellipse]
-	205 [label="GOTO F9520-T"]
-	node [shape=note]
-	206 [label="F9520-I"]
-	node [shape=ellipse]
-	207 [label="IF DAT-ADO < '1'           GO TO F9520-IT."]
-	node [shape=ellipse]
-	208 [label="IF DAT-ADO = '2'           GO TO F9520-I2."]
-	node [shape=ellipse]
-	209 [label="IF DAT61 < DAT-CTYT MOVE '19' TO DATCTY DAT61C"]
-	node [shape=ellipse]
-	214 [label="GOTO F9520-IT"]
-	node [shape=note]
-	215 [label="F9520-I2"]
-	node [shape=ellipse]
-	216 [label="IF DAT61 < DAT-CTYT MOVE '20' TO DATCTY DAT61C"]
-	node [shape=note]
-	219 [label="F9520-IT"]
-	node [shape=ellipse]
-	220 [label="GOTO F9520-T"]
-	node [shape=note]
-	221 [label="F9520-M"]
-	node [shape=ellipse]
-	222 [label="GOTO F9520-T"]
-	node [shape=note]
-	223 [label="F9520-S"]
-	node [shape=note]
-	224 [label="F9520-T"]
-	node [shape=ellipse]
-	225 [label="IF T-DAT (1) = '1'"]
-	node [shape=ellipse]
-	227 [label="IF T-DAT (2) = '1'"]
-	node [shape=ellipse]
-	229 [label="IF T-DAT (3) = '1'"]
-	node [shape=ellipse]
-	231 [label="IF T-DAT (4) = '1'"]
-	node [shape=ellipse]
-	233 [label="IF T-DAT (5) = '1'"]
-	node [shape=ellipse]
-	239 [label="IF W-BB00-YCORET NOT = SPACE"]
-	node [shape=ellipse]
-	240 [label="GOTO F20"]
-	node [shape=ellipse]
-	250 [label="IF SQLCODE = 0"]
-	node [shape=ellipse]
-	251 [label="GOTO F98BD-FN"]
-	node [shape=ellipse]
-	253 [label="IF SQLCODE = +100"]
-	node [shape=ellipse]
-	254 [label="GOTO F98BD-FN"]
-	node [shape=ellipse]
-	260 [label="IF SQLCODE = -803"]
-	node [shape=ellipse]
-	261 [label="NEXT SENTENCE"]
-	node [shape=ellipse]
-	263 [label="GOTO F98BJ-FN"]
-	node [shape=note]
-	265 [label="F98BJ-FN"]
-	node [shape=ellipse]
-	267 [label="IF SQLCODE = -530 OR    = -531 OR = -532"]
-	node [shape=ellipse]
-	268 [label="NEXT SENTENCE"]
-	node [shape=ellipse]
-	270 [label="GOTO F98BL-FN"]
-	node [shape=note]
-	272 [label="F98BL-FN"]
-	node [shape=ellipse]
-	277 [label="GOTO F98BQ-B"]
-	node [shape=note]
-	278 [label="F98BQ-A"]
-	node [shape=note]
-	279 [label="F98BQ-B"]
-	node [shape=ellipse]
-	280 [label="IF 10                       <  J98BQR"]
-	node [shape=ellipse]
-	281 [label="GOTO F98BQ-FN"]
-	node [shape=ellipse]
-	284 [label="GOTO F98BQ-A"]
-	node [shape=note]
-	285 [label="F98BQ-FN"]
-	node [shape=note]
-	293 [label="F98BD-FN"]
-	node [shape=ellipse]
-	296 [label="IF S-SPCB-XCORET NOT = '  ' AND   'GE' AND 'GB' AND 'GK' AND   'GA' AND 'II' AND 'GG'"]
-	node [shape=ellipse]
-	297 [label="NEXT SENTENCE"]
-	node [shape=ellipse]
-	299 [label="GOTO F99ER-FN"]
-	node [shape=note]
-	301 [label=F99EU]
-	node [shape=note]
-	303 [label="F99ER-FN"]
+	125 [label="PERFORM F98BX"]
 	node [shape=diamond]
-	370 [label=END]
-	304 -> 7
-	7 -> 8
-	8 -> 19
-	19 -> 22 [label=True]
-	19 -> 22 [label=False]
+	166 [label=END]
+	127 -> 1
+	1 -> 2
+	2 -> 3
+	2 -> 108
+	108 -> 2 [label="Go back"]
+	3 -> 4
+	3 -> 108
+	108 -> 3 [label="Go back"]
+	4 -> 5
+	5 -> 6
+	6 -> 9
+	9 -> 10
+	9 -> 50
+	50 -> 9 [label="Go back"]
+	10 -> 11 [label=True]
+	10 -> 13 [label=False]
+	11 -> 99
+	99 -> 11 [label="Go back"]
+	11 -> 15
+	13 -> 121
+	121 -> 13 [label="Go back"]
+	13 -> 15
+	15 -> 16
+	15 -> 50
+	50 -> 15 [label="Go back"]
+	16 -> 17 [label=True]
+	16 -> 19 [label=False]
+	17 -> 99
+	99 -> 17 [label="Go back"]
+	17 -> 21
+	19 -> 121
+	121 -> 19 [label="Go back"]
+	19 -> 21
+	21 -> 22
 	22 -> 23 [label=True]
-	22 -> 25 [label=False]
-	23 -> 27
-	25 -> 27
-	27 -> 30
-	30 -> 33 [label=True]
-	30 -> 33 [label=False]
-	33 -> 34 [label=True]
-	33 -> 36 [label=False]
-	34 -> 38
-	36 -> 38
-	38 -> 40
-	40 -> 42
-	42 -> 43 [label=True]
-	42 -> 45 [label=False]
-	43 -> 47
-	45 -> 51
+	22 -> 27 [label=False]
+	23 -> 24
+	23 -> 76
+	23 -> 93
+	93 -> 23 [label="Go back"]
+	24 -> 27 [label=True]
+	24 -> 27 [label=False]
+	27 -> 28
+	28 -> 29 [label=True]
+	28 -> 31 [label=False]
+	29 -> 31
+	31 -> 32
+	32 -> 33
+	32 -> 77
+	77 -> 32 [label="Go back"]
+	33 -> 34
+	34 -> 35
+	34 -> 57
+	57 -> 34 [label="Go back"]
+	35 -> 36
+	35 -> 62
+	62 -> 35 [label="Go back"]
+	36 -> 37
+	37 -> 42 [label="'C'"]
+	37 -> 42 [label="'D'"]
+	37 -> 42 [label=OTHER]
+	42 -> 43
+	42 -> 62
+	62 -> 42 [label="Go back"]
+	43 -> 44
+	43 -> 49
+	49 -> 43 [label="Go back"]
+	44 -> 45
+	44 -> 71
+	71 -> 44 [label="Go back"]
+	45 -> 46
+	45 -> 82
+	82 -> 45 [label="Go back"]
+	46 -> 47
+	46 -> 94
+	94 -> 46 [label="Go back"]
 	47 -> 48
-	48 -> 49 [label=True]
-	48 -> 51 [label=False]
-	49 -> 51
-	51 -> 53
-	53 -> 54
+	48 -> 21
+	49 -> 50
+	50 -> 51
+	51 -> 52 [label=True]
+	51 -> 54 [label=False]
+	52 -> 112
+	52 -> 122
+	122 -> 52 [label="Go back"]
+	52 -> 54
 	54 -> 55 [label=True]
 	54 -> 57 [label=False]
-	55 -> 59
-	57 -> 69
-	59 -> 69
-	69 -> 71
+	55 -> 123
+	123 -> 55 [label="Go back"]
+	55 -> 57
+	57 -> 58
+	58 -> 59 [label=True]
+	58 -> 62 [label=False]
+	59 -> 60
+	60 -> 112
+	60 -> 122
+	122 -> 60 [label="Go back"]
+	60 -> 62
+	62 -> 63
+	63 -> 64
+	64 -> 65
+	64 -> 112
+	64 -> 122
+	122 -> 64 [label="Go back"]
+	65 -> 71 [label="'1'"]
+	65 -> 71 [label="'0'"]
+	65 -> 71 [label="'2'"]
+	65 -> 71 [label=OTHER]
 	71 -> 72
 	72 -> 73 [label=True]
-	72 -> 75 [label=False]
-	73 -> 77
-	75 -> 94
+	72 -> 76 [label=False]
+	73 -> 74
+	74 -> 112
+	74 -> 122
+	122 -> 74 [label="Go back"]
+	74 -> 76
+	76 -> 77
 	77 -> 78
 	78 -> 79 [label=True]
-	78 -> 81 [label=False]
-	79 -> 83
-	81 -> 89
-	83 -> 85 [label=True]
-	83 -> 85 [label=False]
-	85 -> 88 [label=True]
-	85 -> 88 [label=False]
-	88 -> 77
-	89 -> 93
-	93 -> 71
-	94 -> 100
-	100 -> 101 [label=True]
-	100 -> 103 [label=False]
-	101 -> 105
-	103 -> 108
-	105 -> 108
-	108 -> 113
-	113 -> 40
-	114 -> 117
-	117 -> 119 [label=True]
-	117 -> 119 [label=False]
-	119 -> 125 [label=True]
-	119 -> 125 [label=False]
-	125 -> 126 [label=True]
-	125 -> 128 [label=False]
-	126 -> 129
-	128 -> 129
-	129 -> 131
-	131 -> 132
-	132 -> 134 [label=True]
-	132 -> 134 [label=False]
-	134 -> 136 [label=True]
-	134 -> 136 [label=False]
-	136 -> 141 [label=True]
-	136 -> 141 [label=False]
-	141 -> 142 [label=True]
-	141 -> 144 [label=False]
-	142 -> 145
-	144 -> 145
-	145 -> 148
-	148 -> 149 [label=True]
-	148 -> 151 [label=False]
-	149 -> 152
-	151 -> 152
-	152 -> 154
-	154 -> 155
-	155 -> 157 [label=True]
-	155 -> 157 [label=False]
-	157 -> 159 [label=True]
-	157 -> 159 [label=False]
-	159 -> 161 [label=True]
-	159 -> 161 [label=False]
-	161 -> 166 [label=True]
-	161 -> 166 [label=False]
-	166 -> 167 [label=True]
-	166 -> 169 [label=False]
-	167 -> 170
-	169 -> 170
-	170 -> 173
-	173 -> 224
-	174 -> 175
-	175 -> 176 [label=True]
-	175 -> 182 [label=False]
-	176 -> 177 [label=True]
-	176 -> 182 [label=False]
-	177 -> 182 [label=True]
-	177 -> 182 [label=False]
-	182 -> 187
-	183 -> 184
-	184 -> 187 [label=True]
-	184 -> 187 [label=False]
-	187 -> 188
-	188 -> 224
-	189 -> 190
-	190 -> 191 [label=True]
-	190 -> 197 [label=False]
-	191 -> 192 [label=True]
-	191 -> 197 [label=False]
-	192 -> 197 [label=True]
-	192 -> 197 [label=False]
-	197 -> 202
-	198 -> 199
-	199 -> 202 [label=True]
-	199 -> 202 [label=False]
-	202 -> 203
-	203 -> 224
-	204 -> 205
-	205 -> 224
-	206 -> 207
-	207 -> 208 [label=True]
-	207 -> 214 [label=False]
-	208 -> 209 [label=True]
-	208 -> 214 [label=False]
-	209 -> 214 [label=True]
-	209 -> 214 [label=False]
-	214 -> 219
-	215 -> 216
-	216 -> 219 [label=True]
-	216 -> 219 [label=False]
-	219 -> 220
-	220 -> 224
-	221 -> 222
-	222 -> 224
-	223 -> 224
-	224 -> 225
-	225 -> 227 [label=True]
-	225 -> 227 [label=False]
-	227 -> 229 [label=True]
-	227 -> 229 [label=False]
-	229 -> 231 [label=True]
-	229 -> 231 [label=False]
-	231 -> 233 [label=True]
-	231 -> 233 [label=False]
-	233 -> 239 [label=True]
-	233 -> 239 [label=False]
-	239 -> 240 [label=True]
-	239 -> 250 [label=False]
-	240 -> 53
-	250 -> 251 [label=True]
-	250 -> 253 [label=False]
-	251 -> 293
-	253 -> 254 [label=True]
-	253 -> 260 [label=False]
-	254 -> 293
-	260 -> 261 [label=True]
-	260 -> 263 [label=False]
-	261 -> 265
-	263 -> 265
-	265 -> 267
-	267 -> 268 [label=True]
-	267 -> 270 [label=False]
-	268 -> 272
-	270 -> 272
-	272 -> 277
-	277 -> 279
-	278 -> 279
-	279 -> 280
-	280 -> 281 [label=True]
-	280 -> 284 [label=False]
-	281 -> 285
-	284 -> 278
-	285 -> 293
-	293 -> 296
-	296 -> 297 [label=True]
-	296 -> 299 [label=False]
-	297 -> 301
-	299 -> 303
-	301 -> 303
-	303 -> 370
+	78 -> 82 [label=False]
+	79 -> 80
+	80 -> 112
+	80 -> 122
+	122 -> 80 [label="Go back"]
+	80 -> 82
+	82 -> 83
+	83 -> 84
+	84 -> 85
+	84 -> 112
+	84 -> 122
+	122 -> 84 [label="Go back"]
+	85 -> 87 [label=True]
+	85 -> 87 [label=False]
+	87 -> 93 [label="'1'"]
+	87 -> 93 [label="'2'"]
+	87 -> 93 [label="'3'"]
+	87 -> 93 [label=OTHER]
+	93 -> 94
+	94 -> 95
+	95 -> 96 [label=True]
+	95 -> 99 [label=False]
+	96 -> 97
+	97 -> 112
+	97 -> 122
+	122 -> 97 [label="Go back"]
+	97 -> 99
+	99 -> 100
+	100 -> 102 [label=True]
+	100 -> 102 [label=False]
+	102 -> 104 [label=True]
+	102 -> 104 [label=False]
+	104 -> 106 [label=True]
+	104 -> 106 [label=False]
+	106 -> 108 [label=True]
+	106 -> 108 [label=False]
+	108 -> 109
+	109 -> 110 [label=True]
+	109 -> 112 [label=False]
+	110 -> 27
+	112 -> 113
+	113 -> 115 [label=0]
+	113 -> 117 [label=100]
+	113 -> 120 [label=OTHER]
+	115 -> 122
+	117 -> 122
+	120 -> 121
+	121 -> 122
+	122 -> 123
+	123 -> 124
+	124 -> 125 [label=True]
+	124 -> 166 [label=False]
+	125 -> 121
+	121 -> 125 [label="Go back"]
 }

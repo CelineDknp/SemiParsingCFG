@@ -1,11 +1,12 @@
 class Node:
 	id = 0
-	def __init__(self, depth, type):
+	def __init__(self, depth, type, regex=None):
 		self.depth = depth
 		self.type = type
 		self.childs = []
 		self.parents = []
-		self.id = Node.id 
+		self.id = Node.id
+		self.regex = regex
 		Node.id += 1
 
 	def __str__(self):
@@ -71,3 +72,6 @@ class Node:
 	def remove_parent(self, node):
 		if node in self.parents:
 			self.parents.remove(node)
+
+	def get_regex(self):
+		return self.regex

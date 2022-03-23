@@ -1,22 +1,18 @@
-digraph "partial.COB" {
+digraph "perform_base_test_file.COB" {
 	node [shape=diamond]
 	8 [label=START]
 	node [shape=ellipse]
-	1 [label="PERFORM P1 THRU P4"]
+	1 [label="PERFORM P1"]
 	node [shape=note]
 	2 [label=PZ]
 	node [shape=note]
 	3 [label=P1]
-	node [shape=note]
-	6 [label=P4]
 	node [shape=diamond]
 	9 [label=END]
 	8 -> 1
 	1 -> 2
 	1 -> 3
-	1 -> 6
-	6 -> 1 [label="Go back"]
+	3 -> 1 [label="Go back"]
 	2 -> 3
-	3 -> 6
-	6 -> 9
+	3 -> 9
 }

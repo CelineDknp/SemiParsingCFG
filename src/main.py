@@ -44,7 +44,9 @@ def process_and_parse(filename):
 
 def process_and_create(filename):
 	lot = process_and_parse(filename)
-	#print(f"Final array of nodes: {lot}")
+	print(f"Final array of nodes: {lot}")
+	for n in lot:
+		print(n)
 	# print(f"Final size of array of nodes: {len(lot)}")
 	g = construct_graph(lot)
 	print(f"Graph constructed!", flush=True)

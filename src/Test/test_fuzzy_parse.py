@@ -139,6 +139,40 @@ def test_fuzzy_parse_if_condition_case_insensitive():
 	assert node_array[1].get_type() == NODE_COND_END
 	assert node_array[0].get_condition() == "A > 0 and B > 0"
 
+def test_fuzzy_parse_simple_evaluate():
+	node_array = process_and_parse("TestFiles/pytest/evaluate_simple_test_file.COB")
+	assert len(node_array) == 8
+	assert node_array[0].get_type() == NODE_COND_START
+	assert node_array[0].get_condition() == "TRUE"
+	assert node_array[1].get_type() == NODE_COND_BRANCH
+	assert node_array[1].get_condition() == "A > 0"
+	assert node_array[3].get_type() == NODE_COND_BRANCH
+	assert node_array[3].get_condition() == "A < 0"
+	assert node_array[5].get_type() == NODE_COND_BRANCH
+	assert node_array[5].get_condition() == "A = 0"
+	assert node_array[7].get_type() == NODE_COND_END
+
+def test_fuzzy_parse_mixed_evaluate():
+	node_array = process_and_parse("TestFiles/pytest/evaluate_if_mix_test_file.COB")
+	assert len(node_array) == 14
+	assert node_array[0].get_type() == NODE_COND_START
+	assert node_array[0].get_condition() == "TRUE"
+	assert node_array[1].get_type() == NODE_COND_BRANCH
+	assert node_array[1].get_condition() == "A > 0"
+	assert node_array[2].get_type() == NODE_COND_START
+	assert node_array[2].get_condition() == "B > 1"
+	assert node_array[4].get_type() == NODE_COND_BRANCH
+	assert node_array[5].get_type() == NODE_COND_END
+	assert node_array[6].get_type() == NODE_COND_BRANCH
+	assert node_array[6].get_condition() == "A < 0"
+	assert node_array[7].get_type() == NODE_COND_START
+	assert node_array[7].get_condition() == "B > 2"
+	assert node_array[8].get_type() == NODE_COND_BRANCH
+	assert node_array[10].get_type() == NODE_COND_END
+	assert node_array[11].get_type() == NODE_COND_BRANCH
+	assert node_array[11].get_condition() == "A = 0"
+	assert node_array[13].get_type() == NODE_COND_END
+
 #Testing the comment part of parsing
 def test_fuzzy_parse_comment():
 	node_array = process_and_parse("TestFiles/pytest/comment_normal_test_file.COB")
@@ -184,3 +218,105 @@ def test_fuzzy_parse_exec_case_insensitive():
 	assert node_array[1].get_depth() == 0
 	assert node_array[2].get_depth() == 0
 	assert node_array[3].get_depth() == 0
+
+def test_fuzzy_parse_next_sentence():
+	node_array = process_and_parse("TestFiles/pytest/next_sentence_test_file.COB")
+	assert len(node_array) == 7
+	assert node_array[0].get_type() == NODE_COND_START
+	assert node_array[0].get_condition() == "A > 0"
+	assert node_array[1].get_type() == NODE_LOOP
+	assert node_array[2].get_type() == NODE_COND_BRANCH
+	assert node_array[3].get_type() == NODE_COND_END
+	assert node_array[4].get_type() == NODE_COND_END_ANY
+	assert node_array[5].get_type() == NODE_COND_START
+	assert node_array[6].get_type() == NODE_COND_END
+
+def test_fuzzy_parse_base_perform():
+	node_array = process_and_parse("TestFiles/pytest/perform_base_test_file.COB")
+	assert len(node_array) == 8
+	assert node_array[0].get_type() == NODE_LABEL
+	assert node_array[1].get_type() == NODE_LOOP
+	assert node_array[2].get_type() == NODE_LABEL
+	assert node_array[3].get_type() == NODE_LABEL
+	assert node_array[4].get_type() == NODE_LABEL
+	assert node_array[5].get_type() == NODE_LABEL
+	assert node_array[6].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+
+def test_fuzzy_parse_chained_perform():
+	node_array = process_and_parse("TestFiles/pytest/perform_chained_test_file.COB")
+	assert len(node_array) == 9
+	assert node_array[0].get_type() == NODE_LABEL
+	assert node_array[1].get_type() == NODE_LOOP
+	assert node_array[2].get_type() == NODE_LABEL
+	assert node_array[3].get_type() == NODE_LABEL
+	assert node_array[4].get_type() == NODE_LOOP
+	assert node_array[5].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+	assert node_array[8].get_type() == NODE_LABEL
+
+def test_fuzzy_parse_broken_perform():
+	node_array = process_and_parse("TestFiles/pytest/perform_broken_goto_test_file.COB")
+	assert len(node_array) == 9
+	assert node_array[0].get_type() == NODE_LABEL
+	assert node_array[1].get_type() == NODE_LOOP
+	assert node_array[2].get_type() == NODE_LABEL
+	assert node_array[3].get_type() == NODE_LABEL
+	assert node_array[4].get_type() == NODE_LOOP
+	assert node_array[5].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+	assert node_array[8].get_type() == NODE_LABEL
+
+def test_fuzzy_parse_base_perform_thru():
+	node_array = process_and_parse("TestFiles/pytest/performThru_base_test_file.COB")
+	assert len(node_array) == 8
+	assert node_array[0].get_type() == NODE_LABEL
+	assert node_array[1].get_type() == NODE_LOOP
+	assert node_array[2].get_type() == NODE_LABEL
+	assert node_array[3].get_type() == NODE_LABEL
+	assert node_array[4].get_type() == NODE_LABEL
+	assert node_array[5].get_type() == NODE_LABEL
+	assert node_array[6].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+
+def test_fuzzy_parse_chained_perform_thru():
+	node_array = process_and_parse("TestFiles/pytest/performThru_chained_test_file.COB")
+	assert len(node_array) == 9
+	assert node_array[0].get_type() == NODE_LABEL
+	assert node_array[1].get_type() == NODE_LOOP
+	assert node_array[2].get_type() == NODE_LABEL
+	assert node_array[3].get_type() == NODE_LABEL
+	assert node_array[4].get_type() == NODE_LOOP
+	assert node_array[5].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+	assert node_array[8].get_type() == NODE_LABEL
+
+def test_fuzzy_parse_goto_perform_thru():
+	node_array = process_and_parse("TestFiles/pytest/performThru_goto_test_file.COB")
+	assert len(node_array) == 9
+	assert node_array[0].get_type() == NODE_LABEL
+	assert node_array[1].get_type() == NODE_LOOP
+	assert node_array[2].get_type() == NODE_LABEL
+	assert node_array[3].get_type() == NODE_LABEL
+	assert node_array[4].get_type() == NODE_LOOP
+	assert node_array[5].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+	assert node_array[8].get_type() == NODE_LABEL
+
+def test_fuzzy_parse_broken_perform_thru():
+	node_array = process_and_parse("TestFiles/pytest/performThru_broken_goto_test_file.COB")
+	assert len(node_array) == 9
+	assert node_array[0].get_type() == NODE_LABEL
+	assert node_array[1].get_type() == NODE_LOOP
+	assert node_array[2].get_type() == NODE_LABEL
+	assert node_array[3].get_type() == NODE_LABEL
+	assert node_array[4].get_type() == NODE_LOOP
+	assert node_array[5].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+	assert node_array[7].get_type() == NODE_LABEL
+	assert node_array[8].get_type() == NODE_LABEL
+

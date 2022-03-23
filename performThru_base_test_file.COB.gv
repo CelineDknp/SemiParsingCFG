@@ -1,4 +1,4 @@
-digraph "partial.COB" {
+digraph "performThru_base_test_file.COB" {
 	node [shape=diamond]
 	8 [label=START]
 	node [shape=ellipse]

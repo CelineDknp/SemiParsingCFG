@@ -6,10 +6,9 @@ import re
 class ConditionNode(Node):
 
     def __init__(self, depth, type, regex):
-        super().__init__(depth, type)
+        super().__init__(depth, type, regex)
         if self.type != NODE_COND_START:
             self.condition = ""
-        self.regex = regex
 
     def __str__(self):
         if self.type == NODE_COND_START:
@@ -29,10 +28,15 @@ class ConditionNode(Node):
         go = True
         cond = ""
         new_line = input.upper().find("\n", pos)
-        next_line = input[pos:new_line]
+        new_spaces = input.upper().find("   ", pos)
+        if new_spaces < new_line:
+            next_line = input[pos:new_spaces]
+        else:
+            next_line = input[pos:new_line]
         first = True
         while go:
             if not first:
+                # print(f"Current cond is: {cond}")
                 # print(f"Looking at next line: {next_line}")
                 if self.is_anchor(next_line.upper(), [r"\sIF(\s)+", "ELSE", "END-IF","WHEN","EXEC SQL", r"\*"]):
                     # print("saw anchor")
@@ -67,6 +71,3 @@ class ConditionNode(Node):
 
     def get_condition(self):
         return self.condition
-
-    def get_regex(self):
-        return self.regex

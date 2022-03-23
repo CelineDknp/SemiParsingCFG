@@ -10,8 +10,17 @@ CONDITION = "condition"
 conditions = [{"start":r"\sIF(\s)+", "single_branch":"ELSE", "end":"END-IF"}, {"start":r"\sEVALUATE(\s)+", "multiple_branch":"WHEN", "end":"END-EVALUATE"}]
 
 #Loops structures
+# start: regex for the start of the loop structure
+# type: label, multiple_label or control-flow
+# goback: True if the execution goes back after the paragraph, false if not
+# for label-type: inline-label regex and label-regex regex (first one for the label in the loop call, second for the label in the code body)
+# for control-type, control-type = regex towards control-flow
 LOOP = "loop"
-loops = [{"start":r"\sGO(\s)?TO(\s)+", "type":"label", "label-regex":r"^\s{7}([^\s*])+(\s)*\."}, {"start":r"\sNEXT\sSENTENCE(\s)*", "type":"control-flow", "control-type":NODE_COND_END_ANY}]
+loops = [{"start":r"\sGO(\s)?TO(\s)+", "type":"label", "goback":False, "inline-label":r"([^\s*.])+(\s)*", "label-regex":r"^\s{7}([^\s*])+(\s)*\."},
+{"start":r"\sPERFORM(\s)+", "type":"multiple_label", "goback":True, "separator":r"(\s)+THRU(\s)*", "inline-label":r"([^\s*.])+(\s)*", "label-regex":r"^\s{7}([^\s*])+(\s)*\."},
+         {"start":r"\sPERFORM(\s)+", "type":"label", "goback":True, "inline-label":r"([^\s*.])+(\s)*", "label-regex":r"^\s{7}([^\s*])+(\s)*\."},
+         {"start":r"\sNEXT\sSENTENCE(\s)*", "type":"control-flow", "goback":False, "control-type": NODE_COND_END_ANY, "control-regex":r"\.(\s)+"}
+         ]
 
 PARSABLE = "parsable"
 parsable = [{"start":r"EXEC\sSQL", "end":"END-EXEC"}]

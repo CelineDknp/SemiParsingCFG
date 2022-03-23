@@ -20,8 +20,8 @@ class ParseNode(Node):
                 return c
             return ord(chr(c).upper() if self._upper else chr(c).lower())
 
-    def __init__(self, depth, node_type):
-        super().__init__(depth, node_type)
+    def __init__(self, depth, node_type, regex):
+        super().__init__(depth, node_type, regex)
         self.SQLL = MySqlLexer
         self.SQLP = MySqlParser
 
