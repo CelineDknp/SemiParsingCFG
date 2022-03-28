@@ -1,4 +1,4 @@
-from Nodes.Node import Node
+from .Node import Node
 from antlr4 import *
 from AntlrParser.MySqlLexer import MySqlLexer
 from AntlrParser.MySqlParser import MySqlParser

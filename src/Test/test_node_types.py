@@ -1,10 +1,8 @@
 import pytest
-from Utils.config import *
 from Nodes.SimpleBranchConditionNode import SimpleBranchConditionNode
 from Nodes.MultipleBranchConditionNode import MultipleBranchConditionNode
 from Nodes.ConditionNode import ConditionNode
 from Nodes.ParseNode import ParseNode
-from Nodes.LoopNode import LoopNode
 from Nodes.LabelLoopNode import LabelLoopNode
 from Nodes.MultipleLabelLoopNode import MultipleLabelLoopNode
 from Nodes.ControlLoopNode import ControlLoopNode

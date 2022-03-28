@@ -1,4 +1,5 @@
-from Nodes.LabelLoopNode import LabelLoopNode
+from .LabelLoopNode import LabelLoopNode
+from Anchors import LoopAnchor
 import re
 
 
@@ -8,12 +9,21 @@ class MultipleLabelLoopNode(LabelLoopNode):
 		super().__init__(depth, node_type, anchor)
 		self.separator = anchor.get_separator()
 
+	@classmethod
+	def from_explicit(cls, depth, node_type, regex, separator, label, goback):
+		elem = {"type":"multiple_label", "start":regex, "separator":separator, "inline-label":label,"goback":goback}
+		anchor = LoopAnchor.LoopAnchor(elem)
+		return cls(depth, node_type, anchor)
+
 	def __str__(self):
 		return f"Node {self.type} (multiple labels) to {self.label}"
 
 	def go_back_label(self):
 		if self.go_back:
 			return self.label[-1]
+
+	def set_label(self, label):
+		self.label = label
 
 	def is_label(self):
 		return True

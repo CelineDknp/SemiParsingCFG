@@ -1,11 +1,11 @@
-from Nodes.Node import Node
-from Nodes.FusedNode import FusedNode
-from Nodes.SimpleBranchConditionNode import SimpleBranchConditionNode
-from Nodes.MultipleBranchConditionNode import MultipleBranchConditionNode
-from Nodes.ControlLoopNode import ControlLoopNode
-from Nodes.LabelLoopNode import LabelLoopNode
-from Nodes.LoopNode import LoopNode
-from Nodes.MultipleLabelLoopNode import MultipleLabelLoopNode
+from .Node import Node
+from .FusedNode import FusedNode
+from .SimpleBranchConditionNode import SimpleBranchConditionNode
+from .MultipleBranchConditionNode import MultipleBranchConditionNode
+from .ControlLoopNode import ControlLoopNode
+from .LabelLoopNode import LabelLoopNode
+from .LoopNode import LoopNode
+from .MultipleLabelLoopNode import MultipleLabelLoopNode
 from Utils.config import *
 from Utils.utils import clean_regex
 import graphviz
@@ -22,6 +22,9 @@ class Graph:
 		self.open_control_loops = []
 		self.all_labels = {}
 		self.all_nodes = [start_node]
+
+	def get_last_node(self):
+		return self.all_nodes[-1]
 
 	def match_if(self, branch_node):
 		res = None
@@ -242,7 +245,7 @@ class Graph:
 						child_node = current_node.get_childs().copy()
 						for c in child_node:
 							self.replace_child(parents[0], current_node, c)
-						cleaned = True
+							cleaned = True
 
 				for child in current_node.get_childs().copy():  # Look at a node's childrens
 					if child.get_type() == NODE_CONTROL:  # When we find a control node

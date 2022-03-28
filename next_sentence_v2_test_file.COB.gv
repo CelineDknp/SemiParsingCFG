@@ -1,6 +1,6 @@
-digraph "partial.COB" {
+digraph "next_sentence_v2_test_file.COB" {
 	node [shape=diamond]
-	6 [label=START]
+	7 [label=START]
 	node [shape=ellipse]
 	0 [label="IF A > 0"]
 	node [shape=ellipse]
@@ -8,10 +8,11 @@ digraph "partial.COB" {
 	node [shape=ellipse]
 	4 [label="IF B = 0"]
 	node [shape=diamond]
-	10 [label=END]
-	6 -> 0
+	12 [label=END]
+	7 -> 0
 	0 -> 1 [label=True]
 	0 -> 4 [label=False]
-	4 -> 10 [label=True]
-	4 -> 10 [label=False]
+	1 -> 12
+	4 -> 12 [label=True]
+	4 -> 12 [label=False]
 }

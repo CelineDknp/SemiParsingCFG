@@ -139,6 +139,7 @@ def test_fuzzy_parse_if_condition_case_insensitive():
 	assert node_array[1].get_type() == NODE_COND_END
 	assert node_array[0].get_condition() == "A > 0 and B > 0"
 
+#Tests for evaluate (multiple branch conditions)
 def test_fuzzy_parse_simple_evaluate():
 	node_array = process_and_parse("TestFiles/pytest/evaluate_simple_test_file.COB")
 	assert len(node_array) == 8
@@ -219,6 +220,7 @@ def test_fuzzy_parse_exec_case_insensitive():
 	assert node_array[2].get_depth() == 0
 	assert node_array[3].get_depth() == 0
 
+#Testing the next sentence instruction (control loop)
 def test_fuzzy_parse_next_sentence():
 	node_array = process_and_parse("TestFiles/pytest/next_sentence_test_file.COB")
 	assert len(node_array) == 7
@@ -231,6 +233,19 @@ def test_fuzzy_parse_next_sentence():
 	assert node_array[5].get_type() == NODE_COND_START
 	assert node_array[6].get_type() == NODE_COND_END
 
+def test_fuzzy_parse_next_sentence_v2():
+	node_array = process_and_parse("TestFiles/pytest/next_sentence_v2_test_file.COB")
+	assert len(node_array) == 7
+	assert node_array[0].get_type() == NODE_COND_START
+	assert node_array[0].get_condition() == "A > 0"
+	assert node_array[1].get_type() == NODE_LOOP
+	assert node_array[2].get_type() == NODE_COND_BRANCH
+	assert node_array[3].get_type() == NODE_COND_END
+	assert node_array[4].get_type() == NODE_COND_START
+	assert node_array[5].get_type() == NODE_COND_END
+	assert node_array[6].get_type() == NODE_COND_END_ANY
+
+#Testing the simple (single label) perform
 def test_fuzzy_parse_base_perform():
 	node_array = process_and_parse("TestFiles/pytest/perform_base_test_file.COB")
 	assert len(node_array) == 8
@@ -269,6 +284,7 @@ def test_fuzzy_parse_broken_perform():
 	assert node_array[7].get_type() == NODE_LABEL
 	assert node_array[8].get_type() == NODE_LABEL
 
+#Testing the perform thru (multiple label goback)
 def test_fuzzy_parse_base_perform_thru():
 	node_array = process_and_parse("TestFiles/pytest/performThru_base_test_file.COB")
 	assert len(node_array) == 8

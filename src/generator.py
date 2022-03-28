@@ -1,6 +1,6 @@
 import sys
 import os
-from main import process_file
+from .main import process_file
 
 
 

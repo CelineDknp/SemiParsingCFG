@@ -1,4 +1,4 @@
-from Nodes.Node import Node
+from .Node import Node
 from Utils.config import *
 from Utils.constants import *
 

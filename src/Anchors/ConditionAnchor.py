@@ -1,4 +1,4 @@
-from Anchor import Anchor
+from .Anchor import Anchor
 from Utils.config import *
 class ConditionAnchor(Anchor):
 

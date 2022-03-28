@@ -1,5 +1,5 @@
 import re
-from Utils.constants import *
+from .constants import *
 
 #All structures that can contain code but should be ignored (typically, strings and comments)
 IGNORE = "ignore"
@@ -17,9 +17,9 @@ conditions = [{"start":r"\sIF(\s)+", "single_branch":"ELSE", "end":"END-IF"}, {"
 # for control-type, control-type = regex towards control-flow
 LOOP = "loop"
 loops = [{"start":r"\sGO(\s)?TO(\s)+", "type":"label", "goback":False, "inline-label":r"([^\s*.])+(\s)*", "label-regex":r"^\s{7}([^\s*])+(\s)*\."},
-{"start":r"\sPERFORM(\s)+", "type":"multiple_label", "goback":True, "separator":r"(\s)+THRU(\s)*", "inline-label":r"([^\s*.])+(\s)*", "label-regex":r"^\s{7}([^\s*])+(\s)*\."},
+         {"start":r"\sPERFORM(\s)+", "type":"multiple_label", "goback":True, "separator":r"(\s)+THRU(\s)*", "inline-label":r"([^\s*.])+(\s)*", "label-regex":r"^\s{7}([^\s*])+(\s)*\."},
          {"start":r"\sPERFORM(\s)+", "type":"label", "goback":True, "inline-label":r"([^\s*.])+(\s)*", "label-regex":r"^\s{7}([^\s*])+(\s)*\."},
-         {"start":r"\sNEXT\sSENTENCE(\s)*", "type":"control-flow", "goback":False, "control-type": NODE_COND_END_ANY, "control-regex":r"\.(\s)+"}
+         {"start":r"\sNEXT\sSENTENCE(\s)*", "type":"control-flow", "goback":False, "control-type": NODE_COND_END_ANY, "control-regex":r"\.(\s)*$"}
          ]
 
 PARSABLE = "parsable"
@@ -27,5 +27,5 @@ parsable = [{"start":r"EXEC\sSQL", "end":"END-EXEC"}]
 
 #Language special case
 SPECIAL = "special"
-special = [{"regex":r"(\s)*PROCEDURE\sDIVISION", "effect":"start_parse"}, {"regex":r"\.(\s)+", "effect":"close_all"}]
+special = [{"regex":r"(\s)*PROCEDURE\sDIVISION", "effect":"start_parse"}, {"regex":r"\.(\s)*$", "effect":"close_all"}]
 

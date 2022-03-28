@@ -21,6 +21,9 @@ class Node:
 	def get_type(self):
 		return self.type
 
+	def is_goback_node(self):
+		return False
+
 	def point_to_one(self):
 		return len(self.childs) == 1
 

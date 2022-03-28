@@ -9,10 +9,10 @@ from Nodes.MultipleLabelLoopNode import MultipleLabelLoopNode
 from Nodes.ControlLoopNode import ControlLoopNode
 from Nodes.LabelNode import LabelNode
 from Nodes.Node import Node
-from ConditionAnchor import ConditionAnchor
-from LoopAnchor import LoopAnchor
-from SpecialAnchor import SpecialAnchor
-from Anchor import Anchor
+from Anchors.ConditionAnchor import ConditionAnchor
+from Anchors.LoopAnchor import LoopAnchor
+from Anchors.SpecialAnchor import SpecialAnchor
+from Anchors.Anchor import Anchor
 import re
 
 class FuzzyParser():
@@ -60,7 +60,7 @@ class FuzzyParser():
 		return result
 
 	def next_anchor(self):
-		#print(f"Searching from: |{self.input[self.pos:self.pos+150]}|")
+		# print(f"Searching from: |{self.input[self.pos:self.pos+150]}|")
 		next_pos = []
 		for val in self.anchors_dict.keys():
 			res = val.search(self.input[self.pos:].upper())
@@ -85,9 +85,9 @@ class FuzzyParser():
 				if val < min_val and val != -1:
 					min_val = val 
 					min_key = key
-		#print(f"Anchors: {next_pos}", flush=True)
+		# print(f"Anchors: {next_pos}", flush=True)
 		if min_key != '':
-			#print(f"picked: {min_val}, {self.anchors_dict[min_key]}, {min_key}")
+			# print(f"picked: {min_val}, {self.anchors_dict[min_key]}, {min_key}")
 			return min_val, self.anchors_dict[min_key], min_key
 		else:
 			return min_val, None, min_key

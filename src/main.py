@@ -1,10 +1,7 @@
 import sys
-import re
-from Nodes.ConditionNode import ConditionNode
-from Nodes.ParseNode import ParseNode
-from Nodes.Node import Node
-from Nodes.Graph import Graph
-from Utils.config import *  
+from Nodes import Node
+from Nodes import Graph
+from Utils.config import *
 from FuzzyParser import FuzzyParser
 import graphviz
 #Windows-specific Graphiz import
@@ -25,10 +22,10 @@ def pre_process(file):
 
 
 def construct_graph(node_array):
-	graph = Graph(Node(0, "START") )
+	graph = Graph.Graph(Node.Node(0, "START") )
 	for node in node_array:
 		graph.add_node(node)
-	graph.add_node(Node(0, "END"))
+	graph.add_node(Node.Node(0, "END"))
 	return graph
 
 def process_and_parse(filename):

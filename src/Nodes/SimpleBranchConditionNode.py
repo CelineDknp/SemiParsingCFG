@@ -1,4 +1,4 @@
-from Nodes.ConditionNode import ConditionNode
+from .ConditionNode import ConditionNode
 from Utils.config import *
 from Utils.utils import *
 import re

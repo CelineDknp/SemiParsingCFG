@@ -3,11 +3,20 @@ import xml.etree.ElementTree as ET
 from Nodes.ConditionNode import ConditionNode
 from Nodes.SimpleBranchConditionNode import SimpleBranchConditionNode
 from Nodes.MultipleBranchConditionNode import MultipleBranchConditionNode
+from Nodes.LoopNode import LoopNode
+from Nodes.ControlLoopNode import ControlLoopNode
+from Nodes.LabelLoopNode import LabelLoopNode
+from Nodes.MultipleLabelLoopNode import MultipleLabelLoopNode
+from Nodes.LabelNode import LabelNode
 from Nodes.ParseNode import ParseNode
 from Nodes.Node import Node
 from Nodes.Graph import Graph
 from Utils.utils import *
 from Utils.config import *
+import re
+
+all_labels = {}
+loops = []
 
 def get_condition_helper(current, answer):
 	if current.text.strip() != "":
@@ -18,7 +27,13 @@ def get_condition_helper(current, answer):
 def get_condition(statement):
 	cond = []
 	get_condition_helper(statement, cond)
-	return cond 
+	return cond
+
+def add_node(node, last_node, graph):
+	if last_node is not None:
+		last_node.add_child(node)
+	graph.add_node_to_list(node)
+
 
 def consume_if(statement, current_node, graph, depth):
 	# print("found if !")
@@ -27,8 +42,7 @@ def consume_if(statement, current_node, graph, depth):
 	# depth += 1
 	# print(cond)
 	node.set_condition(" ".join(cond))
-	current_node.add_child(node)
-	graph.add_node_to_list(node)
+	add_node(node, current_node, graph)
 	return node
 
 def get_parse_text_helper(current, answer):
@@ -51,8 +65,7 @@ def consume_exec(statement, current_node, graph, depth):
 	parse_text = get_parse_text(statement)
 	# print(parse_text)
 	node.set_parse_text(" ".join(parse_text))
-	current_node.add_child(node)
-	graph.add_node_to_list(node)
+	add_node(node, current_node, graph)
 	return node
 
 def consume_evaluate(statement, current_node, graph, depth):
@@ -62,8 +75,43 @@ def consume_evaluate(statement, current_node, graph, depth):
 	# depth += 1
 	# print(cond)
 	node.set_condition(" ".join(cond))
-	current_node.add_child(node)
-	graph.add_node_to_list(node)
+	add_node(node, current_node, graph)
+	return node
+
+def consume_next_sentence(statement, current_node, graph, depth):
+	# print("hello")
+	node = ControlLoopNode.from_explicit(depth, NODE_LOOP, "NEXT SENTENCE", NODE_COND_END_ANY)
+	add_node(node, current_node, graph)
+
+def consume_goto(statement, current_node, graph, depth):
+	# print("hello")
+	label = get_condition(statement)
+	node = LabelLoopNode.from_explicit(depth, NODE_LOOP, "GOTO", r"([^\s*.])+(\s)*",False)
+	node.set_label(" ".join(label))
+	add_node(node, current_node, graph)
+	loops.append(node)
+
+def consume_perform(statement, current_node, graph, depth):
+	# print("hello")
+	label = get_condition(statement.find("TheCodeRef"))
+	if len(label) == 1:
+		node = LabelLoopNode.from_explicit(depth, NODE_LOOP, "PERFORM", r"([^\s*.])+(\s)*",True)
+		node.set_label(" ".join(label))
+		add_node(node, current_node, graph)
+		loops.append(node)
+	elif len(label) == 2:
+		node = MultipleLabelLoopNode.from_explicit(depth, NODE_LOOP, "PERFORM", r"(\s)+THRU(\s)*", r"([^\s*.])+(\s)*",True)
+		node.set_label(label)
+		add_node(node, current_node, graph)
+		loops.append(node)
+	return node
+
+def consume_label(statement, current_node, graph, depth):
+	label = get_condition(statement)
+	node = LabelNode(depth, NODE_LABEL, "label")
+	node.set_label(" ".join(label))
+	all_labels[node.get_label()] = node
+	add_node(node, current_node, graph)
 	return node
 
 def new_branch(statement, current_node, graph, depth):
@@ -93,22 +141,49 @@ def close_true(current_node):
 			break
 		current_node = current_node.get_parent()
 
+def match_labels():
+	for l in loops:
+		if isinstance(l.get_label(), str):
+			l.add_child(all_labels[l.get_label()])
+		else:
+			for label in l.get_label():
+				l.add_child(all_labels[label])
+
 
 def handle_statement(statement, current_node, graph, depth):
-	# print(statement.tag)
+	# print(f"Handle start: {statement.tag}")
+	print(current_node)
+	# print(f"last{graph.get_last_node()}")
+	if current_node != graph.get_last_node():
+		if not isinstance(graph.get_last_node(), LoopNode):
+			current_node = graph.get_last_node()
+		elif isinstance(graph.get_last_node(), LoopNode) and graph.get_last_node().is_goback_node():
+			current_node = graph.get_last_node()
+		elif isinstance(graph.get_last_node(), LoopNode) and not graph.get_last_node().is_goback_node():
+			current_node = None
 	if statement.get("{http://www.w3.org/2001/XMLSchema}type") == "IfStatement":
 		current_node = consume_if(statement, current_node, graph, depth)
-	if statement.get("{http://www.w3.org/2001/XMLSchema}type") == "ExecStatement":
+	elif statement.get("{http://www.w3.org/2001/XMLSchema}type") == "ExecStatement":
 		current_node = consume_exec(statement, current_node, graph, depth)
-	if statement.get("{http://www.w3.org/2001/XMLSchema}type") == "EvaluateStatement":
+	elif statement.get("{http://www.w3.org/2001/XMLSchema}type") == "EvaluateStatement":
 		current_node = consume_evaluate(statement, current_node, graph, depth)
+	elif statement.get("{http://www.w3.org/2001/XMLSchema}type") == "NextSentenceStatement":
+		current_node = consume_next_sentence(statement, current_node, graph, depth)
+	elif statement.get("{http://www.w3.org/2001/XMLSchema}type") == "PerformStatement":
+		current_node = consume_perform(statement, current_node, graph, depth)
+	elif statement.get("{http://www.w3.org/2001/XMLSchema}type") == "GotoStatement":
+		current_node = consume_goto(statement, current_node, graph, depth)
 	if statement.tag == "TheElseStatementList":
 		close_true(current_node)
-	if statement.tag == "TheClauses":
+	elif statement.tag == "ALabelIdent":
+		current_node = consume_label(statement, current_node, graph, depth)
+	elif statement.tag == "TheClauses":
 		new_branch(statement, current_node, graph, depth)
-	if statement.tag == "TheEnd":
+	elif statement.tag == "TheEnd":
 		close_all(current_node)
+
 	for child in statement.getchildren():
+		# print(f"Sending {current_node} with {child} from {statement}")
 		handle_statement(child, current_node, graph, depth)
 
 
@@ -121,13 +196,13 @@ if __name__ == '__main__':
 	procedure = root.getchildren()[0].find("TheProcedureDivision")
 	root = Node(0, "START")
 	graph = Graph(root)
-	
 	for statements in procedure:
 		handle_statement(statements, root, graph, 0)
 	end = Node(0, "END")
 	last = flatten(graph.all_nodes[-1].get_last_childs())[0]
 	last.add_child(end)
 	graph.add_node_to_list(end)
-	graph.cleanup()
+	match_labels()
+	# graph.cleanup()
 	print(graph)
 	graph.save_as_file("test.gvz")

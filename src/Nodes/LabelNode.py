@@ -1,4 +1,4 @@
-from Nodes.Node import Node
+from .Node import Node
 import re
 
 
@@ -13,6 +13,8 @@ class LabelNode(Node):
     def get_label(self):
         return self.label
 
+    def set_label(self, label):
+        self.label = label
 
     def find_label(self, input_str, pos, pattern):
         res = pattern.search(input_str[pos:].upper())

@@ -1,5 +1,5 @@
-from Nodes.Node import Node
-from Nodes.SimpleBranchConditionNode import SimpleBranchConditionNode
+from .Node import Node
+from .SimpleBranchConditionNode import SimpleBranchConditionNode
 from Utils.config import *
 
 class FusedNode(Node):
