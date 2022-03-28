@@ -1,6 +1,6 @@
 import sys
-from Nodes import Node
-from Nodes import Graph
+from Nodes.Node import Node
+from Nodes.Graph import Graph
 from Utils.config import *
 from FuzzyParser import FuzzyParser
 import graphviz
@@ -22,10 +22,10 @@ def pre_process(file):
 
 
 def construct_graph(node_array):
-	graph = Graph.Graph(Node.Node(0, "START") )
+	graph = Graph(Node(0, "START") )
 	for node in node_array:
 		graph.add_node(node)
-	graph.add_node(Node.Node(0, "END"))
+	graph.add_node(Node(0, "END"))
 	return graph
 
 def process_and_parse(filename):
@@ -50,23 +50,23 @@ def process_and_create(filename):
 	# print(f"Intermediary size of graph: {g.get_size()}")
 	return g
 
-def process_and_cleanup(filename):
+def process_and_cleanup(filename, label_clean=False):
 	g = process_and_create(filename)
-	g.cleanup()
+	g.cleanup(label_clean)
 	print(f"Graph cleaned!", flush=True)
 	# print(f"Final size of graph: {g.get_size()}")
 	return g
 
-def process_and_squish(filename):
-	g = process_and_cleanup(filename)
+def process_and_squish(filename,label_clean=False):
+	g = process_and_cleanup(filename, label_clean=label_clean)
 	g.squish()
 	print(f"Graph squished!", flush=True)
 	return g
 
 def process_file(filename, dir_path):
 	# g = process_and_create(filename)
-	g = process_and_cleanup(filename)
-	# g = process_and_squish(filename)
+	g = process_and_cleanup(filename,label_clean=False)
+	# g = process_and_squish(filename,label_clean=True)
 	g.save_as_file(os.path.basename(filename), output_dir=dir_path)
 	print(f"Done!")
 

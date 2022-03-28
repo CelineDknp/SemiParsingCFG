@@ -206,7 +206,7 @@ class Graph:
 					return False
 		return True
 
-	def cleanup(self):
+	def cleanup(self, label_clean=False):
 		for o in self.open_loops:
 			if self.open_loops[o] != []:
 				print(f"Found open loop: {o}, {self.open_loops[o]}")
@@ -239,7 +239,7 @@ class Graph:
 						for p in parent_node:
 							self.replace_child(p, current_node, children[0])
 						cleaned = True
-				elif current_node.get_type() == NODE_LABEL:
+				elif current_node.get_type() == NODE_LABEL and label_clean:
 					parents = current_node.get_parent()
 					if len(parents) == 1 and parents[0].get_type() != NODE_LOOP:  # A single parent that is not a GOTO
 						child_node = current_node.get_childs().copy()

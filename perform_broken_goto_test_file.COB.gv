@@ -1,6 +1,8 @@
 digraph "perform_broken_goto_test_file.COB" {
 	node [shape=diamond]
 	9 [label=START]
+	node [shape=note]
+	0 [label=P0]
 	node [shape=ellipse]
 	1 [label="PERFORM P1"]
 	node [shape=note]
@@ -12,16 +14,23 @@ digraph "perform_broken_goto_test_file.COB" {
 	node [shape=note]
 	5 [label=P2]
 	node [shape=note]
+	6 [label=P3]
+	node [shape=note]
 	7 [label=P4]
+	node [shape=note]
+	8 [label=P5]
 	node [shape=diamond]
 	10 [label=END]
-	9 -> 1
+	9 -> 0
+	0 -> 1
 	1 -> 2
 	1 -> 3
 	3 -> 1 [label="Go back"]
 	2 -> 3
 	3 -> 4
 	4 -> 7
-	5 -> 7
-	7 -> 10
+	5 -> 6
+	6 -> 7
+	7 -> 8
+	8 -> 10
 }
