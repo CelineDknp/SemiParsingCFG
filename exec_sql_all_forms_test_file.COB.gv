@@ -1,7 +1,0 @@
-digraph "exec_sql_all_forms_test_file.COB" {
-	node [shape=diamond]
-	0 [label=START]
-	node [shape=diamond]
-	1 [label=END]
-	0 -> 1
-}
