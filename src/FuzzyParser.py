@@ -71,7 +71,6 @@ class FuzzyParser():
 				if self.anchors_dict[val].get_type() == SPECIAL and self.anchors_dict[val].get_effect() == "start_parse":
 					anchor = self.anchors_dict[val]
 					self.clean_anchors(start_parse=True)
-					print(0, anchor, val)
 					return 0, anchor, val
 				else:
 					next_pos.append({val:self.input.upper().find(res.group(0), self.pos)})

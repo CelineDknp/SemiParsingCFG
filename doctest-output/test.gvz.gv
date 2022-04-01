@@ -1,36 +1,17 @@
 digraph "test.gvz" {
 	node [shape=diamond]
 	0 [label=START]
-	node [shape=note]
-	1 [label=P0]
 	node [shape=ellipse]
-	2 [label="PERFORM P1"]
-	node [shape=note]
-	3 [label=PZ]
-	node [shape=note]
-	4 [label=P1]
-	node [shape=ellipse]
-	5 [label="GOTO P4"]
-	node [shape=note]
-	6 [label=P2]
-	node [shape=note]
-	7 [label=P3]
-	node [shape=note]
-	8 [label=P4]
-	node [shape=note]
-	9 [label=P5]
+	1 [label="IF A Greater 0"]
+	node [shape=box]
+	2 [label="SqlOpen DB"]
+	node [shape=box]
+	3 [label="SqlOpen DB"]
 	node [shape=diamond]
-	10 [label=END]
+	5 [label=END]
 	0 -> 1
-	1 -> 2
+	1 -> 2 [label=True]
+	1 -> 4 [label=False]
 	2 -> 3
-	2 -> 4
-	4 -> 2 [label="Go back"]
 	3 -> 4
-	4 -> 5
-	5 -> 8
-	6 -> 7
-	7 -> 8
-	8 -> 9
-	9 -> 10
 }

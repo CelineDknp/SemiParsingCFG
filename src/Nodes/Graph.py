@@ -120,7 +120,7 @@ class Graph:
 			self.match_loops(node)
 		elif node.get_type() == NODE_LOOP:
 			self.add_single_node(node)
-			print(f"Loop node {node}")
+			#print(f"Loop node {node}")
 			if not node.is_goback_node(): #If we don't need to go back to this node, don't
 				print("Node was a GOTO, cancel last node")
 				self.last_node = None
@@ -207,9 +207,9 @@ class Graph:
 		return True
 
 	def cleanup(self, label_clean=False):
-		for o in self.open_loops:
-			if self.open_loops[o] != []:
-				print(f"Found open loop: {o}, {self.open_loops[o]}")
+		#for o in self.open_loops:
+		#	if self.open_loops[o] != []:
+		#		print(f"Found open loop: {o}, {self.open_loops[o]}")
 		cleaned = True
 		while cleaned == True:
 			visited = []

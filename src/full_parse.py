@@ -17,6 +17,7 @@ import re
 
 all_labels = {}
 loops = []
+conditions = []
 
 def get_condition_helper(current, answer):
 	if current.text.strip() != "":
@@ -43,6 +44,7 @@ def consume_if(statement, current_node, graph, depth):
 	# print(cond)
 	node.set_condition(" ".join(cond))
 	add_node(node, current_node, graph)
+	conditions.append(node)
 	return node
 
 def get_parse_text_helper(current, answer):
@@ -61,7 +63,7 @@ def get_parse_text(statement):
 def consume_exec(statement, current_node, graph, depth):
 	# print("found exec !")
 	# print(f"current_node is: {current_node}")
-	node = ParseNode(depth, NODE_SQL)
+	node = ParseNode(depth, NODE_SQL, "EXEC")
 	parse_text = get_parse_text(statement)
 	# print(parse_text)
 	node.set_parse_text(" ".join(parse_text))
@@ -123,23 +125,33 @@ def new_branch(statement, current_node, graph, depth):
 	current_node.add_branch_condition(" ".join(cond))
 	# print(f"Current node branches: {current_node.branch_childs}")
 
-def close_all(current_node):
+def find_open_conf(depth):
+	result = None
+	#print(f"Looking for node at depth {depth}")
+	for n in conditions:
+		#print(f"Found open node at depth {n.get_depth()}")
+		if n.get_depth() == depth-1:
+			result = n
+	return result
+
+
+def close_all(current_node, graph):
 	# print("Found end !")
 	# print(f"Node is {current_node}")
 	while True:
+		if isinstance(current_node, list):
+			current_node = current_node[0]
 		if current_node.get_type() == NODE_COND_START:
-			current_node.close(Node(-1, NODE_CONTROL))
+			node = Node(-1, NODE_CONTROL)
+			current_node.close(node)
+			graph.add_node_to_list(node)
 			break
 		current_node = current_node.get_parent()
 
-def close_true(current_node):
+def close_true(depth):
 	# print("Found else !")
-	# print(f"Node is {current_node}")
-	while True:
-		if current_node.get_type() == NODE_COND_START:
-			current_node.close_branch()
-			break
-		current_node = current_node.get_parent()
+	node = find_open_conf(depth)
+	node.close_branch()
 
 def match_labels():
 	for l in loops:
@@ -152,7 +164,7 @@ def match_labels():
 
 def handle_statement(statement, current_node, graph, depth):
 	# print(f"Handle start: {statement.tag}")
-	print(current_node)
+	#print(current_node)
 	# print(f"last{graph.get_last_node()}")
 	if current_node != graph.get_last_node():
 		if not isinstance(graph.get_last_node(), LoopNode):
@@ -174,25 +186,22 @@ def handle_statement(statement, current_node, graph, depth):
 	elif statement.get("{http://www.w3.org/2001/XMLSchema}type") == "GotoStatement":
 		current_node = consume_goto(statement, current_node, graph, depth)
 	if statement.tag == "TheElseStatementList":
-		close_true(current_node)
+		close_true(depth)
 	elif statement.tag == "ALabelIdent":
 		current_node = consume_label(statement, current_node, graph, depth)
 	elif statement.tag == "TheClauses":
 		new_branch(statement, current_node, graph, depth)
 	elif statement.tag == "TheEnd":
-		close_all(current_node)
+		close_all(current_node, graph)
 
 	for child in statement.getchildren():
 		# print(f"Sending {current_node} with {child} from {statement}")
-		handle_statement(child, current_node, graph, depth)
+		handle_statement(child, current_node, graph, depth+1)
 
 
-
-if __name__ == '__main__':
-	print("Running")
-	# Pass the path of the xml document 
-	tree = ET.parse(sys.argv[1])
-	root = tree.getroot() 
+def make_graph(filename):
+	tree = ET.parse(filename)
+	root = tree.getroot()
 	procedure = root.getchildren()[0].find("TheProcedureDivision")
 	root = Node(0, "START")
 	graph = Graph(root)
@@ -203,6 +212,11 @@ if __name__ == '__main__':
 	last.add_child(end)
 	graph.add_node_to_list(end)
 	match_labels()
-	# graph.cleanup()
-	print(graph)
+	graph.cleanup()
+	# print(graph)
 	graph.save_as_file("test.gvz")
+
+if __name__ == '__main__':
+	print("Running")
+	# Pass the path of the xml document 
+	make_graph(sys.argv[1])

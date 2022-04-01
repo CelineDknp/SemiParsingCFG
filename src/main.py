@@ -30,20 +30,30 @@ def construct_graph(node_array):
 
 def process_and_parse(filename):
 	with open(filename, "r") as f:
-		print(f"Opened {filename}", flush=True)
+		#print(f"Opened {filename}", flush=True)
 		pre_processed_input = pre_process(f)
 		# print(pre_processed_input)
-		print(f"Pre-processed", flush=True)
+		# print(f"Pre-processed", flush=True)
 		parser = FuzzyParser(pre_processed_input)
 		lot = parser.fuzzy_parse()
-		print(f"Fuzzy parsing done!", flush=True)
+		# print(f"Fuzzy parsing done!", flush=True)
 		return lot
 
 def process_and_create(filename):
 	lot = process_and_parse(filename)
-	print(f"Final array of nodes: {lot}")
-	for n in lot:
-		print(n)
+	#print(f"Final array of nodes: {lot}")
+	#for n in lot:
+	#	print(n)
+	# print(f"Final size of array of nodes: {len(lot)}")
+	g = construct_graph(lot)
+	print(f"Graph constructed!", flush=True)
+	# print(f"Intermediary size of graph: {g.get_size()}")
+	return g
+
+def create(lot):
+	#print(f"Final array of nodes: {lot}")
+	#for n in lot:
+	#	print(n)
 	# print(f"Final size of array of nodes: {len(lot)}")
 	g = construct_graph(lot)
 	print(f"Graph constructed!", flush=True)
@@ -52,6 +62,13 @@ def process_and_create(filename):
 
 def process_and_cleanup(filename, label_clean=False):
 	g = process_and_create(filename)
+	g.cleanup(label_clean)
+	print(f"Graph cleaned!", flush=True)
+	# print(f"Final size of graph: {g.get_size()}")
+	return g
+
+def create_and_cleanup(lot, label_clean=False):
+	g = create(lot)
 	g.cleanup(label_clean)
 	print(f"Graph cleaned!", flush=True)
 	# print(f"Final size of graph: {g.get_size()}")
