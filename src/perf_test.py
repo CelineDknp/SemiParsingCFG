@@ -13,7 +13,7 @@ def run_single_full(filename, p_num, all_runs_full):
 	file = "Compilers/bin/cobrc.exe "
 	flags = f" :DBConnectString=perf_output{p_num}.sqlite :DBDriver=Sqlite"
 	args = file + filename + flags
-	r = subprocess.run(args, stdout=FNULL, stderr=FNULL, shell=False)
+	r = subprocess.run(args, stdout=FNULL, stderr=FNULL, shell=True)
 	conn = None
 	try:
 		conn = sqlite3.connect(f"perf_output{p_num}.sqlite")

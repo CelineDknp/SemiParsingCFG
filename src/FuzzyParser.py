@@ -149,7 +149,13 @@ class FuzzyParser():
 				node = MultipleBranchConditionNode(self.depth, NODE_COND_START, n_anchor.get_start())
 			else:
 				node = SimpleBranchConditionNode(self.depth, NODE_COND_START, n_anchor.get_start())
-			self.pos = node.find_condition(self.input, self.pos)
+			if n_anchor.has_condition_delimiter():
+				if n_anchor.is_delimiter_mandatory():
+					self.pos = node.find_condition_delimiter(self.input, self.pos, n_anchor.get_delimiter())
+				else:
+					self.pos = node.find_condition(self.input, self.pos, n_anchor.get_delimiter())
+			else:
+					self.pos = node.find_condition_simple(self.input, self.pos)
 			self.depth += 1
 			lot.append(node)
 		elif actual_val == n_anchor.get_branch_pattern() and (not n_anchor.is_multiple_branches()):
@@ -161,7 +167,7 @@ class FuzzyParser():
 			# print('>>> FOUND COND multiple branch')
 			self.pos = next_val+len(re.search(actual_val, self.input[self.pos:]).group(0))
 			node = MultipleBranchConditionNode(self.depth - 1, NODE_COND_BRANCH, n_anchor.get_start())
-			self.pos = node.find_condition(self.input, self.pos)
+			self.pos = node.find_condition_simple(self.input, self.pos)
 			# print(f"Found condition: {node.get_condition()}")
 			lot.append(node)
 		elif actual_val == n_anchor.get_end_pattern(): #Found a COND end
