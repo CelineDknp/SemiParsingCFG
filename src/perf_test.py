@@ -13,7 +13,7 @@ def run_single_full(filename, p_num, all_runs_full):
 	file = "Compilers/bin/cobrc.exe "
 	flags = f" :DBConnectString=perf_output{p_num}.sqlite :DBDriver=Sqlite"
 	args = file + filename + flags
-	r = subprocess.run(args, stdout=FNULL, stderr=FNULL, shell=False)
+	r = subprocess.run(args, capture_output=True, text=True, shell=False)
 	conn = None
 	try:
 		conn = sqlite3.connect(f"perf_output{p_num}.sqlite")
@@ -30,6 +30,13 @@ def run_single_full(filename, p_num, all_runs_full):
 	os.remove(f"perf_output{p_num}.sqlite") 
 	all_runs_full.put(delta_full)
 
+def run_single_fuzzy(filename, all_runs_fuzzy):
+	start_time_fuzzy = time.time()
+	process_and_parse(filename)
+	end_time_fuzzy = time.time()
+	delta_fuzzy = end_time_fuzzy - start_time_fuzzy
+	all_runs_fuzzy.put(delta_fuzzy)
+
 def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=True):
 	with open(output_file, "a") as f:
 		target = open(filename, "r")
@@ -38,20 +45,31 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 		all_runs_fuzzy = 0
 		if verbose:
 			print("PURE PARSING")
-		for e in range(runs):
-			start_time_fuzzy = time.time()
-			process_and_parse(filename)
-			end_time_fuzzy = time.time()
-			delta_fuzzy = end_time_fuzzy - start_time_fuzzy
-			all_runs_fuzzy+= delta_fuzzy
-			if not condense:
-				f.write(f"F; {filename}; {file_size} ; fuzzy; {delta_fuzzy}\n")
-				if verbose:
-					print(f"Fuzzy parsing time: {delta_fuzzy}", flush=True)
-		mean_fuzzy = all_runs_fuzzy/runs
+		all_runs_fuzzy = Queue()
+		rets = []
+		while len(rets) != runs:
+			processes = []
+			launch = multi if len(rets)+multi <= runs else runs-len(rets)
+			# print(f"Launching {launch} processe(s) !")
+			for pid in range(launch):
+				p = Process(target=run_single_fuzzy, args=(filename, all_runs_fuzzy ,))
+				processes.append(p)
+				p.start()
+			for p in processes:
+				ret = all_runs_fuzzy.get() # will block
+				rets.append(ret)
+			for p in processes:
+				p.join()
+		if not condense:
+			f.write(f"F; {filename}; {file_size} ; fuzzy; {delta_fuzzy}\n")
+			if verbose:
+				print(f"Fuzzy parsing time: {delta_fuzzy}", flush=True)
+		total = 0
+		for elem in rets:
+			total += elem
+		mean_fuzzy = total/runs
 		if verbose:
 			print(f"Mean fuzzy parsing time: {mean_fuzzy}", flush=True)
-		f.write(f"T; {filename}; {file_size} ; fuzzy; {mean_fuzzy}\n")
 
 		all_runs_full = Queue()
 		rets = []
@@ -77,7 +95,8 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 		for elem in rets:
 			total += elem
 		mean_full = total/runs
-		f.write(f"T; {filename}; {file_size} ; full; {mean_full}\n")
+
+		f.write(f"T; {filename}; {file_size} ; {mean_fuzzy} ; {mean_full} ; {(mean_full/mean_fuzzy)} \n")
 		if verbose:
 			print(f"Mean full parsing time: {mean_full}",flush=True)
 			if mean_full > mean_fuzzy:
@@ -92,8 +111,8 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 					print((f"Full wins ! Difference is {mean_fuzzy/mean_full} ({mean_fuzzy-mean_full})"), flush=True)
 				else:
 					print((f"Full wins ! Difference is ({mean_fuzzy-mean_full})"), flush=True)
+		return mean_fuzzy, mean_full
 
-	return all_runs_fuzzy/runs
 
 def crawl_dirs(argv):
 	runs = 20
@@ -117,7 +136,7 @@ def main(argv):
 		return
 	else: #More options were given
 		f = open(argv[2], "w")
-		f.write("mean(T/F); filename; file size; method; time (s)\n")
+		f.write("mean(T/F); filename; file size; fuzzy time (s); parsing time (s); parsing/fuzzy\n")
 		f.close()
 		if "-dir" in argv:
 			crawl_dirs(argv)
