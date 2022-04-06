@@ -3,11 +3,11 @@ from .constants import *
 
 #All structures that can contain code but should be ignored (typically, strings and comments)
 IGNORE = "ignore"
-to_ignore = ["'", r"\*"]
+to_ignore = [{"regex": r"(('(.)*$\s{7}-\s*))?('(.)*')", "type":"string"}, {"regex":r"((\s)*\*(.)*$)+", "type":"comment"}]
 
 #Condition structures, in the form of list of dicts {start, n_branch|single_branch, end}
 CONDITION = "condition"
-conditions = [{"start":r"\sIF(\s)+", "single_branch":"ELSE", "end":"END-IF"}, {"start":r"\sEVALUATE(\s)+", "multiple_branch":"WHEN", "end":"END-EVALUATE"}]
+conditions = [{"start":r"\sIF(\s)+", "condition_delimiter":r"\sTHEN(\s)+", "mandatory_delimiter":False, "single_branch":"ELSE", "end":"END-IF"}, {"start":r"\sEVALUATE(\s)+", "multiple_branch":"WHEN", "end":"END-EVALUATE"}]
 
 #Loops structures
 # start: regex for the start of the loop structure

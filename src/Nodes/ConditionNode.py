@@ -28,7 +28,20 @@ class ConditionNode(Node):
 
 
 
-    def find_condition(self, input, pos):
+    def find_condition(self, input, pos, delimiter):
+        res = delimiter.search(input[pos:].upper())
+        if res is None:
+            return self.find_condition_simple(input, pos)
+        else:
+            return self.find_condition_delimiter(input, pos, delimiter)
+
+    def find_condition_delimiter(self, input, pos, delimiter):
+        res = delimiter.search(input[pos:].upper())
+        end_cond = input.upper().find(res.group(0), pos)
+        self.condition = input[pos:end_cond].strip()
+        return end_cond+1
+
+    def find_condition_simple(self, input, pos):
         go = True
         cond = ""
         new_line = input.upper().find("\n", pos)

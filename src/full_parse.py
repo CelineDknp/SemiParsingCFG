@@ -31,9 +31,14 @@ def get_condition(statement):
 	return cond
 
 def add_node(node, last_node, graph):
+	graph.add_node_to_list(node)
+	if isinstance(last_node, LoopNode) and not last_node.is_goback_node():
+		if not isinstance(node, LabelNode):
+			return
+		if node.get_label() not in flatten([last_node.get_label()]):
+			return
 	if last_node is not None:
 		last_node.add_child(node)
-	graph.add_node_to_list(node)
 
 
 def consume_if(statement, current_node, graph, depth):
@@ -164,15 +169,19 @@ def match_labels():
 
 def handle_statement(statement, current_node, graph, depth):
 	# print(f"Handle start: {statement.tag}")
-	#print(current_node)
+	if current_node != None:
+		current_node = flatten(current_node.get_last_childs())[-1]
+		print(current_node)
+		print(f"node: {current_node} node depth: {current_node.get_depth()} depth: {depth}")
+
 	# print(f"last{graph.get_last_node()}")
-	if current_node != graph.get_last_node():
-		if not isinstance(graph.get_last_node(), LoopNode):
-			current_node = graph.get_last_node()
-		elif isinstance(graph.get_last_node(), LoopNode) and graph.get_last_node().is_goback_node():
-			current_node = graph.get_last_node()
-		elif isinstance(graph.get_last_node(), LoopNode) and not graph.get_last_node().is_goback_node():
-			current_node = None
+	#if current_node != graph.get_last_node():
+	#	if not isinstance(graph.get_last_node(), LoopNode):
+	#		current_node = graph.get_last_node()
+	#	elif isinstance(graph.get_last_node(), LoopNode) and graph.get_last_node().is_goback_node():
+	#		current_node = graph.get_last_node()
+	#	elif isinstance(graph.get_last_node(), LoopNode) and not graph.get_last_node().is_goback_node():
+	#		current_node = None
 	if statement.get("{http://www.w3.org/2001/XMLSchema}type") == "IfStatement":
 		current_node = consume_if(statement, current_node, graph, depth)
 	elif statement.get("{http://www.w3.org/2001/XMLSchema}type") == "ExecStatement":
