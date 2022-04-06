@@ -10,6 +10,7 @@ class ConditionNode(Node):
         super().__init__(depth, type, regex)
         if self.type != NODE_COND_START:
             self.condition = ""
+        self.statements_starts = [r"\sIF(\s)+", r"ELSE", r"WHEN", r"EXEC\sSQL", r"\*", r"PERFORM", r"GO(\s)*TO", "MOVE", "DISPLAY", "CONTINUE", "EXIT"]
 
     def __str__(self):
         if self.type == NODE_COND_START:
@@ -19,18 +20,23 @@ class ConditionNode(Node):
 
     def is_anchor(self, input, anchors):
         for val in anchors:
+            # print(f"Looking for {val}")
             res = re.search(val, input)
             if res != None:
-                return True
-        return False
+                return input.upper().find(res.group(0))
+        return -1
+
+
 
     def find_condition(self, input, pos):
         go = True
         cond = ""
         new_line = input.upper().find("\n", pos)
-        new_spaces = input.upper().find("   ", pos)
-        if new_spaces < new_line:
-            next_line = input[pos:new_spaces]
+        is_anchor = self.is_anchor(input[pos:new_line], self.statements_starts)
+        if is_anchor != -1:
+            self.condition = input[pos:pos+is_anchor].strip()
+            # print(f"COND: {self.condition} for {input[pos-10:pos+15]}")
+            return pos + len(self.condition)
         else:
             next_line = input[pos:new_line]
         first = True
@@ -38,13 +44,12 @@ class ConditionNode(Node):
             if not first:
                 # print(f"Current cond is: {cond}")
                 # print(f"Looking at next line: {next_line}")
-                if self.is_anchor(next_line.upper(), [r"\sIF(\s)+", "ELSE", "END-IF", "WHEN", "EXEC SQL", r"\*"]):
+                if self.is_anchor(next_line.upper(), self.statements_starts) != -1:
                     # print("saw anchor")
                     go = False
-                elif re.search(r'^(\s)*(\S)+(\s)*$',
-                               next_line.upper()):  # Special case of just one thing to finish the line
+                elif re.search(r'^(\s)*(\S)+(\s)*$',next_line.upper()):  # Special case of just one thing to finish the line
                     # print("saw signe element")
-                    if any(x in next_line.upper() for x in ["MOVE", "WHEN", "DISPLAY", "CONTINUE"]):
+                    if any(x in next_line.upper() for x in self.statements_starts):
                         # print("saw move")
                         go = False
                     else:

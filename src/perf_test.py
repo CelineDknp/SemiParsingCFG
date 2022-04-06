@@ -11,7 +11,7 @@ from full_parse import make_graph
 def run_single_full(filename, p_num, all_runs_full):
 	FNULL = open(os.devnull, 'w')  # use this if you want to suppress output to stdout from the subprocess
 	file = "Compilers/bin/cobrc.exe "
-	flags = f" :DBConnectString=perf_output{p_num}.sqlite :DBDriver=Sqlite"
+	flags = f" :DBConnectString=perf_output{p_num}.sqlite :DBDriver=Sqlite :MaxMem=500"
 	args = file + filename + flags
 	r = subprocess.run(args, capture_output=True, text=True, shell=False)
 	conn = None
@@ -45,6 +45,8 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 		all_runs_fuzzy = 0
 		if verbose:
 			print("PURE PARSING")
+
+		print(f"Doing file {filename}", flush=True)
 		all_runs_fuzzy = Queue()
 		rets = []
 		while len(rets) != runs:
@@ -123,7 +125,7 @@ def crawl_dirs(argv):
 		multi = int(argv[argv.index("-thread")+1])
 	verbose = True if "-verbose" in argv else False
 	condense = False if "-uncondense" in argv else True
-	print(f"Crawling directory {argv[1]}, {runs} runs for each file, {multi} parallel processes", flush=True)
+	print(f"Crawling directory {argv[1]}, {runs} runs for each file, {multi} parallel processes (verbose={verbose})", flush=True)
 	for file in os.listdir(argv[1]):
 		stat_run(os.path.join(argv[1],file), argv[2], runs=runs, multi=multi, verbose=verbose, condense=condense)
 	print("Done!")
