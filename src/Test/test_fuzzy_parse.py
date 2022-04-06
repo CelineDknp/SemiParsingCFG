@@ -177,13 +177,17 @@ def test_fuzzy_parse_mixed_evaluate():
 #Testing the comment part of parsing
 def test_fuzzy_parse_comment():
 	node_array = process_and_parse("TestFiles/pytest/comment_normal_test_file.COB")
-	assert len(node_array) == 3
+	assert len(node_array) == 5
 	assert node_array[0].get_type() == NODE_COND_START
 	assert node_array[1].get_type() == NODE_COND_BRANCH
 	assert node_array[2].get_type() == NODE_COND_END
+	assert node_array[3].get_type() == NODE_COND_START
+	assert node_array[4].get_type() == NODE_COND_END
 	assert node_array[0].get_depth() == 0
 	assert node_array[1].get_depth() == 0
 	assert node_array[2].get_depth() == 0
+	assert node_array[3].get_depth() == 0
+	assert node_array[4].get_depth() == 0
 
 #Testing the string part of parsing, normal case
 def test_fuzzy_parse_string():

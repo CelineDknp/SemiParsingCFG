@@ -3,7 +3,7 @@ from .constants import *
 
 #All structures that can contain code but should be ignored (typically, strings and comments)
 IGNORE = "ignore"
-to_ignore = ["'", r"\*"]
+to_ignore = [{"regex": r"(('(.)*$\s{7}-\s*))?('(.)*')", "type":"string"}, {"regex":r"((\s)*\*(.)*$)+", "type":"comment"}]
 
 #Condition structures, in the form of list of dicts {start, n_branch|single_branch, end}
 CONDITION = "condition"
