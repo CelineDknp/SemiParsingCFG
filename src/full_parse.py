@@ -134,9 +134,9 @@ def new_branch(statement, current_node, graph, depth):
 
 def find_open_conf(depth):
 	result = None
-	print(f"Looking for node at depth {depth}")
+	#print(f"Looking for node at depth {depth}")
 	for n in conditions:
-		print(f"Found open node at depth {n.get_depth()}")
+		#print(f"Found open node at depth {n.get_depth()}")
 		if n.get_depth() == depth-1:
 			result = n
 	return result

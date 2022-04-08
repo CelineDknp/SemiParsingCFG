@@ -183,6 +183,7 @@ class FuzzyParser():
 			self.pos = next_val+len(actual_match)
 
 	def consume_condition(self, n_anchor, next_val, actual_val, lot, actual_match):
+		#print(f"Found condition {actual_match}")
 		# print(f"In condition ! anchor: {n_anchor}, next_val: {next_val}, actual: {actual_val}, match: {actual_match}")
 		self.pos = next_val + len(actual_match)
 		if actual_val == n_anchor.get_start_pattern(): #Found an opening condition
@@ -222,12 +223,13 @@ class FuzzyParser():
 			lot.append(node)
 
 	def consume_parsable(self, n_anchor, next_val, lot):
-		# print('>>> FOUND EXEC')
+		#print('>>> FOUND EXEC')
 		node = ParseNode(self.depth, NODE_SQL, n_anchor.get_regex())
 		lot.append(node)
 		self.pos = node.find_parse_text(self.input, next_val)
 
 	def consume_special(self, n_anchor, next_val, lot, actual_match):
+		#print(f"Found special {actual_match}")
 		#print(f"special ! {actual_match} effect: {n_anchor.get_effect()}")
 		if n_anchor.get_effect() == "label":
 			# print("found label")
@@ -263,7 +265,7 @@ class FuzzyParser():
 			self.pos = self.len_next_match(n_anchor.get_pattern())
 
 	def consume_loop(self, n_anchor, lot):
-		# print("found loop !")
+		#print("found loop !")
 		# print(f"Current state of input is: |{self.input[self.pos:self.pos+150]}|")
 		if n_anchor.is_label_anchor():
 			node = None

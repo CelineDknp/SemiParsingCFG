@@ -11,7 +11,7 @@ from full_parse import make_graph
 def run_single_full(filename, p_num, all_runs_full):
 	FNULL = open(os.devnull, 'w')  # use this if you want to suppress output to stdout from the subprocess
 	file = "Compilers/bin/cobrc.exe "
-	flags = f" :DBConnectString=perf_output{p_num}.sqlite :DBDriver=Sqlite :MaxMem=500"
+	flags = f" :DBConnectString=perf_output{p_num}.sqlite :DBDriver=Sqlite :IncludeSearchDir=Compilers/includes/cobol/ :MaxMem=500"
 	args = file + filename + flags
 	r = subprocess.run(args, capture_output=True, text=True, shell=False)
 	conn = None
