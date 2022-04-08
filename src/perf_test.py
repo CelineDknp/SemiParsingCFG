@@ -11,7 +11,7 @@ from full_parse import make_graph
 def run_single_full(filename, p_num, all_runs_full):
 	FNULL = open(os.devnull, 'w')  # use this if you want to suppress output to stdout from the subprocess
 	file = "Compilers/bin/cobrc.exe "
-	flags = f" :DBConnectString=perf_output{p_num}.sqlite :DBDriver=Sqlite :IncludeSearchDir=Compilers/includes/cobol/ :MaxMem=500"
+	flags = f" :DBConnectString=perf_output{p_num}.sqlite :DBDriver=Sqlite :IncludeSearchDir=Compilers/includes/cobol :MaxMem=750"
 	args = file + filename + flags
 	r = subprocess.run(args, capture_output=True, text=True, shell=False)
 	conn = None
@@ -97,8 +97,12 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 		for elem in rets:
 			total += elem
 		mean_full = total/runs
+		diff = mean_full/mean_fuzzy
+		str_fuzzy = str(mean_fuzzy)
+		str_full = str(mean_full)
+		str_diff = str(diff)
 
-		f.write(f"T; {filename}; {file_size} ; {mean_fuzzy} ; {mean_full} ; {(mean_full/mean_fuzzy)} \n")
+		f.write(f'T; {filename}; {file_size} ; {str_fuzzy.replace(".", ",")} ; {str_full.replace(".", ",")} ; {str_diff.replace(".", ",")} \n')
 		if verbose:
 			print(f"Mean full parsing time: {mean_full}",flush=True)
 			if mean_full > mean_fuzzy:
