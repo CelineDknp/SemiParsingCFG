@@ -4,6 +4,7 @@ from Nodes.Graph import Graph
 from Utils.config import *
 from FuzzyParser import FuzzyParser
 import graphviz
+import cProfile
 #Windows-specific Graphiz import
 import os
 total_path = os.path.join("c:", "Program Files", "Graphviz", "bin")# os.pathsep + "C:\Program Files\Graphviz/bin/"
@@ -30,7 +31,7 @@ def construct_graph(node_array):
 
 def process_and_parse(filename):
 	with open(filename, "r") as f:
-		#print(f"Opened {filename}", flush=True)
+		# print(f"Opened {filename}", flush=True)
 		pre_processed_input = pre_process(f)
 		# print(pre_processed_input)
 		# print(f"Pre-processed", flush=True)
@@ -81,11 +82,12 @@ def process_and_squish(filename,label_clean=False):
 	return g
 
 def process_file(filename, dir_path):
-	# g = process_and_create(filename)
-	g = process_and_cleanup(filename,label_clean=False)
+	#g = process_and_parse(filename)
+	# g = process_and_cleanup(filename,label_clean=False)
 	# g = process_and_squish(filename,label_clean=True)
-	g.save_as_file(os.path.basename(filename), output_dir=dir_path)
-	print(f"Done!")
+	#g.save_as_file(os.path.basename(filename), output_dir=dir_path)
+	#print(f"Done!")
+	cProfile.run('process_and_parse("Cobol_85/NC105A.cob")')
 
 
 
