@@ -14,7 +14,6 @@ from Anchors.LoopAnchor import LoopAnchor
 from Anchors.SpecialAnchor import SpecialAnchor
 from Anchors.IgnoreAnchor import IgnoreAnchor
 from Anchors.Anchor import Anchor
-import re
 
 class FuzzyParser():
 	def anchors_creation(self):
@@ -46,10 +45,10 @@ class FuzzyParser():
 
 	def next_pos_init(self):
 		for val in self.anchors_dict.keys():
-			res = val.search(self.input[self.pos:].upper())
+			res = val.search(self.input[self.pos:])
 			# res = re.search(val, self.input[self.pos:].upper())
 			if res != None:
-				self.next_pos[val] = [self.input.upper().find(res.group(0), self.pos), res.group(0), self.anchors_dict[val]]
+				self.next_pos[val] = [self.input.find(res.group(0), self.pos), res.group(0), self.anchors_dict[val]]
 			else:
 				self.absent_regex.append(val)
 
@@ -132,17 +131,17 @@ class FuzzyParser():
 		for val in self.anchors_dict.keys():
 			if val not in self.next_pos:
 				if val not in self.absent_regex:
-					res = val.search(self.input[self.pos:].upper())
+					res = val.search(self.input[self.pos:])
 					if res != None:
-						self.next_pos[val] = [self.input.upper().find(res.group(0), self.pos), res.group(0), self.anchors_dict[val]]
+						self.next_pos[val] = [self.input.find(res.group(0), self.pos), res.group(0), self.anchors_dict[val]]
 					else:
 						self.absent_regex.append(val)
 					#print(f"Found {val} not in next pos or absent_regex")
 			elif self.next_pos[val][0] < self.pos:
 				#print(f"Outdated next_pos for val {val} ! Update")
-				res = val.search(self.input[self.pos:].upper())
+				res = val.search(self.input[self.pos:])
 				if res != None:
-					self.next_pos[val] = [self.input.upper().find(res.group(0), self.pos), res.group(0), self.anchors_dict[val]]
+					self.next_pos[val] = [self.input.find(res.group(0), self.pos), res.group(0), self.anchors_dict[val]]
 				else:
 					#print("No more of this, remove")
 					self.absent_regex.append(val)
@@ -152,8 +151,8 @@ class FuzzyParser():
 		return self.pick_next_anchor()
 
 	def len_next_match(self, pattern):
-		res = pattern.search(self.input[self.pos:].upper())
-		return self.input.upper().find(res.group(0), self.pos) + len(res.group(0))
+		res = pattern.search(self.input[self.pos:])
+		return self.input.find(res.group(0), self.pos) + len(res.group(0))
 
 	def clean_anchors(self, start_parse=False, found_control=False):
 		if start_parse:

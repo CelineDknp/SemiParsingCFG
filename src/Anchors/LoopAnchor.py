@@ -1,20 +1,20 @@
 from .Anchor import Anchor
 from Utils.config import *
-class LoopAnchor(Anchor):
 
+class LoopAnchor(Anchor):
 	def __init__(self, elem):
 		if elem["type"] == "multiple_label":
 			super().__init__(elem["start"]+elem["inline-label"]+elem["separator"], LOOP)
-			self.start_regex = re.compile(elem["start"], re.MULTILINE)
-			self.label = re.compile(elem["inline-label"], re.MULTILINE)
-			self.separator = re.compile(elem["separator"], re.MULTILINE)
+			self.start_regex = re.compile(elem["start"], flags=re.MULTILINE|re.IGNORECASE)
+			self.label = re.compile(elem["inline-label"], flags=re.MULTILINE|re.IGNORECASE)
+			self.separator = re.compile(elem["separator"], flags=re.MULTILINE|re.IGNORECASE)
 			self.is_multiple = True
 			self.is_label = True
 			self.is_control = False
 		elif elem["type"] == "label":
 			super().__init__(elem["start"]+elem["inline-label"], LOOP)
-			self.start_regex = re.compile(elem["start"], re.MULTILINE)
-			self.label = re.compile(elem["inline-label"], re.MULTILINE)
+			self.start_regex = re.compile(elem["start"], flags=re.MULTILINE|re.IGNORECASE)
+			self.label = re.compile(elem["inline-label"], flags=re.MULTILINE|re.IGNORECASE)
 			self.is_label = True
 			self.is_multiple = False
 			self.is_control = False

@@ -8,19 +8,19 @@ class ConditionAnchor(Anchor):
 		for key in elem.keys():
 			if key == "start":
 				self.start_regex = elem[key]
-				self.start_pattern = re.compile(elem[key], re.MULTILINE) 
+				self.start_pattern = re.compile(elem[key], flags=re.MULTILINE|re.IGNORECASE)
 				all_regex.append(elem[key])
 			elif key == "end":
 				self.end_regex = elem[key]
-				self.end_pattern = re.compile(elem[key], re.MULTILINE)
+				self.end_pattern = re.compile(elem[key], flags=re.MULTILINE|re.IGNORECASE)
 				all_regex.append(elem[key])
 			elif key == "condition_delimiter":
-				self.condition_delimiter = re.compile(elem[key], re.MULTILINE)
+				self.condition_delimiter = re.compile(elem[key], flags=re.MULTILINE|re.IGNORECASE)
 			elif key == "mandatory_delimiter":
 				self.delimiter_mandatory = elem[key]
 			else:
 				self.branch_regex = elem[key]
-				self.branch_pattern = re.compile(elem[key], re.MULTILINE) 
+				self.branch_pattern = re.compile(elem[key], flags=re.MULTILINE|re.IGNORECASE)
 				all_regex.append(elem[key])
 		super().__init__(all_regex, CONDITION)
 		if "multiple_branch" in elem.keys():

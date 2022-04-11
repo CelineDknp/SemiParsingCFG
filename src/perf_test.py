@@ -97,8 +97,13 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 		for elem in rets:
 			total += elem
 		mean_full = total/runs
+		diff = mean_full/mean_fuzzy
+		mean_full_str = str(mean_full).replace(".", ",")
+		mean_fuzzy_str = str(mean_fuzzy).replace(".", ",")
+		diff_str = str(diff).replace(".", ",")
 
-		f.write(f"T; {filename}; {file_size} ; {mean_fuzzy} ; {mean_full} ; {(mean_full/mean_fuzzy)} \n")
+
+		f.write(f"T; {filename}; {file_size} ; {mean_fuzzy_str} ; {mean_full_str} ; {diff_str} \n")
 		if verbose:
 			print(f"Mean full parsing time: {mean_full}",flush=True)
 			if mean_full > mean_fuzzy:

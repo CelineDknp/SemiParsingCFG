@@ -1,7 +1,6 @@
 from .Node import Node
 from Utils.config import *
 from Utils.utils import *
-import re
 
 
 class ConditionNode(Node):
@@ -23,28 +22,28 @@ class ConditionNode(Node):
             # print(f"Looking for {val}")
             res = re.search(val, input)
             if res != None:
-                return input.upper().find(res.group(0))
+                return input.find(res.group(0))
         return -1
 
 
 
     def find_condition(self, input, pos, delimiter):
-        res = delimiter.search(input[pos:].upper())
+        res = delimiter.search(input[pos:])
         if res is None:
             return self.find_condition_simple(input, pos)
         else:
             return self.find_condition_delimiter(input, pos, delimiter)
 
     def find_condition_delimiter(self, input, pos, delimiter):
-        res = delimiter.search(input[pos:].upper())
-        end_cond = input.upper().find(res.group(0), pos)
+        res = delimiter.search(input[pos:])
+        end_cond = input.find(res.group(0), pos)
         self.condition = input[pos:end_cond].strip()
         return end_cond+1
 
     def find_condition_simple(self, input, pos):
         go = True
         cond = ""
-        new_line = input.upper().find("\n", pos)
+        new_line = input.find("\n", pos)
         is_anchor = self.is_anchor(input[pos:new_line], self.statements_starts)
         if is_anchor != -1:
             self.condition = input[pos:pos+is_anchor].strip()
@@ -57,19 +56,19 @@ class ConditionNode(Node):
             if not first:
                 # print(f"Current cond is: {cond}")
                 # print(f"Looking at next line: {next_line}")
-                if self.is_anchor(next_line.upper(), self.statements_starts) != -1:
+                if self.is_anchor(next_line, self.statements_starts) != -1:
                     # print("saw anchor")
                     go = False
-                elif re.search(r'^(\s)*(\S)+(\s)*$',next_line.upper()):  # Special case of just one thing to finish the line
+                elif re.search(r'^(\s)*(\S)+(\s)*$',next_line):  # Special case of just one thing to finish the line
                     # print("saw signe element")
-                    if any(x in next_line.upper() for x in self.statements_starts):
+                    if any(x in next_line for x in self.statements_starts):
                         # print("saw move")
                         go = False
                     else:
                         # print("condition kept going")
                         cond += next_line.lstrip()
                         pos = new_line + 1
-                elif any(x in next_line.upper() for x in [">", "<", " IS ", " NOT ", " OR ", " AND ", " NUMERIC "]):
+                elif any(x in next_line for x in [">", "<", " IS ", " NOT ", " OR ", " AND ", " NUMERIC "]):
                     cond += next_line.strip() + " "
                     pos = new_line + 1
                 else:

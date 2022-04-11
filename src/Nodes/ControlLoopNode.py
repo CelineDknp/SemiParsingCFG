@@ -1,7 +1,6 @@
 from .LoopNode import LoopNode
 from Anchors import LoopAnchor
 from Utils.config import *
-import re
 
 
 class ControlLoopNode(LoopNode):
