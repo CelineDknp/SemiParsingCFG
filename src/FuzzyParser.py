@@ -45,10 +45,11 @@ class FuzzyParser():
 
 	def next_pos_init(self):
 		for val in self.anchors_dict.keys():
-			res = val.search(self.input[self.pos:])
-			# res = re.search(val, self.input[self.pos:].upper())
-			if res != None:
-				self.next_pos[val] = [self.input.find(res.group(0), self.pos), res.group(0), self.anchors_dict[val]]
+			res = val.finditer(self.input[self.pos:])
+			elem = next(res, None)
+			if elem is not None:
+				self.next_pos_iter[val] = res
+				self.next_pos[val] = [self.input.find(elem.group(0), self.pos), elem.group(0), self.anchors_dict[val]]
 			else:
 				self.absent_regex.append(val)
 
@@ -58,6 +59,7 @@ class FuzzyParser():
 		self.depth = 0
 		self.open_control = False
 		self.next_pos = {}
+		self.next_pos_iter = {}
 		self.absent_regex = []
 		self.init = False
 		self.anchors_creation()
@@ -120,34 +122,49 @@ class FuzzyParser():
 						anchor = self.next_pos[key][2]
 						actual_match = self.next_pos[key][1]
 		if min_key != '':
-			#print(f"picked: {min_val}, {anchor}, {min_key}, {actual_match}")
+			# print(f"picked: {min_val}, {anchor}, {min_key}, {actual_match}")
 			return min_val, anchor, min_key, actual_match
 		else:
 			return min_val, None, min_key, None
 
+	def get_next_value_regex(self, val):
+		if val not in self.next_pos_iter:
+			res = val.finditer(self.input[self.pos:])
+			self.next_pos_iter[val] = res
+
+		elem = next(self.next_pos_iter[val], None)
+		if elem is not None:
+			return [self.input.find(elem.group(0), self.pos), elem.group(0), self.anchors_dict[val]]
+		else:
+			return None
+
 
 	def next_anchor(self):
-		#print(f"Searching from: |{self.input[self.pos:self.pos+150]}|")
+		# print(f"Searching from: |{self.input[self.pos:self.pos+150]}|")
 		for val in self.anchors_dict.keys():
+			# print(f"Looking for {val}")
 			if val not in self.next_pos:
+				# print(f"Not in next_pos {val}")
 				if val not in self.absent_regex:
-					res = val.search(self.input[self.pos:])
+					# print(f"Not in absent_regex")
+					res = self.get_next_value_regex(val)
 					if res != None:
-						self.next_pos[val] = [self.input.find(res.group(0), self.pos), res.group(0), self.anchors_dict[val]]
+						self.next_pos[val] = res
 					else:
 						self.absent_regex.append(val)
 					#print(f"Found {val} not in next pos or absent_regex")
 			elif self.next_pos[val][0] < self.pos:
 				#print(f"Outdated next_pos for val {val} ! Update")
-				res = val.search(self.input[self.pos:])
-				if res != None:
-					self.next_pos[val] = [self.input.find(res.group(0), self.pos), res.group(0), self.anchors_dict[val]]
-				else:
-					#print("No more of this, remove")
-					self.absent_regex.append(val)
-					self.next_pos.pop(val)
-		#for elem in self.next_pos:
-			#print(f"{elem} : {self.next_pos[elem]}")
+				while self.next_pos[val][0] < self.pos:
+					res = self.get_next_value_regex(val)
+					if res != None:
+						self.next_pos[val] = res
+					else:
+						self.absent_regex.append(val)
+						self.next_pos.pop(val)
+						break
+		# for elem in self.next_pos:
+			# print(f"{elem} : {self.next_pos[elem]}")
 		return self.pick_next_anchor()
 
 	def len_next_match(self, pattern):
@@ -165,14 +182,20 @@ class FuzzyParser():
 					self.next_pos.pop(self.special_anchors["control-regex"].get_pattern())
 			else:
 				self.anchors.append(self.special_anchors["control-regex"])
+				a = self.special_anchors["control-regex"].get_pattern()
+				if self.special_anchors["control-regex"].get_pattern() in self.absent_regex:
+					self.absent_regex.remove(self.special_anchors["control-regex"].get_pattern())
 		else:
 			if "close_all" in self.special_anchors:
 				if self.depth == 0 and self.special_anchors["close_all"] in self.anchors:
 					self.anchors.remove(self.special_anchors["close_all"])
-					if self.special_anchors["close_all"].get_pattern() in self.next_pos:
+					if self.special_anchors["close_all"].get_pattern() in self.next_pos and not self.open_control:
 						self.next_pos.pop(self.special_anchors["close_all"].get_pattern())
 				elif self.depth > 0 and self.special_anchors["close_all"] not in self.anchors:
 					self.anchors.append(self.special_anchors["close_all"])
+					a = self.special_anchors["close_all"].get_pattern()
+					if self.special_anchors["close_all"].get_pattern() in self.absent_regex:
+						self.absent_regex.remove(self.special_anchors["close_all"].get_pattern())
 		self.anchors_dict = self.current_anchors_and_regexes()
 
 	def consume_ignore(self, n_anchor, next_val, actual_val, actual_match):

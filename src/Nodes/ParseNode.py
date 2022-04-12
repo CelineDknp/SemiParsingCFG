@@ -4,7 +4,6 @@ from AntlrParser.MySqlLexer import MySqlLexer
 from AntlrParser.MySqlParser import MySqlParser
 import re
 
-
 class ParseNode(Node):
     class CaseChangingStream:
         def __init__(self, stream, upper):
@@ -33,7 +32,7 @@ class ParseNode(Node):
         end_pattern = re.compile("END-EXEC", flags=re.MULTILINE|re.IGNORECASE)
         res = end_pattern.search(input_str[pos + 8:])
         self.parsable = input_str[pos + 8:input_str.find(res.group(0), pos)].strip()
-        self.parse_tree = self.parse()
+        # self.parse_tree = self.parse()
         return input_str.find(res.group(0), pos) + 8
 
     def set_parse_text(self, value):
