@@ -15,6 +15,7 @@ from Anchors.SpecialAnchor import SpecialAnchor
 from Anchors.IgnoreAnchor import IgnoreAnchor
 from Anchors.Anchor import Anchor
 
+
 class FuzzyParser():
 	def anchors_creation(self):
 		self.anchors = []
@@ -65,6 +66,8 @@ class FuzzyParser():
 		self.anchors_creation()
 		self.next_pos_init()
 		self.clean_anchors()
+		self.close_all_iter = None
+		self.control_iter = None
 
 	def current_anchors_and_regexes(self):
 		result = {}
@@ -186,18 +189,27 @@ class FuzzyParser():
 				self.anchors.append(self.special_anchors["control-regex"])
 				if self.special_anchors["control-regex"].get_pattern() in self.banned_regex:
 					self.banned_regex.remove(self.special_anchors["control-regex"].get_pattern())
+				if self.control_iter is not None:
+					self.self.next_pos[self.special_anchors["control-regex"].get_pattern()] = self.control_iter
+				else:
+					self.control_iter = self.special_anchors["control-regex"].get_pattern().finditer(self.input[self.pos:])
+					self.next_pos_iter[self.special_anchors["control-regex"].get_pattern()] = self.control_iter 
+
 		else:
 			if "close_all" in self.special_anchors:
 				if not self.init:
 					self.banned_regex.append(self.special_anchors["close_all"].get_pattern())
 					if self.special_anchors["close_all"].get_pattern() in self.next_pos:
-						self.next_pos.pop(self.special_anchors["close_all"].get_pattern())
+						self.close_all_iter = self.next_pos.pop(self.special_anchors["close_all"].get_pattern())
 				if self.depth == 0 and self.special_anchors["close_all"].get_pattern() not in self.banned_regex:
 					self.banned_regex.append(self.special_anchors["close_all"].get_pattern())
 					if self.special_anchors["close_all"].get_pattern() in self.next_pos and not self.open_control:
 						self.next_pos.pop(self.special_anchors["close_all"].get_pattern())
 				elif self.depth > 0 and self.special_anchors["close_all"].get_pattern() in self.banned_regex:
 					self.banned_regex.remove(self.special_anchors["close_all"].get_pattern())
+					if self.close_all_iter is None:
+						self.close_all_iter = self.special_anchors["close_all"].get_pattern().finditer(self.input[self.pos:])
+					self.next_pos_iter[self.special_anchors["close_all"].get_pattern()] = self.close_all_iter 
 		self.anchors_dict = self.current_anchors_and_regexes()
 
 	def consume_ignore(self, n_anchor, next_val, actual_val, actual_match):

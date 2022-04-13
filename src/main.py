@@ -3,7 +3,8 @@ from Nodes.Node import Node
 from Nodes.Graph import Graph
 from Utils.config import *
 from FuzzyParser import FuzzyParser
-import graphviz
+import cProfile
+# import graphviz
 #Windows-specific Graphiz import
 import os
 total_path = os.path.join("c:", "Program Files", "Graphviz", "bin")# os.pathsep + "C:\Program Files\Graphviz/bin/"
@@ -29,7 +30,7 @@ def construct_graph(node_array):
 	return graph
 
 def process_and_parse(filename):
-	with open(filename, "r") as f:
+	with open(filename, "r", encoding='latin-1') as f:
 		#print(f"Opened {filename}", flush=True)
 		pre_processed_input = pre_process(f)
 		# print(pre_processed_input)
@@ -91,7 +92,8 @@ def process_file(filename, dir_path):
 
 
 def main(argv):
-	process_file(argv[1],"")
+	# process_file(argv[1],"")
+	cProfile.run("process_and_parse('Cobol_85/NC105A.COB')")
 
 
 

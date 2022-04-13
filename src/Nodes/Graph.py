@@ -8,7 +8,7 @@ from .LoopNode import LoopNode
 from .MultipleLabelLoopNode import MultipleLabelLoopNode
 from Utils.config import *
 from Utils.utils import clean_regex
-import graphviz
+# import graphviz
 
 
 

@@ -2,7 +2,22 @@ from .Node import Node
 from antlr4 import *
 from AntlrParser.MySqlLexer import MySqlLexer
 from AntlrParser.MySqlParser import MySqlParser
-import re
+import regex as re
+from contextlib import contextmanager
+import sys, os
+
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        old_stderr = sys.stderr
+        sys.stdout = devnull
+        sys.stderr = devnull
+        try:  
+            yield
+        finally:
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
 
 class ParseNode(Node):
     class CaseChangingStream:
@@ -32,16 +47,17 @@ class ParseNode(Node):
         end_pattern = re.compile("END-EXEC", flags=re.MULTILINE|re.IGNORECASE)
         res = end_pattern.search(input_str[pos + 8:])
         self.parsable = input_str[pos + 8:input_str.find(res.group(0), pos)].strip()
-        # self.parse_tree = self.parse()
+        self.parse_tree = self.parse()
         return input_str.find(res.group(0), pos) + 8
 
     def set_parse_text(self, value):
         self.parsable = value
 
     def parse(self):
-        input_stream = InputStream(self.parsable)
-        lexer = self.SQLL(input_stream)
-        stream = CommonTokenStream(self.CaseChangingStream(lexer, True))
-        parser = self.SQLP(stream)
-        tree = parser.root()
-        return tree
+        with suppress_stdout():
+            input_stream = InputStream(self.parsable)
+            lexer = self.SQLL(input_stream)
+            stream = CommonTokenStream(self.CaseChangingStream(lexer, True))
+            parser = self.SQLP(stream)
+            tree = parser.root()
+            return tree

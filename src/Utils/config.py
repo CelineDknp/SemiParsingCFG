@@ -1,4 +1,4 @@
-import re
+import regex as re
 from .constants import *
 
 #All structures that can contain code but should be ignored (typically, strings and comments)

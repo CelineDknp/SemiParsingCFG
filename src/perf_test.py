@@ -7,6 +7,7 @@ from multiprocessing import Process
 import sqlite3
 from main import process_and_parse, create_and_cleanup
 from full_parse import make_graph
+import gc
 
 def run_single_full(filename, p_num, all_runs_full):
 	FNULL = open(os.devnull, 'w')  # use this if you want to suppress output to stdout from the subprocess
@@ -31,15 +32,17 @@ def run_single_full(filename, p_num, all_runs_full):
 	all_runs_full.put(delta_full)
 
 def run_single_fuzzy(filename, all_runs_fuzzy):
+	# gc.disable()
 	start_time_fuzzy = time.time()
 	process_and_parse(filename)
 	end_time_fuzzy = time.time()
+	# gc.enable()
 	delta_fuzzy = end_time_fuzzy - start_time_fuzzy
 	all_runs_fuzzy.put(delta_fuzzy)
 
 def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=True):
 	with open(output_file, "a") as f:
-		target = open(filename, "r")
+		target = open(filename, "r",encoding='latin-1')
 		file_size = len(target.readlines())
 		target.close()
 		all_runs_fuzzy = 0
@@ -47,6 +50,22 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 			print("PURE PARSING")
 
 		print(f"Doing file {filename}", flush=True)
+		#Warm up
+		all_runs_warmup = Queue()
+		warm = []
+		while len(warm) != runs:
+			processes = []
+			launch = multi if len(warm)+multi <= runs else runs-len(warm)
+			# print(f"Launching {launch} processe(s) !")
+			for pid in range(launch):
+				p = Process(target=run_single_fuzzy, args=(filename, all_runs_warmup ,))
+				processes.append(p)
+				p.start()
+			for p in processes:
+				warm.append(all_runs_warmup.get()) # will block
+			for p in processes:
+				p.join()
+		#Actual calcul
 		all_runs_fuzzy = Queue()
 		rets = []
 		while len(rets) != runs:
@@ -72,7 +91,21 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 		mean_fuzzy = total/runs
 		if verbose:
 			print(f"Mean fuzzy parsing time: {mean_fuzzy}", flush=True)
-
+		#Warm up
+		warm = []
+		while len(warm) != runs:
+			processes = []
+			launch = multi if len(warm)+multi <= runs else runs-len(warm)
+			# print(f"Launching {launch} processe(s) !")
+			for pid in range(launch):
+				p = Process(target=run_single_full, args=(filename, pid, all_runs_warmup ,))
+				processes.append(p)
+				p.start()
+			for p in processes:
+				warm.append(all_runs_warmup.get()) # will block
+			for p in processes:
+				p.join()
+		#Actual calcul
 		all_runs_full = Queue()
 		rets = []
 		while len(rets) != runs:
@@ -158,28 +191,6 @@ def main(argv):
 			condense = False if "-uncondense" in argv else True
 			print(f"Comparing performance on file {argv[1]} ({runs} runs)")
 			stat_run(argv[1], argv[2], runs=runs, multi=multi, verbose=verbose, condense=condense)
-
-	# print("PURE GRAPH CREATION")
-	# lot = process_and_parse(argv[1])
-	# start_time_fuzzy = time.time()
-	# create_and_cleanup(lot)
-	# end_time_fuzzy = time.time()
-	# delta_fuzzy = end_time_fuzzy - start_time_fuzzy
-	# print(f"Fuzzy parsing time: {delta_fuzzy}")
-	# start_time_full = time.time()
-	# make_graph(argv[2])
-	# end_time_full = time.time()
-	# delta_full = end_time_full-start_time_full
-	# print(f"Full parsing time: {delta_full}")
-	# if delta_full > delta_fuzzy:
-	# 	print(f"Fuzzy wins ! Difference is {delta_full-delta_fuzzy}")
-	# elif delta_full == delta_fuzzy:
-	# 	print(f"Both executions took the same time")
-	# else:
-	# 	print((f"Full wins ! Difference is {delta_fuzzy-delta_full}"))
-
-
-
 
 
 
