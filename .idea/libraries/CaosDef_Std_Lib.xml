@@ -1,0 +1,8 @@
+<component name="libraryTable">
+  <library name="CaosDef-Std-Lib" type="Caos Library">
+    <CLASSES />
+    <SOURCES>
+      <root url="jar://$APPLICATION_PLUGINS_DIR$/CaosPlugin/lib/CaosPlugin-2021.11.01.jar!/lib" />
+    </SOURCES>
+  </library>
+</component>

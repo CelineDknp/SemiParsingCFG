@@ -92,8 +92,10 @@ def process_file(filename, dir_path):
 
 
 def main(argv):
-	# process_file(argv[1],"")
-	cProfile.run("process_and_parse('Cobol_85/NC105A.COB')")
+	if len(argv) == 2:
+		process_file(argv[1],"")
+	else :
+		cProfile.run("process_and_parse('raincodeData/ALCP519V2.COB')")
 
 
 
