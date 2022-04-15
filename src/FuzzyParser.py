@@ -190,7 +190,7 @@ class FuzzyParser():
 				if self.special_anchors["control-regex"].get_pattern() in self.banned_regex:
 					self.banned_regex.remove(self.special_anchors["control-regex"].get_pattern())
 				if self.control_iter is not None:
-					self.self.next_pos[self.special_anchors["control-regex"].get_pattern()] = self.control_iter
+					self.next_pos_iter[self.special_anchors["control-regex"].get_pattern()] = self.control_iter
 				else:
 					self.control_iter = self.special_anchors["control-regex"].get_pattern().finditer(self.input[self.pos:])
 					self.next_pos_iter[self.special_anchors["control-regex"].get_pattern()] = self.control_iter 
@@ -241,6 +241,8 @@ class FuzzyParser():
 					self.pos = node.find_condition_simple(self.input, self.pos)
 			# print(f">>> COND COND: {node.get_condition()}")
 			self.depth += 1
+			if self.depth == 1:
+				self.clean_anchors()
 			lot.append(node)
 		elif actual_val == n_anchor.get_branch_pattern() and (not n_anchor.is_multiple_branches()):
 			# print('>>> FOUND COND single branch')
@@ -255,6 +257,8 @@ class FuzzyParser():
 		elif actual_val == n_anchor.get_end_pattern(): #Found a COND end
 			# print('>>> FOUND END-COND')
 			self.depth -= 1
+			if self.depth == 0:
+				self.clean_anchors()
 			node = ConditionNode(self.depth, NODE_COND_END, n_anchor.get_start())
 			lot.append(node)
 
@@ -333,12 +337,10 @@ class FuzzyParser():
 			elif n_anchor.get_type() == CONDITION:
 				# print("IN COND")
 				self.consume_condition(n_anchor, next_val, actual_val, lot, actual_match)
-				self.clean_anchors()
 			elif n_anchor.get_type() == PARSABLE:
 				self.consume_parsable(n_anchor, next_val, lot)
 			elif n_anchor.get_type() == SPECIAL:
 				self.consume_special(n_anchor, next_val, lot, actual_match)
-				self.clean_anchors()
 			elif n_anchor.get_type() == LOOP:
 				self.consume_loop(n_anchor, lot)
 			else:

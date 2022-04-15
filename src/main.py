@@ -95,7 +95,7 @@ def main(argv):
 	if len(argv) == 2:
 		process_file(argv[1],"")
 	else :
-		cProfile.run("process_and_parse('raincodeData/ALCP519V2.COB')")
+		cProfile.run("process_and_parse('raincodeData/Delivery/V1/ALCB025.COB')")
 
 
 
