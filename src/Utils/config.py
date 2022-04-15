@@ -1,4 +1,4 @@
-import re
+import regex as re
 from .constants import *
 
 #All structures that can contain code but should be ignored (typically, strings and comments)
@@ -7,7 +7,7 @@ to_ignore = [{"regex": r"(('(.)*$\s{7}-\s*))?('(.)*')", "type":"string"}, {"rege
 
 #Condition structures, in the form of list of dicts {start, n_branch|single_branch, end}
 CONDITION = "condition"
-conditions = [{"start":r"\sIF(\s)+", "condition_delimiter":r"\sTHEN(\s)+", "mandatory_delimiter":False, "single_branch":"ELSE", "end":"END-IF"}, {"start":r"\sEVALUATE(\s)+", "multiple_branch":"WHEN", "end":"END-EVALUATE"}]
+conditions = [{"start":r"\sIF(\s)+", "condition_delimiter":r"\sTHEN(\s)+", "mandatory_delimiter":False, "single_branch":"ELSE\s", "end":"\sEND-IF"}, {"start":r"\sEVALUATE(\s)+", "multiple_branch":"\sWHEN", "end":"\sEND-EVALUATE"}]
 
 #Loops structures
 # start: regex for the start of the loop structure

@@ -1,7 +1,6 @@
 from .LoopNode import LoopNode
 from Anchors import LoopAnchor
 from Utils.config import *
-import re
 
 
 class LabelLoopNode(LoopNode):
@@ -33,7 +32,7 @@ class LabelLoopNode(LoopNode):
 
 	def find_label(self, input_str, pos):
 		# print(f"Looking from: |{input_str[pos:pos+80]}|")
-		res = self.get_label_regex().search(input_str[pos:].upper())
+		res = self.get_label_regex().search(input_str[pos:])
 		self.label = res.group(0).strip()
 		# print(f"Label found: {self.label}")
-		return input_str.upper().find(res.group(0), pos) + len(res.group(0).rstrip())
+		return input_str.find(res.group(0), pos) + len(res.group(0).rstrip())

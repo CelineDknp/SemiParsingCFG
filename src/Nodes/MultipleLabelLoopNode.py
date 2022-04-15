@@ -1,6 +1,5 @@
 from .LabelLoopNode import LabelLoopNode
 from Anchors import LoopAnchor
-import re
 
 
 class MultipleLabelLoopNode(LabelLoopNode):
@@ -39,17 +38,17 @@ class MultipleLabelLoopNode(LabelLoopNode):
 
 	def find_label(self, input_str, pos):
 		self.label = []
-		res = self.get_label_regex().search(input_str[pos:].upper())
+		res = self.get_label_regex().search(input_str[pos:])
 		self.label.append(res.group(0).strip())
-		pos = input_str.upper().find(res.group(0), pos) + len(res.group(0).rstrip())
+		pos = input_str.find(res.group(0), pos) + len(res.group(0).rstrip())
 		# print(f"[MOVING POS 1] Current state of input is: |{input_str[pos:pos+150]}|")
-		res = self.separator.search(input_str[pos:].upper())
-		pos = input_str.upper().find(res.group(0), pos) + len(res.group(0).rstrip())
+		res = self.separator.search(input_str[pos:])
+		pos = input_str.find(res.group(0), pos) + len(res.group(0).rstrip())
 		# print(f"[MOVING POS 2]Current state of input is: |{input_str[pos:pos+150]}|")
-		res = self.get_label_regex().search(input_str[pos:].upper())
+		res = self.get_label_regex().search(input_str[pos:])
 		self.label.append(res.group(0).strip())
 		# print(f"Label found: {self.label}")
-		pos = input_str.upper().find(res.group(0), pos) + len(res.group(0).rstrip())
+		pos = input_str.find(res.group(0), pos) + len(res.group(0).rstrip())
 
 		# print(f"[MOVING POS 3]Current state of input is: |{input_str[pos:pos+150]}|")
 		return pos

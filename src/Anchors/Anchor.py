@@ -1,9 +1,9 @@
 from Utils.config import *
-import re
+import regex as re
 class Anchor():
 	def __init__(self, regex, type):
 		if isinstance(regex,str): 
-			self.pattern = re.compile(regex, re.MULTILINE) 
+			self.pattern = re.compile(regex, flags=re.MULTILINE|re.IGNORECASE) 
 		self.regex = regex
 		self.type = type
 

@@ -1,5 +1,4 @@
 from .Node import Node
-import re
 
 
 class LabelNode(Node):
@@ -17,7 +16,7 @@ class LabelNode(Node):
         self.label = label
 
     def find_label(self, input_str, pos, pattern):
-        res = pattern.search(input_str[pos:].upper())
+        res = pattern.search(input_str[pos:])
         self.label = res.group(0)[:-1].strip()
         # print(f"Label found: {self.label}")
-        return input_str.upper().find(res.group(0), pos) + 7 + len(self.label)
+        return input_str.find(res.group(0), pos) + 7 + len(self.label)

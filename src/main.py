@@ -3,8 +3,13 @@ from Nodes.Node import Node
 from Nodes.Graph import Graph
 from Utils.config import *
 from FuzzyParser import FuzzyParser
+<<<<<<< HEAD
 import graphviz
 import cProfile
+=======
+import cProfile
+# import graphviz
+>>>>>>> finall
 #Windows-specific Graphiz import
 import os
 total_path = os.path.join("c:", "Program Files", "Graphviz", "bin")# os.pathsep + "C:\Program Files\Graphviz/bin/"
@@ -30,15 +35,14 @@ def construct_graph(node_array):
 	return graph
 
 def process_and_parse(filename):
-	with open(filename, "r") as f:
-		# print(f"Opened {filename}", flush=True)
+	with open(filename, "r", encoding='latin-1') as f:
 		pre_processed_input = pre_process(f)
 		# print(pre_processed_input)
 		# print(f"Pre-processed", flush=True)
 		parser = FuzzyParser(pre_processed_input)
 		lot = parser.fuzzy_parse()
 		# print(f"Fuzzy parsing done!", flush=True)
-		return lot
+		# return lot
 
 def process_and_create(filename):
 	lot = process_and_parse(filename)
@@ -82,18 +86,20 @@ def process_and_squish(filename,label_clean=False):
 	return g
 
 def process_file(filename, dir_path):
-	#g = process_and_parse(filename)
+	g = process_and_parse(filename)
 	# g = process_and_cleanup(filename,label_clean=False)
 	# g = process_and_squish(filename,label_clean=True)
-	#g.save_as_file(os.path.basename(filename), output_dir=dir_path)
-	#print(f"Done!")
-	cProfile.run('process_and_parse("Cobol_85/NC105A.cob")')
+	# g.save_as_file(os.path.basename(filename), output_dir=dir_path)
+	# print(f"Done!")
 
 
 
 
 def main(argv):
-	process_file(argv[1],"")
+	if len(argv) == 2:
+		process_file(argv[1],"")
+	else :
+		cProfile.run("process_and_parse('raincodeData/Delivery/V1/ALCB025.COB')")
 
 
 

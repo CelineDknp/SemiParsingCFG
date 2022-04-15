@@ -1,7 +1,6 @@
 from .ConditionNode import ConditionNode
 from Utils.config import *
 from Utils.utils import *
-import re
 
 class MultipleBranchConditionNode(ConditionNode):
 
