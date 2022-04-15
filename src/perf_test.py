@@ -81,7 +81,7 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 			launch = multi if len(rets)+multi <= runs else runs-len(rets)
 			# print(f"Launching {launch} processe(s) !")
 			for pid in range(launch):
-				p = Process(target=run_single_fuzzy_nui, args=(filename, all_runs_fuzzy ,))
+				p = Process(target=run_single_fuzzy, args=(filename, all_runs_fuzzy ,))
 				processes.append(p)
 				p.start()
 			for p in processes:
