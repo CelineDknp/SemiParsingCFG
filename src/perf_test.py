@@ -39,6 +39,14 @@ def run_single_fuzzy(filename, all_runs_fuzzy):
 	# gc.enable()
 	delta_fuzzy = end_time_fuzzy - start_time_fuzzy
 	all_runs_fuzzy.put(delta_fuzzy)
+def run_single_fuzzy_nui(filename, all_runs_fuzzy):
+	# gc.disable()
+	start_time_fuzzy = time.time()
+	r = subprocess.run(f"src/main.exe {filename}", capture_output=True, text=True, shell=False)
+	end_time_fuzzy = time.time()
+	# gc.enable()
+	delta_fuzzy = end_time_fuzzy - start_time_fuzzy
+	all_runs_fuzzy.put(delta_fuzzy)
 
 def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=True):
 	with open(output_file, "a") as f:
@@ -53,18 +61,18 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 		#Warm up
 		all_runs_warmup = Queue()
 		warm = []
-		while len(warm) != runs:
-			processes = []
-			launch = multi if len(warm)+multi <= runs else runs-len(warm)
-			# print(f"Launching {launch} processe(s) !")
-			for pid in range(launch):
-				p = Process(target=run_single_fuzzy, args=(filename, all_runs_warmup ,))
-				processes.append(p)
-				p.start()
-			for p in processes:
-				warm.append(all_runs_warmup.get()) # will block
-			for p in processes:
-				p.join()
+		# while len(warm) != runs:
+		# 	processes = []
+		# 	launch = multi if len(warm)+multi <= runs else runs-len(warm)
+		# 	# print(f"Launching {launch} processe(s) !")
+		# 	for pid in range(launch):
+		# 		p = Process(target=run_single_fuzzy, args=(filename, all_runs_warmup ,))
+		# 		processes.append(p)
+		# 		p.start()
+		# 	for p in processes:
+		# 		warm.append(all_runs_warmup.get()) # will block
+		# 	for p in processes:
+		# 		p.join()
 		#Actual calcul
 		all_runs_fuzzy = Queue()
 		rets = []
@@ -73,7 +81,7 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 			launch = multi if len(rets)+multi <= runs else runs-len(rets)
 			# print(f"Launching {launch} processe(s) !")
 			for pid in range(launch):
-				p = Process(target=run_single_fuzzy, args=(filename, all_runs_fuzzy ,))
+				p = Process(target=run_single_fuzzy_nui, args=(filename, all_runs_fuzzy ,))
 				processes.append(p)
 				p.start()
 			for p in processes:
@@ -93,18 +101,7 @@ def stat_run(filename, output_file, multi=1, runs=20, verbose=False, condense=Tr
 			print(f"Mean fuzzy parsing time: {mean_fuzzy}", flush=True)
 		#Warm up
 		warm = []
-		while len(warm) != runs:
-			processes = []
-			launch = multi if len(warm)+multi <= runs else runs-len(warm)
-			# print(f"Launching {launch} processe(s) !")
-			for pid in range(launch):
-				p = Process(target=run_single_full, args=(filename, pid, all_runs_warmup ,))
-				processes.append(p)
-				p.start()
-			for p in processes:
-				warm.append(all_runs_warmup.get()) # will block
-			for p in processes:
-				p.join()
+		# wo
 		#Actual calcul
 		all_runs_full = Queue()
 		rets = []

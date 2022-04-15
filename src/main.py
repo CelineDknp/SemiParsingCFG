@@ -38,7 +38,7 @@ def process_and_parse(filename):
 		parser = FuzzyParser(pre_processed_input)
 		lot = parser.fuzzy_parse()
 		# print(f"Fuzzy parsing done!", flush=True)
-		return lot
+		# return lot
 
 def process_and_create(filename):
 	lot = process_and_parse(filename)
@@ -82,11 +82,11 @@ def process_and_squish(filename,label_clean=False):
 	return g
 
 def process_file(filename, dir_path):
-	# g = process_and_create(filename)
-	g = process_and_cleanup(filename,label_clean=False)
+	g = process_and_parse(filename)
+	# g = process_and_cleanup(filename,label_clean=False)
 	# g = process_and_squish(filename,label_clean=True)
-	g.save_as_file(os.path.basename(filename), output_dir=dir_path)
-	print(f"Done!")
+	# g.save_as_file(os.path.basename(filename), output_dir=dir_path)
+	# print(f"Done!")
 
 
 
