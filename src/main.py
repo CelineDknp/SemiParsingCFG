@@ -12,12 +12,15 @@ if total_path not in os.environ["PATH"]:
 	os.environ["PATH"] += total_path
 
 def pre_process(file):
-	result = ""
+	l = []
 	for line in file.readlines():
+		l.append("      ")
 		if len(line) == 81:
-			result += "      "+(line[6:-9])+"        \n" #Remove the first 6 char (line number) and last 9 (id + \n)
+			l.append(line[6:-9])
+			l.append("        \n") #Remove the first 6 char (line number) and last 9 (id + \n)
 		else:
-			result += "      "+(line[6:])#Remove the first 6 char (line number), but not the end
+			l.append(line[6:])#Remove the first 6 char (line number), but not the end
+	result = "".join(l)
 	# print(result)
 	return result
 
