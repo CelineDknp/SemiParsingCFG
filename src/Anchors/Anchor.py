@@ -1,5 +1,5 @@
 from Utils.config import *
-import regex as re
+import re
 class Anchor():
 	def __init__(self, regex, type):
 		if isinstance(regex,str): 

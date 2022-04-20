@@ -13,7 +13,14 @@ class AnchorHandler:
 		self.anchors = []
 		self.banned_regex = []
 		self.anchors_creation()
-		self.anchors_dict = self.get_anchors_and_regex_dict()
+		self.anchors_dict = {}
+		self.initial_anchors = self.anchors.copy()
+		self.initial_dict = self.get_anchors_and_regex_dict().copy()
+
+	def reset_anchors(self):
+		self.banned_regex = []
+		self.anchors = self.initial_anchors.copy()
+		self.anchors_dict = self.initial_dict.copy()
 
 	def anchors_creation(self):
 		for elem in conditions:
@@ -57,8 +64,6 @@ class AnchorHandler:
 		self.ban_regex(anchor.get_pattern())
 
 	def ban_regex(self, regex):
-		#print(f"Trying to ban {regex} from:")
-		#print(self.anchors_dict.keys())
 		if regex not in self.banned_regex:
 			self.banned_regex.append(regex)
 			self.anchors_dict.pop(regex)

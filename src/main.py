@@ -4,7 +4,7 @@ from Nodes.Graph import Graph
 from Utils.config import *
 from FuzzyParser import FuzzyParser
 import cProfile
-# import graphviz
+import graphviz
 #Windows-specific Graphiz import
 import os
 total_path = os.path.join("c:", "Program Files", "Graphviz", "bin")# os.pathsep + "C:\Program Files\Graphviz/bin/"
@@ -38,10 +38,10 @@ def process_and_parse(filename):
 		pre_processed_input = pre_process(f)
 		# print(pre_processed_input)
 		# print(f"Pre-processed", flush=True)
-		parser = FuzzyParser(pre_processed_input)
-		lot = parser.fuzzy_parse()
+		parser = FuzzyParser()
+		lot = parser.fuzzy_parse(pre_processed_input)
 		# print(f"Fuzzy parsing done!", flush=True)
-		# return lot
+		return lot
 
 def process_and_create(filename):
 	lot = process_and_parse(filename)
@@ -96,9 +96,9 @@ def process_file(filename, dir_path):
 
 def main(argv):
 	if len(argv) == 2:
-		process_file(argv[1],"")
+		process_and_cleanup(argv[1],"")
 	else :
-		cProfile.run("process_and_parse('raincodeData/Delivery/V1/ALCB025.COB')")
+		cProfile.run("process_and_parse('raincodeData/Delivery/V1/ALCB018.COB')")
 
 
 

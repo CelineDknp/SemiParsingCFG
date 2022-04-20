@@ -2,7 +2,7 @@ from .Node import Node
 from antlr4 import *
 from AntlrParser.MySqlLexer import MySqlLexer
 from AntlrParser.MySqlParser import MySqlParser
-import regex as re
+import re
 from contextlib import contextmanager
 import sys, os
 
@@ -44,11 +44,12 @@ class ParseNode(Node):
         return f"Node {self.type} ({self.parsable})"
 
     def find_parse_text(self, input_str, pos):
-        end_pattern = re.compile("END-EXEC", flags=re.MULTILINE|re.IGNORECASE)
-        res = end_pattern.search(input_str[pos + 8:])
-        self.parsable = input_str[pos + 8:input_str.find(res.group(0), pos)].strip()
+        res = re.search("END-EXEC", input_str[pos + 8:], flags=re.IGNORECASE)
+        end_parsable = pos+8+ res.span()[0]
+        next_pos = end_parsable+len(res.group(0))
+        self.parsable = input_str[pos + 8:end_parsable].strip()
         #self.parse_tree = self.parse()
-        return input_str.find(res.group(0), pos) + 8
+        return next_pos
 
     def set_parse_text(self, value):
         self.parsable = value

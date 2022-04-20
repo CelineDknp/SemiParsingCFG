@@ -30,9 +30,7 @@ class LabelLoopNode(LoopNode):
 	def is_label(self):
 		return True
 
-	def find_label(self, input_str, pos):
-		# print(f"Looking from: |{input_str[pos:pos+80]}|")
-		res = self.get_label_regex().search(input_str[pos:])
-		self.label = res.group(0).strip()
+	def find_label(self, actual_match):
+		splitted = actual_match.strip().split(" ")
+		self.label = splitted[1].strip()
 		# print(f"Label found: {self.label}")
-		return input_str.find(res.group(0), pos) + len(res.group(0).rstrip())
