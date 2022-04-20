@@ -15,8 +15,6 @@ class LabelNode(Node):
     def set_label(self, label):
         self.label = label
 
-    def find_label(self, input_str, pos, pattern):
-        res = pattern.search(input_str[pos:])
-        self.label = res.group(0)[:-1].strip()
-        # print(f"Label found: {self.label}")
-        return input_str.find(res.group(0), pos) + 7 + len(self.label)
+    def find_label(self, match):
+        self.label = match.lstrip()[:-1] #Remove trailing spaces and the dot at the end
+        #print(f"Label found: {self.label}")

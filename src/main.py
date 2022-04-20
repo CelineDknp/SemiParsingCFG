@@ -3,13 +3,8 @@ from Nodes.Node import Node
 from Nodes.Graph import Graph
 from Utils.config import *
 from FuzzyParser import FuzzyParser
-<<<<<<< HEAD
 import graphviz
 import cProfile
-=======
-import cProfile
-# import graphviz
->>>>>>> finall
 #Windows-specific Graphiz import
 import os
 total_path = os.path.join("c:", "Program Files", "Graphviz", "bin")# os.pathsep + "C:\Program Files\Graphviz/bin/"
@@ -17,12 +12,15 @@ if total_path not in os.environ["PATH"]:
 	os.environ["PATH"] += total_path
 
 def pre_process(file):
-	result = ""
+	l = []
 	for line in file.readlines():
+		l.append("      ")
 		if len(line) == 81:
-			result += "      "+(line[6:-9])+"        \n" #Remove the first 6 char (line number) and last 9 (id + \n)
+			l.append(line[6:-9])
+			l.append("        \n") #Remove the first 6 char (line number) and last 9 (id + \n)
 		else:
-			result += "      "+(line[6:])#Remove the first 6 char (line number), but not the end
+			l.append(line[6:])#Remove the first 6 char (line number), but not the end
+	result = "".join(l)
 	# print(result)
 	return result
 
@@ -39,10 +37,10 @@ def process_and_parse(filename):
 		pre_processed_input = pre_process(f)
 		# print(pre_processed_input)
 		# print(f"Pre-processed", flush=True)
-		parser = FuzzyParser(pre_processed_input)
-		lot = parser.fuzzy_parse()
+		parser = FuzzyParser()
+		lot = parser.fuzzy_parse(pre_processed_input)
 		# print(f"Fuzzy parsing done!", flush=True)
-		# return lot
+		return lot
 
 def process_and_create(filename):
 	lot = process_and_parse(filename)
@@ -97,9 +95,9 @@ def process_file(filename, dir_path):
 
 def main(argv):
 	if len(argv) == 2:
-		process_file(argv[1],"")
+		process_and_cleanup(argv[1],"")
 	else :
-		cProfile.run("process_and_parse('raincodeData/Delivery/V1/ALCB025.COB')")
+		cProfile.run("process_and_parse('raincodeData/Delivery/V1/ALCB018.COB')")
 
 
 

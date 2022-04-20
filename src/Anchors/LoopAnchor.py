@@ -4,7 +4,7 @@ from Utils.config import *
 class LoopAnchor(Anchor):
 	def __init__(self, elem):
 		if elem["type"] == "multiple_label":
-			super().__init__(elem["start"]+elem["inline-label"]+elem["separator"], LOOP)
+			super().__init__(elem["start"]+elem["inline-label"]+elem["separator"]+elem["inline-label"], LOOP)
 			self.start_regex = re.compile(elem["start"], flags=re.MULTILINE|re.IGNORECASE)
 			self.label = re.compile(elem["inline-label"], flags=re.MULTILINE|re.IGNORECASE)
 			self.separator = re.compile(elem["separator"], flags=re.MULTILINE|re.IGNORECASE)

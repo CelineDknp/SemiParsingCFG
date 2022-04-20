@@ -36,19 +36,7 @@ class MultipleLabelLoopNode(LabelLoopNode):
 	def is_multiple_labels(self):
 		return True
 
-	def find_label(self, input_str, pos):
-		self.label = []
-		res = self.get_label_regex().search(input_str[pos:])
-		self.label.append(res.group(0).strip())
-		pos = input_str.find(res.group(0), pos) + len(res.group(0).rstrip())
-		# print(f"[MOVING POS 1] Current state of input is: |{input_str[pos:pos+150]}|")
-		res = self.separator.search(input_str[pos:])
-		pos = input_str.find(res.group(0), pos) + len(res.group(0).rstrip())
-		# print(f"[MOVING POS 2]Current state of input is: |{input_str[pos:pos+150]}|")
-		res = self.get_label_regex().search(input_str[pos:])
-		self.label.append(res.group(0).strip())
-		# print(f"Label found: {self.label}")
-		pos = input_str.find(res.group(0), pos) + len(res.group(0).rstrip())
-
-		# print(f"[MOVING POS 3]Current state of input is: |{input_str[pos:pos+150]}|")
-		return pos
+	def find_label(self, actual_match):
+		splitted = actual_match.strip().split(" ")
+		self.label = [splitted[1], splitted[3]]
+		#print(f"Found labels: {self.label}")

@@ -1,4 +1,11 @@
 #_____INTERNAL CONFIG, DO NOT CHANGE______
+#Node types
+IGNORE = "ignore"
+CONDITION = "condition"
+LOOP = "loop"
+PARSABLE = "parsable"
+SPECIAL = "special"
+
 NODE_CONTROL = "CONTROL"
 NODE_FUSED = "FUSED"
 NODE_COND_END_ANY = "END_"

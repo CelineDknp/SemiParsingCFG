@@ -10,6 +10,8 @@ class ConditionNode(Node):
         if self.type != NODE_COND_START:
             self.condition = ""
         self.statements_starts = [r"\sIF(\s)+", r"ELSE", r"WHEN", r"EXEC\sSQL", r"\*", r"PERFORM", r"GO(\s)*TO", "MOVE", "DISPLAY", "CONTINUE", "EXIT"]
+        self.statements_str = [r"IF", r"ELSE", r"WHEN", r"EXEC SQL", r"\*", r"PERFORM", r"GOTO", r"GO TO", "MOVE", "DISPLAY", "CONTINUE", "EXIT"]
+
 
     def __str__(self):
         if self.type == NODE_COND_START:
@@ -17,8 +19,10 @@ class ConditionNode(Node):
         else:
             return super().__str__()
 
-    def is_anchor(self, input, anchors):
-        for val in anchors:
+    def is_anchor(self, input):
+        if not any(substring in input for substring in self.statements_str):
+            return -1
+        for val in self.statements_starts:
             # print(f"Looking for {val}")
             res = re.search(val, input)
             if res != None:
@@ -44,7 +48,7 @@ class ConditionNode(Node):
         go = True
         cond = ""
         new_line = input.find("\n", pos)
-        is_anchor = self.is_anchor(input[pos:new_line], self.statements_starts)
+        is_anchor = self.is_anchor(input[pos:new_line])
         if is_anchor != -1:
             self.condition = input[pos:pos+is_anchor].strip()
             # print(f"COND: {self.condition} for {input[pos-10:pos+15]}")
@@ -56,7 +60,7 @@ class ConditionNode(Node):
             if not first:
                 # print(f"Current cond is: {cond}")
                 # print(f"Looking at next line: {next_line}")
-                if self.is_anchor(next_line, self.statements_starts) != -1:
+                if self.is_anchor(next_line) != -1:
                     # print("saw anchor")
                     go = False
                 elif re.search(r'^(\s)*(\S)+(\s)*$',next_line):  # Special case of just one thing to finish the line

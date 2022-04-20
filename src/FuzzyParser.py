@@ -9,83 +9,41 @@ from Nodes.MultipleLabelLoopNode import MultipleLabelLoopNode
 from Nodes.ControlLoopNode import ControlLoopNode
 from Nodes.LabelNode import LabelNode
 from Nodes.Node import Node
-from Anchors.ConditionAnchor import ConditionAnchor
-from Anchors.LoopAnchor import LoopAnchor
-from Anchors.SpecialAnchor import SpecialAnchor
-from Anchors.IgnoreAnchor import IgnoreAnchor
-from Anchors.Anchor import Anchor
+from AnchorHandler import AnchorHandler
 
 
-class FuzzyParser():
-	def anchors_creation(self):
-		self.anchors = []
-		self.special_anchors = {}
-		self.label_regex = []
-		for elem in conditions:
-				self.anchors.append(ConditionAnchor(elem))
-		for elem in parsable:
-			self.anchors.append(Anchor(elem["start"], PARSABLE))
-		for elem in special:
-			s = SpecialAnchor(elem)
-			self.anchors.append(s)
-			self.special_anchors[elem["effect"]] = s
-		for elem in to_ignore:
-			s = IgnoreAnchor(elem)
-			self.anchors.append(s)
-		for elem in loops:
-			a = LoopAnchor(elem)
-			self.anchors.append(a)
-			if a.is_label_anchor():
-				s = SpecialAnchor.from_explicit(elem["label-regex"], "label")
-				self.label_regex.append(elem["label-regex"])
-				self.anchors.append(s)
-			elif a.is_control_anchor():
-				s = SpecialAnchor.from_explicit(elem["control-regex"], "control", info=elem["control-type"])
-				self.special_anchors["control-regex"] = s
-		self.anchors_dict = self.current_anchors_and_regexes()
+class FuzzyParser:
+	def __init__(self):
+		self.anchorHandler = AnchorHandler()
 
-	def next_pos_init(self):
-		for val in self.anchors_dict:
-			res = val.finditer(self.input[self.pos:])
-			elem = next(res, None)
-			if elem is not None:
-				self.next_pos_iter[val] = res
-				self.next_pos[val] = [self.input.find(elem.group(0), self.pos), elem.group(0), self.anchors_dict[val]]
-			else:
-				self.banned_regex.append(val)
-
-	def __init__(self, input):
-		self.input = input
+	def reset_vars(self, input):
+		self.input_str = input
 		self.pos = 0
 		self.depth = 0
 		self.open_control = False
 		self.init = False
+		self.stop_close_all_look = False
+		self.close_all_iter = None
+		self.stop_control_look = False
+		self.control_iter = None
 		self.next_pos = {}
 		self.next_pos_iter = {}
-		self.banned_regex = []
-		self.anchors_creation()
+		self.anchorHandler.reset_anchors()
 		self.next_pos_init()
 		self.clean_anchors()
-		self.close_all_iter = None
-		self.control_iter = None
 
-	def current_anchors_and_regexes(self):
-		result = {}
-		for a in self.anchors:
-			if a.get_type() == CONDITION:
-				if a.get_start_pattern() not in self.banned_regex:
-					result[a.get_start_pattern()] = a
-				if a.get_branch_pattern() not in self.banned_regex:
-					result[a.get_branch_pattern()] = a
-				if a.get_end_pattern() not in self.banned_regex:
-					result[a.get_end_pattern()] = a
+
+	def next_pos_init(self):
+		for val in self.anchorHandler.get_anchors():
+			res = val.finditer(self.input_str[self.pos:])
+			elem = next(res, None)
+			if elem is not None:
+				self.next_pos_iter[val] = res
+				self.next_pos[val] = self.get_next_pos_array(val, elem)
 			else:
-				if a.get_pattern() not in self.banned_regex:
-					result[a.get_pattern()] = a
-		return result
+				self.anchorHandler.ban_regex(val)
 
 	def useful_anchor(self, current_anchor, end_match):
-		#print(f"Is {current_anchor} useful ?")
 		if not current_anchor.get_type() == IGNORE: #If this isn't an ignore anchor, allow it
 			return True
 		else:
@@ -99,7 +57,7 @@ class FuzzyParser():
 
 	def pick_next_anchor(self):
 		# print("PICKING")
-		min_val = len(self.input) + 1
+		min_val = len(self.input_str) + 1
 		min_key = ""
 		actual_match = ""
 		anchor = None
@@ -132,39 +90,46 @@ class FuzzyParser():
 		else:
 			return min_val, None, min_key, None
 
+	def get_next_pos_array(self, val, elem):
+		if val == self.anchorHandler.get_special_anchor("close_all").get_pattern() or \
+				val == self.anchorHandler.get_special_anchor("control-regex").get_pattern():
+			# print("Picked find")
+			return [self.input_str.find(elem.group(0), self.pos), elem.group(0), self.anchorHandler.get_anchor(val)]
+		else:
+			# print("picked span")
+			return [elem.span()[0], elem.group(0), self.anchorHandler.get_anchor(val)]
+
 	def get_next_value_regex(self, val):
 		if val not in self.next_pos_iter:
-			res = val.finditer(self.input[self.pos:])
-			self.next_pos_iter[val] = res
-
-		elem = next(self.next_pos_iter[val], None)
+			next_iter = val.finditer(self.input_str[self.pos:])
+			self.next_pos_iter[val] = next_iter
+		else:
+			next_iter = self.next_pos_iter[val]
+		elem = next(next_iter, None)
 		if elem is not None:
-			return [self.input.find(elem.group(0), self.pos), elem.group(0), self.anchors_dict[val]]
+			return self.get_next_pos_array(val, elem)
 		else:
 			return None
 
+	def get_next_or_ban(self, val):
+		res = self.get_next_value_regex(val)
+		if res != None:
+			self.next_pos[val] = res
+			return False
+		else:
+			self.anchorHandler.ban_regex(val)
+			return True
 
 	def next_anchor(self):
-		#print(f"Searching from: |{self.input[self.pos:self.pos+150]}|")
-		for val in self.anchors_dict.keys():
+		#print(f"Searching from: |{self.input_str[self.pos:self.pos+150]}|")
+		for val in self.anchorHandler.get_anchors():
 			# print(f"Looking for {val}")
 			if val not in self.next_pos:
-				# print(f"Not in next_pos {val}")
-				# print(f"Not in absent_regex")
-				res = self.get_next_value_regex(val)
-				if res != None:
-					self.next_pos[val] = res
-				else:
-					self.banned_regex.append(val)
-					#print(f"Found {val} not in next pos or absent_regex")
+				self.get_next_or_ban(val)
 			elif self.next_pos[val][0] < self.pos:
 				#print(f"Outdated next_pos for val {val} ! Update")
 				while self.next_pos[val][0] < self.pos:
-					res = self.get_next_value_regex(val)
-					if res != None:
-						self.next_pos[val] = res
-					else:
-						self.banned_regex.append(val)
+					if self.get_next_or_ban(val):
 						self.next_pos.pop(val)
 						break
 		# for elem in self.next_pos:
@@ -172,45 +137,60 @@ class FuzzyParser():
 		return self.pick_next_anchor()
 
 	def len_next_match(self, pattern):
-		res = pattern.search(self.input[self.pos:])
-		return self.input.find(res.group(0), self.pos) + len(res.group(0))
+		res = pattern.search(self.input_str[self.pos:])
+		return self.input_str.find(res.group(0), self.pos) + len(res.group(0))
+
+	def remove_regex_from_next_pos(self, regex):
+		if regex in self.next_pos:
+			self.next_pos.pop(regex)
+		if regex in self.next_pos_iter:
+			return self.next_pos_iter.pop(regex)
+
+	def update_iters_and_next(self, result, regex, iterator):
+		if result == "banned": #We banned the regex, remove it
+			return self.remove_regex_from_next_pos(regex) #Remove regex from next_pos and the iterator array, but return the iterator
+		elif result == "unbanned": #We unbanned the regex, fetch it
+			if iterator is not None:
+				self.next_pos_iter[regex] = iterator #We already had an iterator
+			else:
+				new_it = regex.finditer(self.input_str[self.pos:]) #Making a new iteratoor
+				self.next_pos_iter[regex] = new_it
+			#Let's update next_pos and make sure it's not empty
+			banned = self.get_next_or_ban(regex)
+			if banned:
+				return None
+			else:
+				return new_it
 
 	def clean_anchors(self, start_parse=False, found_control=False):
 		if start_parse:
-			self.anchors.remove(self.special_anchors["start_parse"])
-			self.anchors_dict = self.current_anchors_and_regexes()
+			self.anchorHandler.clean_anchors(self.depth, self.open_control, start_parse=True)
 		elif found_control:
-			if self.special_anchors["control-regex"] in self.anchors:
-				self.anchors.remove(self.special_anchors["control-regex"])
-				self.banned_regex.append(self.special_anchors["control-regex"].get_pattern())
-				if self.special_anchors["control-regex"].get_pattern() in self.next_pos:
-					self.next_pos.pop(self.special_anchors["control-regex"].get_pattern())
+			regex = self.anchorHandler.get_special_pattern("control-regex")
+			if self.stop_control_look:
+				self.anchorHandler.ban_regex(regex)
+				self.remove_regex_from_next_pos(regex)
+				return
+			result = self.anchorHandler.clean_anchors(self.depth, self.open_control, found_control=True)
+			is_iter = self.update_iters_and_next(result, regex, self.control_iter)
+			if is_iter is not None:
+				self.control_iter = is_iter
 			else:
-				self.anchors.append(self.special_anchors["control-regex"])
-				if self.special_anchors["control-regex"].get_pattern() in self.banned_regex:
-					self.banned_regex.remove(self.special_anchors["control-regex"].get_pattern())
-				if self.control_iter is not None:
-					self.next_pos_iter[self.special_anchors["control-regex"].get_pattern()] = self.control_iter
-				else:
-					self.control_iter = self.special_anchors["control-regex"].get_pattern().finditer(self.input[self.pos:])
-					self.next_pos_iter[self.special_anchors["control-regex"].get_pattern()] = self.control_iter 
-
+				self.stop_control_look = True
 		else:
-			if "close_all" in self.special_anchors:
-				if not self.init:
-					self.banned_regex.append(self.special_anchors["close_all"].get_pattern())
-					if self.special_anchors["close_all"].get_pattern() in self.next_pos:
-						self.close_all_iter = self.next_pos.pop(self.special_anchors["close_all"].get_pattern())
-				if self.depth == 0 and self.special_anchors["close_all"].get_pattern() not in self.banned_regex:
-					self.banned_regex.append(self.special_anchors["close_all"].get_pattern())
-					if self.special_anchors["close_all"].get_pattern() in self.next_pos and not self.open_control:
-						self.next_pos.pop(self.special_anchors["close_all"].get_pattern())
-				elif self.depth > 0 and self.special_anchors["close_all"].get_pattern() in self.banned_regex:
-					self.banned_regex.remove(self.special_anchors["close_all"].get_pattern())
-					if self.close_all_iter is None:
-						self.close_all_iter = self.special_anchors["close_all"].get_pattern().finditer(self.input[self.pos:])
-					self.next_pos_iter[self.special_anchors["close_all"].get_pattern()] = self.close_all_iter 
-		self.anchors_dict = self.current_anchors_and_regexes()
+			if self.anchorHandler.has_special("close_all"):
+				regex = self.anchorHandler.get_special_pattern("close_all")
+				if self.stop_close_all_look:
+					self.anchorHandler.ban_regex(regex)
+					self.remove_regex_from_next_pos(regex)
+					return
+				result = self.anchorHandler.clean_anchors(self.depth, self.open_control, init=not self.init)
+				if result != "nothing":
+					is_iter = self.update_iters_and_next(result, regex, self.control_iter)
+					if is_iter is not None:
+						self.close_all_iter = is_iter
+					else:
+						self.stop_close_all_look = True
 
 	def consume_ignore(self, n_anchor, next_val, actual_val, actual_match):
 		if n_anchor.get_parse_type() == "comment":
@@ -234,11 +214,11 @@ class FuzzyParser():
 				node = SimpleBranchConditionNode(self.depth, NODE_COND_START, n_anchor.get_start())
 			if n_anchor.has_condition_delimiter():
 				if n_anchor.is_delimiter_mandatory():
-					self.pos = node.find_condition_delimiter(self.input, self.pos, n_anchor.get_delimiter())
+					self.pos = node.find_condition_delimiter(self.input_str, self.pos, n_anchor.get_delimiter())
 				else:
-					self.pos = node.find_condition(self.input, self.pos, n_anchor.get_delimiter())
+					self.pos = node.find_condition(self.input_str, self.pos, n_anchor.get_delimiter())
 			else:
-					self.pos = node.find_condition_simple(self.input, self.pos)
+					self.pos = node.find_condition_simple(self.input_str, self.pos)
 			# print(f">>> COND COND: {node.get_condition()}")
 			self.depth += 1
 			if self.depth == 1:
@@ -251,7 +231,7 @@ class FuzzyParser():
 		elif actual_val == n_anchor.get_branch_pattern() and n_anchor.is_multiple_branches():
 			# print('>>> FOUND COND multiple branch')
 			node = MultipleBranchConditionNode(self.depth - 1, NODE_COND_BRANCH, n_anchor.get_start())
-			self.pos = node.find_condition_simple(self.input, self.pos)
+			self.pos = node.find_condition_simple(self.input_str, self.pos)
 			# print(f"Found condition: {node.get_condition()}")
 			lot.append(node)
 		elif actual_val == n_anchor.get_end_pattern(): #Found a COND end
@@ -266,7 +246,7 @@ class FuzzyParser():
 		#print('>>> FOUND EXEC')
 		node = ParseNode(self.depth, NODE_SQL, n_anchor.get_regex())
 		lot.append(node)
-		self.pos = node.find_parse_text(self.input, next_val)
+		self.pos = node.find_parse_text(self.input_str, next_val)
 
 	def consume_special(self, n_anchor, next_val, lot, actual_match):
 		#print(f"Found special {actual_match}")
@@ -274,9 +254,9 @@ class FuzzyParser():
 		if n_anchor.get_effect() == "label":
 			# print("found label")
 			node = LabelNode(self.depth, NODE_LABEL, n_anchor.get_regex())
-			self.pos = node.find_label(self.input, self.pos, n_anchor.get_pattern())
+			node.find_label(actual_match)
+			self.pos = next_val+len(actual_match)-1
 			lot.append(node)
-			# print(f"label is : {node.get_label()}")
 		elif n_anchor.get_effect() == "close_all":
 			while self.depth > 0:
 				self.depth -= 1
@@ -304,8 +284,8 @@ class FuzzyParser():
 		elif n_anchor.get_effect() == "start_parse":
 			self.pos = self.len_next_match(n_anchor.get_pattern())
 
-	def consume_loop(self, n_anchor, lot):
-		#print("found loop !")
+	def consume_loop(self, n_anchor, lot, next_val, actual_match):
+		#print(f"found loop ! {actual_match}")
 		# print(f"Current state of input is: |{self.input[self.pos:self.pos+150]}|")
 		if n_anchor.is_label_anchor():
 			node = None
@@ -314,22 +294,21 @@ class FuzzyParser():
 			else:	
 				node = LabelLoopNode(self.depth, NODE_LOOP, n_anchor)
 			lot.append(node)
-			self.pos = self.len_next_match(n_anchor.get_start_regex())
-			# print(f"Current state of input is: |{self.input[self.pos:self.pos+150]}|")
-			self.pos = node.find_label(self.input, self.pos)
+			node.find_label(actual_match)
 			# print(f"Current state of input is: |{self.input[self.pos:self.pos+150]}|")
 		elif n_anchor.is_control_anchor():
 			node = ControlLoopNode(self.depth, NODE_LOOP, n_anchor)
 			lot.append(node)
 			self.open_control = True
 			self.clean_anchors(found_control=True)
-			self.pos = self.len_next_match(n_anchor.get_pattern())
+		self.pos = next_val + len(actual_match) - 1
 
-	def fuzzy_parse(self):
+	def fuzzy_parse(self, input):
 		lot = []
-		next_val, n_anchor, actual_val, actual_match = self.next_anchor()
+		self.reset_vars(input)
+		next_val, n_anchor, actual_val, actual_match = self.pick_next_anchor()
 		# print(f"First result from next_anchor: {next_val}, {n_anchor}, {actual_val}, {actual_match}")
-		while next_val != len(self.input)+1:
+		while next_val != len(self.input_str)+1:
 			# print(f"Pos is {self.pos}")
 			# print(f"Looking at next_anchor: {n_anchor} of val {actual_val} current depth is: {self.depth}")
 			if n_anchor.get_type() == IGNORE:
@@ -342,12 +321,12 @@ class FuzzyParser():
 			elif n_anchor.get_type() == SPECIAL:
 				self.consume_special(n_anchor, next_val, lot, actual_match)
 			elif n_anchor.get_type() == LOOP:
-				self.consume_loop(n_anchor, lot)
+				self.consume_loop(n_anchor, lot, next_val, actual_match)
 			else:
 				self.pos += 1
 			next_val, n_anchor, actual_val, actual_match = self.next_anchor()
 			# print(f"Loop result from next_anchor: {next_val}, {n_anchor}, {actual_val}, {actual_match}")
-		if self.input[-1] == ".": #If last character of input is a dot, close any remaining open things
+		if self.input_str[-1] == ".": #If last character of input is a dot, close any remaining open things
 			while self.depth > 0:
 					self.depth -= 1
 					node = ConditionNode(self.depth, NODE_COND_END_ANY, r"\.(\s)+")
