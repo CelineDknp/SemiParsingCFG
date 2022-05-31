@@ -6,6 +6,7 @@ from .ControlLoopNode import ControlLoopNode
 from .LabelLoopNode import LabelLoopNode
 from .LoopNode import LoopNode
 from .MultipleLabelLoopNode import MultipleLabelLoopNode
+from .BlockLoopNode import BlockLoopNode
 from Utils.config import *
 from Utils.utils import clean_regex
 import graphviz
@@ -86,6 +87,8 @@ class Graph:
 	def update_open_loops(self, node):
 		if node.is_control():
 			self.open_control_loops.append(node)
+		elif node.is_block():
+			print("Block found !")
 		elif self.match_labels(node):
 			if node.is_multiple_labels():
 				for l in node.get_label():
@@ -324,6 +327,11 @@ class Graph:
 					dot.node(str(current_node.id), "PERFORM " + current_node.get_label()[0]+" THRU "+ current_node.get_label()[1])
 				elif isinstance(current_node, LabelLoopNode):
 					dot.node(str(current_node.id), clean_regex(current_node)+" " + current_node.get_label())
+				elif isinstance(current_node, BlockLoopNode):
+					if current_node.is_close_node():
+						dot.node(str(current_node.id), "END PERFORM")
+					else:
+						dot.node(str(current_node.id), "PERFORM " + current_node.get_branch_str()+" "+current_node.get_condition_str())
 			elif current_node.get_type() == NODE_SQL:
 				dot.attr('node', shape='box')
 				dot.node(str(current_node.id), current_node.parsable)

@@ -55,6 +55,9 @@ class AnchorHandler:
 					result[a.get_branch_pattern()] = a
 				if a.get_end_pattern() not in self.banned_regex:
 					result[a.get_end_pattern()] = a
+			elif a.get_type() == LOOP and a.is_block_anchor():
+				result[a.get_start_pattern()] = a
+				result[a.get_end_pattern()] = a
 			else:
 				if a.get_pattern() not in self.banned_regex:
 					result[a.get_pattern()] = a

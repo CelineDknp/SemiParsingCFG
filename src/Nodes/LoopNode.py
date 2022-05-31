@@ -24,9 +24,12 @@ class LoopNode(Node):
 	def is_label(self):
 		return False
 
+	def is_block(self):
+		return False
+
 	def add_child(self, node, match=False):
 		if self.is_label():
-			if node.get_type() != NODE_LABEL and not self.is_goback_node():  # We don't want the child
+			if node.get_type() != NODE_LABEL and not self.is_goback_node() and not self.is_block():  # We don't want the child
 				return
 		elif self.is_control():
 			if not match:

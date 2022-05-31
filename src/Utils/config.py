@@ -26,8 +26,9 @@ for control-flow:
 """
 loops = [
     {"start":r"\sGO(\s)?TO(\s)+", "type":"label", "goback":False, "inline-label":r"([^\s*.])+(\s)*", "label-regex":r"^\s{7}([^\s*])+(\s)*\."},
-    {"start":r"\sPERFORM(\s)+", "type":"multiple_label", "goback":True, "separator":r"(\s)+THRU(\s)+", "inline-label":r"([^\s*.])+(\s)*", "label-regex":r"^\s{7}([^\s*])+(\s)*\."},
+    {"start":r"\sPERFORM(\s)+", "type":"multiple_label", "goback":True, "separator":r"(\s)+(THRU|THROUGH)(\s)+", "inline-label":r"([^\s*.])+(\s)*", "label-regex":r"^\s{7}([^\s*])+(\s)*\."},
     {"start":r"\sPERFORM(\s)+", "type":"label", "goback":True, "inline-label":r"([^\s*.])+(\s)*", "label-regex":r"^\s{7}([^\s*])+(\s)*\."},
+    {"start":r"\sPERFORM((\s)+VARYING(\s)+.*)?(\s)+UNTIL.*", "type":"block","end":r"END-PERFORM", "branch":"VARYING", "condition":"UNTIL", "goback":True},
     {"start":r"\sNEXT\sSENTENCE(\s)*", "type":"control-flow", "goback":False, "control-type": NODE_COND_END_ANY, "control-regex":r"\.(\s)*$"}
 ]
 """Structure that we want to parse

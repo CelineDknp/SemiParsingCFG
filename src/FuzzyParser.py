@@ -4,6 +4,7 @@ from Nodes.MultipleBranchConditionNode import MultipleBranchConditionNode
 from Nodes.ConditionNode import ConditionNode
 from Nodes.ParseNode import ParseNode
 from Nodes.LoopNode import LoopNode
+from Nodes.BlockLoopNode import BlockLoopNode
 from Nodes.LabelLoopNode import LabelLoopNode
 from Nodes.MultipleLabelLoopNode import MultipleLabelLoopNode
 from Nodes.ControlLoopNode import ControlLoopNode
@@ -75,15 +76,18 @@ class FuzzyParser:
 					return 0, anchor, val, actual
 			else:
 				val = self.next_pos[key][0]
+				curr_length = 0
 				# print(f"VAL: {val}")
 				# Should we pick this anchor ?
-				if val < min_val and val != -1:
+				temp_length = len(self.next_pos[key][1])
+				if (val < min_val or (val == min_val and temp_length > curr_length)) and val != -1:
 					t_anchor = self.next_pos[key][2]
 					if self.useful_anchor(t_anchor, val + len(self.next_pos[key][1].rstrip())):
 						min_val = val
 						min_key = key
 						anchor = self.next_pos[key][2]
 						actual_match = self.next_pos[key][1]
+						curr_length = len(actual_match)
 		if min_key != '':
 			#print(f"picked: {min_val}, {anchor}, {min_key}, {actual_match}")
 			return min_val, anchor, min_key, actual_match
@@ -284,7 +288,7 @@ class FuzzyParser:
 		elif n_anchor.get_effect() == "start_parse":
 			self.pos = self.len_next_match(n_anchor.get_pattern())
 
-	def consume_loop(self, n_anchor, lot, next_val, actual_match):
+	def consume_loop(self, n_anchor, lot, next_val, actual_val, actual_match):
 		#print(f"found loop ! {actual_match}")
 		# print(f"Current state of input is: |{self.input[self.pos:self.pos+150]}|")
 		if n_anchor.is_label_anchor():
@@ -301,6 +305,14 @@ class FuzzyParser:
 			lot.append(node)
 			self.open_control = True
 			self.clean_anchors(found_control=True)
+		elif n_anchor.is_block_anchor():
+			if actual_val == n_anchor.get_start_pattern():
+				node = BlockLoopNode(self.depth, NODE_LOOP, n_anchor)
+				lot.append(node)
+				node.find_conditions(actual_match)
+			elif actual_val == n_anchor.get_end_pattern():
+				node = BlockLoopNode(self.depth, NODE_LOOP, n_anchor, close=True)
+				lot.append(node)
 		self.pos = next_val + len(actual_match) - 1
 
 	def fuzzy_parse(self, input):
@@ -321,7 +333,7 @@ class FuzzyParser:
 			elif n_anchor.get_type() == SPECIAL:
 				self.consume_special(n_anchor, next_val, lot, actual_match)
 			elif n_anchor.get_type() == LOOP:
-				self.consume_loop(n_anchor, lot, next_val, actual_match)
+				self.consume_loop(n_anchor, lot, next_val, actual_val, actual_match)
 			else:
 				self.pos += 1
 			next_val, n_anchor, actual_val, actual_match = self.next_anchor()
