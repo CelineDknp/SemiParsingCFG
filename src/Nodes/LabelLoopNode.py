@@ -31,6 +31,7 @@ class LabelLoopNode(LoopNode):
 		return True
 
 	def find_label(self, actual_match):
+		actual_match = (' ').join(actual_match.split()) #Clean up any extra space by splitting and joining a first time
 		splitted = actual_match.strip().split(" ")
-		self.label = splitted[1].strip()
-		# print(f"Label found: {self.label}")
+		self.label = splitted[-1].strip()
+		#print(f"Label found: {self.label}")

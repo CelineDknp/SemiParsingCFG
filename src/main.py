@@ -3,7 +3,7 @@ from Nodes.Node import Node
 from Nodes.Graph import Graph
 from Utils.config import *
 from FuzzyParser import FuzzyParser
-import graphviz
+#import graphviz
 import cProfile
 #Windows-specific Graphiz import
 import os
@@ -84,18 +84,18 @@ def process_and_squish(filename,label_clean=False):
 	return g
 
 def process_file(filename, dir_path):
-	g = process_and_parse(filename)
-	# g = process_and_cleanup(filename,label_clean=False)
+	#g = process_and_parse(filename)
+	g = process_and_cleanup(filename,label_clean=False)
 	# g = process_and_squish(filename,label_clean=True)
-	# g.save_as_file(os.path.basename(filename), output_dir=dir_path)
-	# print(f"Done!")
+	g.save_as_file(os.path.basename(filename), output_dir=dir_path)
+	print(f"Done!")
 
 
 
 
 def main(argv):
 	if len(argv) == 2:
-		process_and_cleanup(argv[1],"")
+		process_file(argv[1],"")
 	else :
 		cProfile.run("process_and_parse('raincodeData/Delivery/V1/ALCB018.COB')")
 
