@@ -50,43 +50,45 @@ class ConditionNode(Node):
         new_line = input.find("\n", pos)
         is_anchor = self.is_anchor(input[pos:new_line])
         if is_anchor != -1:
-            self.condition = input[pos:pos+is_anchor].strip()
-            # print(f"COND: {self.condition} for {input[pos-10:pos+15]}")
+            self.condition = input[pos+1:pos+is_anchor].strip()
+            #print(f"COND: {self.condition} for {input[pos-10:pos+15]}")
             return pos + len(self.condition)
         else:
-            next_line = input[pos:new_line]
+            next_line = input[pos+1:new_line]
         first = True
+        temp_pos = pos
         while go:
+            #print(f"Current cond is: {cond}")
+            #print(f"Looking at next line: {next_line}")
             if not first:
-                # print(f"Current cond is: {cond}")
-                # print(f"Looking at next line: {next_line}")
                 if self.is_anchor(next_line) != -1:
-                    # print("saw anchor")
+                    #print("saw anchor")
                     go = False
-                elif re.search(r'^(\s)*(\S)+(\s)*$',next_line):  # Special case of just one thing to finish the line
-                    # print("saw signe element")
+                elif re.search(r'^(\s)*[^\s-]+(\s)*$',next_line):  # Special case of just one thing to finish the line
+                    #print("saw signe element")
                     if any(x in next_line for x in self.statements_starts):
                         # print("saw move")
                         go = False
                     else:
                         # print("condition kept going")
                         cond += next_line.lstrip()
-                        pos = new_line + 1
+                        temp_pos = new_line + 1
                 elif any(x in next_line for x in [">", "<", " IS ", " NOT ", " OR ", " AND ", " NUMERIC "]):
+                    #print("Saw signe")
                     cond += next_line.strip() + " "
-                    pos = new_line + 1
+                    temp_pos = new_line + 1
                 else:
-                    # print("Saw nothing of interest, stop")
+                    #print("Saw nothing of interest, stop")
                     go = False
             else:
                 cond += next_line.strip() + " "
-                pos = new_line + 1
+                temp_pos = new_line + 1
             first = False
-            new_line = input.find("\n", pos)
-            next_line = input[pos:new_line]
+            new_line = input.find("\n", temp_pos)
+            next_line = input[temp_pos:new_line]
         self.condition = cond.strip()
-        # print(self.condition)
-        return pos
+        #print(self.condition)
+        return pos + len(self.condition)
 
     def set_condition(self, cond):
         self.condition = cond

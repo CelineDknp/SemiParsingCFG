@@ -154,8 +154,10 @@ class FuzzyParser:
 		if result == "banned": #We banned the regex, remove it
 			return self.remove_regex_from_next_pos(regex) #Remove regex from next_pos and the iterator array, but return the iterator
 		elif result == "unbanned": #We unbanned the regex, fetch it
+			new_it = None
 			if iterator is not None:
 				self.next_pos_iter[regex] = iterator #We already had an iterator
+				new_it = iterator
 			else:
 				new_it = regex.finditer(self.input_str[self.pos:]) #Making a new iteratoor
 				self.next_pos_iter[regex] = new_it
@@ -176,11 +178,12 @@ class FuzzyParser:
 				self.remove_regex_from_next_pos(regex)
 				return
 			result = self.anchorHandler.clean_anchors(self.depth, self.open_control, found_control=True)
-			is_iter = self.update_iters_and_next(result, regex, self.control_iter)
-			if is_iter is not None:
-				self.control_iter = is_iter
-			else:
-				self.stop_control_look = True
+			if result != "nothing":
+				is_iter = self.update_iters_and_next(result, regex, self.control_iter)
+				if is_iter is not None:
+					self.control_iter = is_iter
+				else:
+					self.stop_control_look = True
 		else:
 			if self.anchorHandler.has_special("close_all"):
 				regex = self.anchorHandler.get_special_pattern("close_all")
@@ -205,7 +208,7 @@ class FuzzyParser:
 	def consume_condition(self, n_anchor, next_val, actual_val, lot, actual_match):
 		#print(f"Found condition {actual_match}")
 		# print(f"In condition ! anchor: {n_anchor}, next_val: {next_val}, actual: {actual_val}, match: {actual_match}")
-		self.pos = next_val + len(actual_match)
+		self.pos = next_val + len(actual_match.rstrip())
 		if actual_val == n_anchor.get_start_pattern(): #Found an opening condition
 			# print(f'>>> FOUND COND start {actual_match}')
 			node = None
@@ -262,15 +265,21 @@ class FuzzyParser:
 			self.pos = next_val+len(actual_match)-1
 			lot.append(node)
 		elif n_anchor.get_effect() == "close_all":
-			while self.depth > 0:
-				self.depth -= 1
-				node = ConditionNode(self.depth, NODE_COND_END_ANY, n_anchor.get_regex())
-				lot.append(node)
-			if self.open_control:
-				node = Node(self.depth, NODE_COND_END_ANY)
-				lot.append(node)
-				self.open_control = False
-				self.clean_anchors(found_control=True)
+			if self.depth > 0:
+				while self.depth > 0:
+					self.depth -= 1
+					node = ConditionNode(self.depth, NODE_COND_END_ANY, n_anchor.get_regex())
+					lot.append(node)
+				if self.open_control:
+					self.open_control = False
+					self.clean_anchors(found_control=True)
+
+			else:
+				if self.open_control:
+					node = Node(self.depth, NODE_COND_END_ANY)
+					lot.append(node)
+					self.open_control = False
+					self.clean_anchors(found_control=True)
 			self.pos = next_val+1
 			#print(f"New pos is {self.pos}")
 		elif n_anchor.get_effect() == "control":

@@ -3,7 +3,7 @@ from Nodes.Node import Node
 from Nodes.Graph import Graph
 from Utils.config import *
 from FuzzyParser import FuzzyParser
-import graphviz
+#import graphviz
 import cProfile
 #Windows-specific Graphiz import
 import os

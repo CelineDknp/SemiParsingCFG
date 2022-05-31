@@ -1,0 +1,11 @@
+mean(T/F); filename; file size; fuzzy time (s); parsing time (s); parsing/fuzzy
+T; raincodeData/parseTests/ALCB0182.COB;2089;0,081037823;;
+T; raincodeData/parseTests/ALCB018.COB;987;0,092148654;;
+T; raincodeData/parseTests/ALCB0183.COB;3017;0,135001564;;
+T; raincodeData/parseTests/ALCB0184.COB;4061;0,214004612;;
+T; raincodeData/parseTests/ALCB0185.COB;5047;0,291833401;;
+T; raincodeData/parseTests/ALCB01810K.COB;10006;0,926994483;;
+T; raincodeData/parseTests/ALCB01820K.COB;20010;3,460849937;;
+T; raincodeData/parseTests/ALCB01830K.COB;30025;7,488638306;;
+T; raincodeData/parseTests/ALCB01840K.COB;40019;13,21811851;;
+T; raincodeData/parseTests/ALCB01850K.COB;50012;20,17614899;;

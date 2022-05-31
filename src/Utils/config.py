@@ -41,7 +41,7 @@ parsable = [{"start":r"EXEC\sSQL", "end":r"END-EXEC"}]
 #All structures that can contain code but should be ignored (typically, strings and comments)
 to_ignore = [
     {"regex": r"(('(.)*$\s{7}-\s*))?('(.)*')", "type":"string"}, 
-    {"regex":r"((\s)*\*(.)*$)+", "type":"comment"}
+    {"regex":r"^\s{6}((\s)*\*(.)*$)+", "type":"comment"}
 ]
 
 #Language special case

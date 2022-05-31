@@ -351,6 +351,7 @@ class Graph:
 				dot.node(str(current_node.id), str(current_node.amount_contained()))
 		for n in self.all_nodes:
 			if n.get_type() == NODE_COND_START and isinstance(n, SimpleBranchConditionNode):
+				print(n)
 				dot.edge(str(n.id), str(n.true_child.id), label='True')
 				dot.edge(str(n.id), str(n.false_child.id), label='False')
 			elif n.get_type() == NODE_COND_START and isinstance(n, MultipleBranchConditionNode):
