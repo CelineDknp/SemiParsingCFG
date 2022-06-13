@@ -39,6 +39,16 @@ class Graph:
 				res = cond_node
 		return res
 
+	def match_varying_loops(self):
+		first_block = None
+		if "block" in self.open_loops:
+			for e in self.open_loops["block"]:
+				if e.is_close_node():
+					e.add_child(first_block)
+					e.set_target(first_block)
+				else:
+					first_block = e
+
 	def match_loops(self, node):
 		to_remove = []
 		# print(f"IN MATCH LOOPS {node}")
@@ -88,7 +98,10 @@ class Graph:
 		if node.is_control():
 			self.open_control_loops.append(node)
 		elif node.is_block():
-			print("Block found !")
+			if "block" not in self.open_loops.keys():
+				self.open_loops["block"] = [node]
+			else:
+				self.open_loops["block"].append(node)
 		elif self.match_labels(node):
 			if node.is_multiple_labels():
 				for l in node.get_label():
@@ -161,7 +174,8 @@ class Graph:
 			self.all_nodes.append(temp)
 		elif node.get_type() == "END":  # Adding the end_node
 			self.add_single_node(node)
-		# print("Added the last_node")
+			print("Added the last_node")
+			self.match_varying_loops()
 		else:
 			print(f"Issue during adding node {node}")
 
@@ -351,7 +365,7 @@ class Graph:
 				dot.node(str(current_node.id), str(current_node.amount_contained()))
 		for n in self.all_nodes:
 			if n.get_type() == NODE_COND_START and isinstance(n, SimpleBranchConditionNode):
-				print(n)
+				#print(n)
 				dot.edge(str(n.id), str(n.true_child.id), label='True')
 				dot.edge(str(n.id), str(n.false_child.id), label='False')
 			elif n.get_type() == NODE_COND_START and isinstance(n, MultipleBranchConditionNode):
@@ -359,11 +373,17 @@ class Graph:
 					# print(condition)
 					dot.edge(str(n.id), str(n.get_branch_child(condition).id), label=condition)
 			elif n.get_type() == NODE_LOOP and n.is_goback_node():
-				# print(f"Doing node {n}")
+				#print(f"Doing node {n}")
 				for link in n.get_childs():
-					dot.edge(str(n.id), str(link.id))
+					#print(f"Linking to {link}")
+					if isinstance(n, BlockLoopNode) and n.is_close_node() and link == n.get_target():
+						dot.edge(str(n.id), str(link.id), label=link.get_condition_str())
+					else:
+						dot.edge(str(n.id), str(link.id))
 					if link.get_type() == NODE_LABEL and link.get_label() == n.go_back_label():
 						dot.edge(str(link.id), str(n.id), label="Go back")
+					
+						
 			else:
 				for link in n.get_childs():
 					dot.edge(str(n.id), str(link.id))

@@ -11,17 +11,29 @@ class BlockLoopNode(LoopNode):
 		if not close:
 			self.branch = anchor.branch
 			self.condition = anchor.condition
-			self.branch_str = None
-			self.condition_str = None
+			self.branch_str = ""
+			self.condition_str = ""
 
 	def __str__(self):
-		return f"Node {self.type} (block) until {self.until_condition}"
+		if self.is_close_node():
+			return f"Node {self.type} (block end)"
+		else:
+			return f"Node {self.type} (block) {self.get_condition_str()}"
 
 	def is_block(self):
 		return True
 
 	def is_close_node(self):
 		return self.close_node
+
+	def set_target(self, target):
+		self.target_node = target
+
+	def get_target(self):
+		if self.is_close_node():
+			return self.target_node
+		else:
+			print("Non-close block node has no target !")
 
 	def find_conditions(self, actual_match):
 		until_start = actual_match.find(self.condition)
