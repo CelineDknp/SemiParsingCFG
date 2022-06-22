@@ -44,16 +44,34 @@ class FuzzyParser:
 			else:
 				self.anchorHandler.ban_regex(val)
 
-	def useful_anchor(self, current_anchor, end_match):
+	def useful_anchor(self, current_anchor, val):
 		if not current_anchor.get_type() == IGNORE: #If this isn't an ignore anchor, allow it
 			return True
 		else:
-			for key in self.next_pos.keys():
-				anchor = self.next_pos[key][2]
-				if not anchor.get_type() == IGNORE: #If this is not an ignore key
-					val = self.next_pos[key][0]
-					if val != -1 and val <= end_match:
-						return True
+			end_match = val + len(self.next_pos[current_anchor.get_pattern()][1].rstrip())
+			skip_max = len(self.input_str)
+			for e in self.next_pos:
+				if not self.next_pos[e][2].get_type() == IGNORE:
+					if skip_max > self.next_pos[e][0]:
+						skip_max = self.next_pos[e][0]
+			go = True
+			while go:
+				for key in self.next_pos.keys():
+					anchor = self.next_pos[key][2]
+					if not anchor.get_type() == IGNORE: #If this is not an ignore key
+						val = self.next_pos[key][0]
+						if val != -1 and val <= end_match:
+							return True
+				if self.get_next_or_ban(current_anchor.get_pattern()):
+					go = False
+				else:
+
+					if self.next_pos[current_anchor.get_pattern()][0] >= skip_max:
+						go = False
+					else:
+						end_match = val + len(self.next_pos[current_anchor.get_pattern()][1].rstrip())
+
+
 			return False
 
 	def pick_next_anchor(self):
@@ -61,6 +79,7 @@ class FuzzyParser:
 		min_val = len(self.input_str) + 1
 		min_key = ""
 		actual_match = ""
+		curr_length = 0
 		anchor = None
 		for key in self.next_pos.keys():
 			# print(key)
@@ -76,13 +95,12 @@ class FuzzyParser:
 					return 0, anchor, val, actual
 			else:
 				val = self.next_pos[key][0]
-				curr_length = 0
 				# print(f"VAL: {val}")
 				# Should we pick this anchor ?
 				temp_length = len(self.next_pos[key][1])
 				if (val < min_val or (val == min_val and temp_length > curr_length)) and val != -1:
 					t_anchor = self.next_pos[key][2]
-					if self.useful_anchor(t_anchor, val + len(self.next_pos[key][1].rstrip())):
+					if self.useful_anchor(t_anchor, val):
 						min_val = val
 						min_key = key
 						anchor = self.next_pos[key][2]
@@ -272,7 +290,8 @@ class FuzzyParser:
 					lot.append(node)
 				if self.open_control:
 					self.open_control = False
-					self.clean_anchors(found_control=True)
+				self.clean_anchors()
+
 
 			else:
 				if self.open_control:
@@ -322,7 +341,7 @@ class FuzzyParser:
 			elif actual_val == n_anchor.get_end_pattern():
 				node = BlockLoopNode(self.depth, NODE_LOOP, n_anchor, close=True)
 				lot.append(node)
-		self.pos = next_val + len(actual_match) - 1
+		self.pos = next_val + len(actual_match.strip()) - 1
 
 	def fuzzy_parse(self, input):
 		lot = []

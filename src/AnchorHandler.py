@@ -84,11 +84,11 @@ class AnchorHandler:
 			self.anchors_dict.pop(start_parse_anchor.get_pattern())
 		elif found_control:
 			control_anchor = self.special_anchors["control-regex"]
-			if control_anchor in self.anchors:
+			if control_anchor in self.anchors and not open_control:
 				self.anchors.remove(control_anchor)
 				self.ban_anchor(control_anchor)
 				return "banned"
-			else:
+			elif control_anchor not in self.anchors and open_control:
 				self.anchors.append(control_anchor)
 				if control_anchor.get_pattern() in self.banned_regex:
 					self.unban_anchor(control_anchor)

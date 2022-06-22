@@ -157,7 +157,7 @@ class Graph:
 		elif node.get_type() == NODE_COND_END or node.get_type() == NODE_COND_END_ANY:
 			# print(">>> In END-IF")
 			corr_if = self.match_if(node)
-			temp = Node(0, NODE_CONTROL) if corr_if is None else Node(corr_if.get_depth(),																			  NODE_CONTROL)
+			temp = Node(0, NODE_CONTROL) if corr_if is None else Node(corr_if.get_depth(), NODE_CONTROL)
 			f = False
 			if node.get_type() == NODE_COND_END_ANY:
 				f = self.match_control_node(node, temp)
@@ -380,7 +380,8 @@ class Graph:
 						dot.edge(str(n.id), str(link.id), label=link.get_condition_str())
 					else:
 						dot.edge(str(n.id), str(link.id))
-					if link.get_type() == NODE_LABEL and link.get_label() == n.go_back_label():
+					#print(link)
+					if not isinstance(n, BlockLoopNode) and link.get_type() == NODE_LABEL and link.get_label() == n.go_back_label():
 						dot.edge(str(link.id), str(n.id), label="Go back")
 					
 						

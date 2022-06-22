@@ -211,6 +211,15 @@ def test_fuzzy_parse_string_on_multiple_lines():
 	assert node_array[1].get_depth() == 0
 	assert node_array[2].get_depth() == 0
 
+#Testing the string part of parsing, special case with a dot in a string that is inside an if
+def test_fuzzy_parse_string_dot():
+	node_array = process_and_parse("TestFiles/pytest/string_dot_test_file.COB")
+	assert len(node_array) == 2
+	assert node_array[0].get_type() == NODE_COND_START
+	assert node_array[1].get_type() == NODE_COND_END
+	assert node_array[0].get_depth() == 0
+	assert node_array[1].get_depth() == 0
+
 #Testing the exec SQL part of parsing, all case insisitive possibilities
 def test_fuzzy_parse_exec_case_insensitive():
 	node_array = process_and_parse("TestFiles/pytest/exec_sql_all_forms_test_file.COB")
