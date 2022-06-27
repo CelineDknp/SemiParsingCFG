@@ -21,6 +21,7 @@ class FuzzyParser:
 		self.input_str = input
 		self.pos = 0
 		self.depth = 0
+		self.skip_max = 0
 		self.open_control = False
 		self.init = False
 		self.stop_close_all_look = False
@@ -49,11 +50,7 @@ class FuzzyParser:
 			return True
 		else:
 			end_match = val + len(self.next_pos[current_anchor.get_pattern()][1].rstrip())
-			skip_max = len(self.input_str)
-			for e in self.next_pos:
-				if not self.next_pos[e][2].get_type() == IGNORE:
-					if skip_max > self.next_pos[e][0]:
-						skip_max = self.next_pos[e][0]
+			#skip_max = self.find_skip_max()
 			go = True
 			while go:
 				for key in self.next_pos.keys():
@@ -66,7 +63,7 @@ class FuzzyParser:
 					go = False
 				else:
 
-					if self.next_pos[current_anchor.get_pattern()][0] >= skip_max:
+					if self.next_pos[current_anchor.get_pattern()][0] >= self.skip_max:
 						go = False
 					else:
 						end_match = val + len(self.next_pos[current_anchor.get_pattern()][1].rstrip())
@@ -137,6 +134,9 @@ class FuzzyParser:
 		res = self.get_next_value_regex(val)
 		if res != None:
 			self.next_pos[val] = res
+			if not self.next_pos[val][2].get_type() == IGNORE:
+				if self.skip_max > self.next_pos[val][0]:
+					self.skip_max = self.next_pos[val][0]
 			return False
 		else:
 			self.anchorHandler.ban_regex(val)
