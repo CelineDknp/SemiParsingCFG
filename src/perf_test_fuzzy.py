@@ -64,10 +64,9 @@ def stat_run(filename, output_file, multi=1, runs=20):
 		for elem in rets:
 			total += elem
 		mean_fuzzy = total/runs
-		mean_fuzzy_str = str(mean_fuzzy).replace(".", ",")
 
 
-		f.write(f"{filename}; {file_size} ; {mean_fuzzy_str} \n")
+		f.write(f"{filename}; {file_size} ; {mean_fuzzy} \n")
 		return mean_fuzzy
 
 def batch_run(dir_name, output_file, multi=1, runs=20):
@@ -101,8 +100,7 @@ def batch_run(dir_name, output_file, multi=1, runs=20):
 		for elem in all_infos.keys():
 			data = all_infos[elem]
 			mean_fuzzy = data[1]/runs
-			mean_fuzzy_str = str(mean_fuzzy).replace(".", ",")
-			f.write(f"{elem}; {data[0]} ; {mean_fuzzy_str}\n")
+			f.write(f"{elem}; {data[0]} ; {mean_fuzzy}\n")
 
 
 def crawl_dirs(argv):
