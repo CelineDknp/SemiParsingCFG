@@ -1,5 +1,0 @@
-mean(T/F); filename; file size; fuzzy time (s); parsing time (s); parsing/fuzzy
-T; raincodeData/Test/ALCB018.COB; 987 ; 0,0899968147277832
-T; raincodeData/Test/ALCB025.COB; 914 ; 0,03900003433227539
-T; raincodeData/Test/ALCB044.COB; 3099 ; 0,11549961566925049
-T; raincodeData/Test/ALCB073.COB; 1070 ; 0,0700002908706665
