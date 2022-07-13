@@ -229,6 +229,7 @@ class Graph:
 		#		print(f"Found open loop: {o}, {self.open_loops[o]}")
 		cleaned = True
 		while cleaned == True:
+			print("cleaning")
 			visited = []
 			cleaned = False
 			start_node = self.all_nodes.copy()
@@ -255,7 +256,10 @@ class Graph:
 						parent_node = current_node.get_parent().copy()
 						for p in parent_node:
 							self.replace_child(p, current_node, children[0])
-						cleaned = True
+						if len(parent_node) > 0:
+							cleaned = True
+						elif current_node in self.all_nodes:
+							self.all_nodes.remove(current_node) #Degenerated node that needs removal
 				elif current_node.get_type() == NODE_LABEL and label_clean:
 					parents = current_node.get_parent()
 					if len(parents) == 1 and parents[0].get_type() != NODE_LOOP:  # A single parent that is not a GOTO
