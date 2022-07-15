@@ -95,8 +95,8 @@ class FuzzyParser:
 				# print(f"VAL: {val}")
 				# Should we pick this anchor ?
 				temp_length = len(self.next_pos[key][1])
+				t_anchor = self.next_pos[key][2]
 				if (val < min_val or (val == min_val and temp_length > curr_length)) and val != -1:
-					t_anchor = self.next_pos[key][2]
 					if self.useful_anchor(t_anchor, val):
 						min_val = val
 						min_key = key
