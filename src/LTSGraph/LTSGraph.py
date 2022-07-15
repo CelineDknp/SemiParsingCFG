@@ -56,5 +56,10 @@ class LTSGraph:
 				if n.get_type() == "COND_START" and child == n.true_child:
 					tag = n.get_condition()
 				elif n.get_type() == "COND_START" and child == n.false_child:
-					tag = "NOT" + n.get_condition()
+					tag = "NOT " + n.get_condition()
+				elif n.get_type() == "LABEL":
+					tag = "Lab: "+n.get_label()
+				elif n.get_type() == "LOOP": #TODO figure out how to draw the performs until
+					a = "test"
+					print(n.get_condition_str())
 				self.link(f, t, tag)
