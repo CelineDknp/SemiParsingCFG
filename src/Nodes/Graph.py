@@ -12,7 +12,6 @@ from Utils.utils import clean_regex
 import graphviz
 
 
-
 class Graph:
 
 	def __init__(self, start_node):

@@ -1,6 +1,7 @@
 import sys
 from Nodes.Node import Node
 from Nodes.Graph import Graph
+from LTSGraph.LTSGraph import LTSGraph
 from Utils.config import *
 from FuzzyParser import FuzzyParser
 #import graphviz
@@ -88,6 +89,8 @@ def process_file(filename, dir_path):
 	g = process_and_cleanup(filename,label_clean=False)
 	# g = process_and_squish(filename,label_clean=True)
 	g.save_as_file(os.path.basename(filename), output_dir=dir_path)
+	lts = LTSGraph()
+	lts.import_graph(g)
 	print(f"Done!")
 
 
