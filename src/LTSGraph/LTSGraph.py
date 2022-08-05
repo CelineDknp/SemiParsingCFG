@@ -1,7 +1,8 @@
-from Nodes.Graph import Graph
 from Utils.config import *
 from .LSTNode import LTSNode
 from .LSTTransition import LTSTransition
+from Nodes.BlockLoopNode import BlockLoopNode
+import graphviz
 
 
 class LTSGraph:
@@ -18,7 +19,12 @@ class LTSGraph:
 			result += n.__repr__() + "\n"
 		return result
 
+	def get_start(self):
+		return self.start
+
 	def add_node(self, n):
+		if self.start is None:
+			self.start = n
 		self.all_states.append(n)
 
 	def has_node(self, tag):
@@ -35,6 +41,7 @@ class LTSGraph:
 
 	def link(self, node_from, node_to, cond_tag):
 		t = LTSTransition(node_from, node_to, cond_tag)
+		self.all_transitions.append(t)
 		node_from.add_transition(t)
 		node_to.add_transition(t)
 
@@ -55,11 +62,30 @@ class LTSGraph:
 				tag = ""
 				if n.get_type() == "COND_START" and child == n.true_child:
 					tag = n.get_condition()
+					if child == n.false_child: #Node pointing to a single child
+						self.link(f, t, "NOT " + n.get_condition()) #Add false link
 				elif n.get_type() == "COND_START" and child == n.false_child:
 					tag = "NOT " + n.get_condition()
 				elif n.get_type() == "LABEL":
 					tag = "Lab: "+n.get_label()
-				elif n.get_type() == "LOOP": #TODO figure out how to draw the performs until
-					a = "test"
-					print(n.get_condition_str())
+				elif isinstance(n, BlockLoopNode): #Block end
+					if n.is_close_node(): #End of the perform
+						if child.get_type() == "LOOP": #Block start
+							tag = "NOT "+child.get_condition_str()
+						else:
+							tag = n.childs[-1].get_condition_str()
+					else:#Start of the perform
+						end = self.corr[n.get_target()]
+						self.link(f, end, n.get_condition_str())  # Add link to end_perform
+						tag = "NOT "+n.get_condition_str()
+					#print(n)
 				self.link(f, t, tag)
+
+	def save_as_file(self, filename, output_dir='doctest-output'):
+		dot = graphviz.Digraph(filename)
+		for current_node in self.all_states:
+			#dot.attr('node', shape='ellipse')
+			dot.node(str(current_node.id))
+		for n in self.all_transitions:
+			dot.edge(str(n.fr.id), str(n.to.id), label=n.label)
+		dot.render(directory=output_dir, view=False)

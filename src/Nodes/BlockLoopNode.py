@@ -26,23 +26,29 @@ class BlockLoopNode(LoopNode):
 	def is_close_node(self):
 		return self.close_node
 
+	#Points to target node: end block for the start, start for the end
 	def set_target(self, target):
 		self.target_node = target
 
 	def get_target(self):
-		if self.is_close_node():
-			return self.target_node
-		else:
-			print("Non-close block node has no target !")
+		return self.target_node
 
 	def find_conditions(self, actual_match):
 		until_start = actual_match.find(self.condition)
 		if self.branch in actual_match:
 			self.branch_str = actual_match[actual_match.find(self.branch):until_start].strip()
-		self.condition_str = actual_match[until_start:].strip()
+		self.condition_str = actual_match[until_start+len(self.condition):].strip()
 
 	def get_branch_str(self):
 		return self.branch_str
 
 	def get_condition_str(self):
 		return self.condition_str
+
+	def set_condition_str(self, cond):
+		self.condition_str = cond
+
+	def get_end_block(self):
+		for e in self.parents:
+			if isinstance(e, BlockLoopNode):
+				return e

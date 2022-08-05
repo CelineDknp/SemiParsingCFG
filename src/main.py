@@ -4,6 +4,7 @@ from Nodes.Graph import Graph
 from LTSGraph.LTSGraph import LTSGraph
 from Utils.config import *
 from FuzzyParser import FuzzyParser
+from TraceEquivalence import TraceEquivalence
 #import graphviz
 import cProfile
 #Windows-specific Graphiz import
@@ -91,14 +92,29 @@ def process_file(filename, dir_path):
 	g.save_as_file(os.path.basename(filename), output_dir=dir_path)
 	lts = LTSGraph()
 	lts.import_graph(g)
+	lts.save_as_file("graph_test")
 	print(f"Done!")
 
 
+def compare_graphs(filename1, filename2):
+	g1 = process_and_cleanup(filename1, label_clean=False)
+	print("G1 processed")
+	g2 = process_and_cleanup(filename2, label_clean=False)
+	print("G2 processed")
+	lst_g1 = LTSGraph()
+	lst_g1.import_graph(g1)
+	lst_g2 = LTSGraph()
+	lst_g2.import_graph(g2)
+	print("LTSs created !")
+	teq = TraceEquivalence(lst_g1, lst_g2)
+	teq.compare()
 
 
 def main(argv):
 	if len(argv) == 2:
 		process_file(argv[1],"")
+	elif len(argv) == 3:
+		compare_graphs(argv[1], argv[2])
 	else :
 		cProfile.run("process_and_parse('raincodeData/Delivery/V1/ALCB018.COB')")
 

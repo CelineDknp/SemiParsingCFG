@@ -13,6 +13,21 @@ class LTSNode:
 	def __repr__(self):
 		return f"Node {self.id} {self.t}"
 
+	def get_transition(self, out=True):
+		if out:
+			return self.transition_out
+		else:
+			return self.transition_in
+
+	def has_single_out(self):
+		return len(self.transition_out) == 1
+
+	def next(self):
+		if self.has_single_out():
+			return self.transition_out[0].to
+		else:
+			return None
+
 	def add_transition(self, t):
 		if t.fr == self:
 			self.transition_out.append(t)

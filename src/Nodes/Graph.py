@@ -45,6 +45,7 @@ class Graph:
 				if e.is_close_node():
 					e.add_child(first_block)
 					e.set_target(first_block)
+					first_block.set_target(e)
 				else:
 					first_block = e
 
@@ -380,7 +381,7 @@ class Graph:
 				for link in n.get_childs():
 					#print(f"Linking to {link}")
 					if isinstance(n, BlockLoopNode) and n.is_close_node() and link == n.get_target():
-						dot.edge(str(n.id), str(link.id), label=link.get_condition_str())
+						dot.edge(str(n.id), str(link.id), label=link.condition+" "+link.get_condition_str())
 					else:
 						dot.edge(str(n.id), str(link.id))
 					#print(link)
