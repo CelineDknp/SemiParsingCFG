@@ -5,13 +5,12 @@ from LTSGraph.LTSGraph import LTSGraph
 from Utils.config import *
 from FuzzyParser import FuzzyParser
 from TraceEquivalence import TraceEquivalence
-#import graphviz
 import cProfile
 #Windows-specific Graphiz import
 import os
-total_path = os.path.join("c:", "Program Files", "Graphviz", "bin")# os.pathsep + "C:\Program Files\Graphviz/bin/"
-if total_path not in os.environ["PATH"]:
-	os.environ["PATH"] += total_path
+#total_path = os.path.join("c:", "Program Files", "Graphviz", "bin")# os.pathsep + "C:\Program Files\Graphviz/bin/"
+#if total_path not in os.environ["PATH"]:
+#	os.environ["PATH"] += total_path
 
 def pre_process(file):
 	l = []
@@ -92,7 +91,7 @@ def process_file(filename, dir_path):
 	g.save_as_file(os.path.basename(filename), output_dir=dir_path)
 	lts = LTSGraph()
 	lts.import_graph(g)
-	lts.save_as_file("graph_test")
+	lts.save_as_file(filename)
 	print(f"Done!")
 
 
@@ -115,7 +114,7 @@ def main(argv):
 		process_file(argv[1],"")
 	elif len(argv) == 3:
 		compare_graphs(argv[1], argv[2])
-	else :
+	else:
 		cProfile.run("process_and_parse('raincodeData/Delivery/V1/ALCB018.COB')")
 
 

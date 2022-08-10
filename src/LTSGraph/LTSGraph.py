@@ -33,9 +33,13 @@ class LTSGraph:
 				return s
 		return None
 
-	def create(self, tag):
+	def create(self, input_node):
 		to_add = LTSNode()
+		tag = input_node.get_type()
+		if input_node.get_type() == "LABEL":
+			tag = input_node.get_label()
 		to_add.tag(tag)
+		to_add.set_initial_id(input_node.id)
 		self.add_node(to_add)
 		return to_add
 
@@ -49,25 +53,20 @@ class LTSGraph:
 	def import_graph(self, graph):
 		#Create all of the nodes
 		for n in graph.all_nodes:
-			tag = str(n.id)+n.get_type()
-			if n.get_type() == "LABEL":
-				tag = str(n.id)+n.get_label()
-			to_add = self.create(tag)
+			to_add = self.create(n)
 			self.corr[n] = to_add
 
 		for n in graph.all_nodes:
 			for child in n.get_childs():
 				f = self.corr[n]
 				t = self.corr[child]
-				tag = ""
+				tag = "INTERNAL"
 				if n.get_type() == "COND_START" and child == n.true_child:
 					tag = n.get_condition()
 					if child == n.false_child: #Node pointing to a single child
 						self.link(f, t, "NOT " + n.get_condition()) #Add false link
 				elif n.get_type() == "COND_START" and child == n.false_child:
 					tag = "NOT " + n.get_condition()
-				elif n.get_type() == "LABEL":
-					tag = "Lab: "+n.get_label()
 				elif isinstance(n, BlockLoopNode): #Block end
 					if n.is_close_node(): #End of the perform
 						if child.get_type() == "LOOP": #Block start
