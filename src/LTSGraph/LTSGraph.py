@@ -1,7 +1,10 @@
 from Utils.config import *
-from .LSTNode import LTSNode
-from .LSTTransition import LTSTransition
+from .LTSNode import LTSNode
+from .LTSTransition import LTSTransition
 from Nodes.BlockLoopNode import BlockLoopNode
+from Nodes.LabelLoopNode import LabelLoopNode
+from Nodes.MultipleLabelLoopNode import MultipleLabelLoopNode
+from Nodes.LabelNode import LabelNode
 import graphviz
 
 
@@ -11,6 +14,7 @@ class LTSGraph:
 		self.start = None
 		self.all_states = []
 		self.all_transitions = []
+		self.all_labels = []
 		self.corr= {}
 
 	def __str__(self):
@@ -55,11 +59,14 @@ class LTSGraph:
 		for n in graph.all_nodes:
 			to_add = self.create(n)
 			self.corr[n] = to_add
-
+			if n.get_type() == "LABEL":
+				self.all_labels.append(to_add)
+		test = True
 		for n in graph.all_nodes:
 			for child in n.get_childs():
 				f = self.corr[n]
 				t = self.corr[child]
+				cancel_link = False
 				tag = "INTERNAL"
 				if n.get_type() == "COND_START" and child == n.true_child:
 					tag = n.get_condition()
@@ -68,17 +75,51 @@ class LTSGraph:
 				elif n.get_type() == "COND_START" and child == n.false_child:
 					tag = "NOT " + n.get_condition()
 				elif isinstance(n, BlockLoopNode): #Block end
-					if n.is_close_node(): #End of the perform
-						if child.get_type() == "LOOP": #Block start
-							tag = "NOT "+child.get_condition_str()
-						else:
-							tag = n.childs[-1].get_condition_str()
-					else:#Start of the perform
-						end = self.corr[n.get_target()]
-						self.link(f, end, n.get_condition_str())  # Add link to end_perform
-						tag = "NOT "+n.get_condition_str()
-					#print(n)
-				self.link(f, t, tag)
+					if n.is_close_node() and n.get_target().get_childs()[0] ==n and child == n.get_target():
+						cancel_link = True
+					else:
+						if n.is_close_node() and child != n.get_target():
+							if n.get_target().get_childs()[0] != n: #If not, out of a single perform, don't repeat cond !
+								tag = n.get_target().get_condition_str()
+						elif n.is_close_node() and child == n.get_target():
+							tag = "NOT " + n.get_target().get_condition_str()
+
+						elif not n.is_close_node():
+							if len(n.get_childs()) == 1 and n.get_childs()[0] == n.get_target():  # We have an empty perform
+								t = f
+								end = self.corr[n.get_target()]
+								self.link(f, end, n.get_condition_str())  # Add link to end_perform
+							else:
+								end = self.corr[n.get_target().get_childs()[0]]
+								self.link(f, end, n.get_condition_str())  # Add link to end_perform
+							tag = "NOT " + n.condition_str  # Loop link
+
+				elif isinstance(n, LabelLoopNode) and n.is_goback_node(): #Link perform to its label
+					if n.is_multiple_labels():
+						if isinstance(child, LabelNode) and child.get_label() == n.start_label():
+							tag = "PERFORM"  # Tag the in link
+							# Get the out link
+							out_node = n.childs[-1]
+							corr_node = self.corr[out_node]
+							index = self.all_labels.index(corr_node)
+							if index < len(self.all_labels)-1:
+								next_label = self.all_labels[index + 1]  # Corner case with end Node !
+							else:
+								next_label = self.all_states[-1] #Link to last node (end)
+							self.link(next_label, f, "GOBACK")
+					else:
+						if isinstance(child, LabelNode) and child.get_label() == n.go_back_label():
+							tag = "PERFORM" #Tag the in link
+							#Get the out link
+							index = self.all_labels.index(t)
+							if index < len(self.all_labels)-1:
+								next_label = self.all_labels[index + 1]  # Corner case with end Node !
+							else:
+								next_label = self.all_states[-1] #Link to last node (end)
+							self.link(next_label, f, "GOBACK")
+
+				if not cancel_link:
+					self.link(f, t, tag)
 
 	def save_as_file(self, filename, output_dir='doctest-output'):
 		dot = graphviz.Digraph(filename)

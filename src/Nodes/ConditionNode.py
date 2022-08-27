@@ -41,7 +41,7 @@ class ConditionNode(Node):
     def find_condition_delimiter(self, input, pos, delimiter):
         res = delimiter.search(input[pos:])
         end_cond = input.find(res.group(0), pos)
-        self.condition = input[pos:end_cond].strip()
+        self.condition = clean_str(input[pos:end_cond])
         return end_cond+1
 
     def find_condition_simple(self, input, pos):
@@ -50,9 +50,10 @@ class ConditionNode(Node):
         new_line = input.find("\n", pos)
         is_anchor = self.is_anchor(input[pos:new_line])
         if is_anchor != -1:
-            self.condition = input[pos+1:pos+is_anchor].strip()
+            next = input[pos+1:pos+is_anchor]
+            self.condition = clean_str(next)
             #print(f"COND: {self.condition} for {input[pos-10:pos+15]}")
-            return pos + len(self.condition)
+            return pos + len(next)
         else:
             next_line = input[pos+1:new_line]
         first = True
@@ -86,9 +87,9 @@ class ConditionNode(Node):
             first = False
             new_line = input.find("\n", temp_pos)
             next_line = input[temp_pos:new_line]
-        self.condition = cond.strip()
+        self.condition = clean_str(cond)
         #print(self.condition)
-        return pos + len(self.condition)
+        return pos + len(cond.strip())
 
     def set_condition(self, cond):
         self.condition = cond

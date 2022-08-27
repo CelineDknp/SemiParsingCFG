@@ -2,6 +2,7 @@ import sys
 from Nodes.Node import Node
 from Nodes.Graph import Graph
 from LTSGraph.LTSGraph import LTSGraph
+from LTSGraph.LTSNode import LTSNode
 from Utils.config import *
 from FuzzyParser import FuzzyParser
 from TraceEquivalence import TraceEquivalence
@@ -110,7 +111,37 @@ def compare_graphs(filename1, filename2):
 
 
 def main(argv):
-	if len(argv) == 2:
+	if len(argv) == 1:#manual example
+		lst_g1 = LTSGraph()
+		node1 = LTSNode()
+		node2 = LTSNode()
+		node3 = LTSNode()
+		node4 = LTSNode()
+		node5 = LTSNode()
+		lst_g1.add_node(node1)
+		lst_g1.add_node(node2)
+		lst_g1.add_node(node3)
+		lst_g1.add_node(node4)
+		lst_g1.add_node(node5)
+		lst_g1.link(node1, node2, "a")
+		lst_g1.link(node1, node3, "a")
+		lst_g1.link(node2, node4, "d")
+		lst_g1.link(node3, node5, "e")
+		lst_g2 = LTSGraph()
+		node1 = LTSNode()
+		node2 = LTSNode()
+		node3 = LTSNode()
+		node4 = LTSNode()
+		lst_g2.add_node(node1)
+		lst_g2.add_node(node2)
+		lst_g2.add_node(node3)
+		lst_g2.add_node(node4)
+		lst_g2.link(node1, node2, "a")
+		lst_g2.link(node2, node3, "d")
+		lst_g2.link(node2, node4, "e")
+		teq = TraceEquivalence(lst_g1, lst_g2)
+		teq.compare()
+	elif len(argv) == 2:
 		process_file(argv[1],"")
 	elif len(argv) == 3:
 		compare_graphs(argv[1], argv[2])

@@ -1,12 +1,14 @@
 from .LoopNode import LoopNode
 from Anchors import LoopAnchor
 from Utils.config import *
+from Utils.utils import *
 
 
 class BlockLoopNode(LoopNode):
 
 	def __init__(self, depth, node_type, anchor, close=False):
 		super().__init__(depth, node_type, anchor)
+		self.target_node = None
 		self.close_node = close
 		if not close:
 			self.branch = anchor.branch
@@ -36,8 +38,8 @@ class BlockLoopNode(LoopNode):
 	def find_conditions(self, actual_match):
 		until_start = actual_match.find(self.condition)
 		if self.branch in actual_match:
-			self.branch_str = actual_match[actual_match.find(self.branch):until_start].strip()
-		self.condition_str = actual_match[until_start+len(self.condition):].strip()
+			self.branch_str = clean_str(actual_match[actual_match.find(self.branch):until_start])
+		self.condition_str = clean_str(actual_match[until_start+len(self.condition):])
 
 	def get_branch_str(self):
 		return self.branch_str

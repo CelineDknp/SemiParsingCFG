@@ -21,6 +21,10 @@ class MultipleLabelLoopNode(LabelLoopNode):
 		if self.go_back:
 			return self.label[-1]
 
+	def start_label(self):
+		if self.go_back:
+			return self.label[0]
+
 	def set_label(self, label):
 		self.label = label
 
