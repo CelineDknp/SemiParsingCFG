@@ -54,9 +54,22 @@ class Graph:
 		# print(f"IN MATCH LOOPS {node}")
 		# print(self.open_loops)
 		if node.get_label() in self.open_loops.keys():
+			label = node.get_label()
 			for loop in self.open_loops[node.get_label()]:
 				# print("MATCH")
-				loop.add_child(node)
+				if isinstance(loop, LabelLoopNode):
+					if isinstance(loop, MultipleLabelLoopNode):
+						first_label = loop.get_label()[0]
+						last_label = loop.get_label()[-1]
+						if label == first_label:
+							loop.add_child(node, label=True)
+						elif label == last_label:
+							node.add_child(loop)
+					elif label == loop.get_label():
+						loop.add_child(node, label=True)
+				else:
+					if label == loop.get_label():
+						loop.add_child(node)
 				if loop.is_complete():
 					to_remove.append(loop)
 		for n in to_remove:
@@ -78,18 +91,15 @@ class Graph:
 		if isinstance(loop_node, ControlLoopNode):
 			return True
 
-		# print(f"IN MATCH LABELS {loop_node}")
-		# print(self.all_labels)
 		if isinstance(loop_node, MultipleLabelLoopNode):
-			for l in loop_node.get_label():
-				if l in self.all_labels.keys():
-					# print("MATCH")
-					loop_node.add_child(self.all_labels[l])
-					if len(loop_node.get_childs()) == len(loop_node.get_label())+1:
-						return False
+			first_label = loop_node.get_label()[0]
+			if first_label in self.all_labels.keys():
+				# print("MATCH")
+				loop_node.add_child(self.all_labels[first_label])
+				if len(loop_node.get_childs()) == len(loop_node.get_label())+1:
+					return False
 		elif isinstance(loop_node, LabelLoopNode):
 			if loop_node.get_label() in self.all_labels.keys():
-				# print("MATCH")
 				loop_node.add_child(self.all_labels[loop_node.get_label()])
 				return False
 		return True
@@ -392,6 +402,8 @@ class Graph:
 							dot.edge(str(n.id), str(link.id), label="NOT "+n.condition_str)
 					else:
 						dot.edge(str(n.id), str(link.id))
+				if isinstance(n, LabelLoopNode):
+					dot.edge(str(n.id), str(n.get_label_child().id), label="PERFORM") #Add the link to the label_child
 					#print(link)
 					if not isinstance(n, BlockLoopNode) and link.get_type() == NODE_LABEL and link.get_label() == n.go_back_label():
 						dot.edge(str(link.id), str(n.id), label="Go back")

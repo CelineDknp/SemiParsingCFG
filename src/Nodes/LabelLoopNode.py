@@ -8,6 +8,7 @@ class LabelLoopNode(LoopNode):
 	def __init__(self, depth, node_type, anchor):
 		super().__init__(depth, node_type, anchor)
 		self.label_regex = anchor.get_label()
+		self.label_child = None
 
 	@classmethod
 	def from_explicit(cls, depth, node_type, regex, label, goback):
@@ -17,6 +18,14 @@ class LabelLoopNode(LoopNode):
 
 	def __str__(self):
 		return f"Node {self.type} (label) to {self.label}"
+
+	def add_child(self, node, label=False):
+		if label:
+			self.label_child = node
+		super().add_child(node)
+
+	def get_label_child(self):
+		return self.label_child
 
 	def get_label(self):
 		return self.label

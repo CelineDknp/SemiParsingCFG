@@ -107,6 +107,8 @@ class LTSGraph:
 							else:
 								next_label = self.all_states[-1] #Link to last node (end)
 							self.link(next_label, f, "GOBACK")
+							if len(n.get_childs()) == 1: #If we have one single child in the perform, we probaby point only to the label
+								self.link(f, t, "")
 					else:
 						if isinstance(child, LabelNode) and child.get_label() == n.go_back_label():
 							tag = "PERFORM" #Tag the in link
