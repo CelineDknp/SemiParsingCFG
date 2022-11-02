@@ -4,6 +4,7 @@ from .SimpleBranchConditionNode import SimpleBranchConditionNode
 from .MultipleBranchConditionNode import MultipleBranchConditionNode
 from .ControlLoopNode import ControlLoopNode
 from .LabelLoopNode import LabelLoopNode
+from .LabelNode import LabelNode
 from .LoopNode import LoopNode
 from .MultipleLabelLoopNode import MultipleLabelLoopNode
 from .BlockLoopNode import BlockLoopNode
@@ -400,15 +401,22 @@ class Graph:
 						else:
 							dot.edge(str(n.id), str(n.get_target().get_childs()[0].id), label=n.condition_str)
 							dot.edge(str(n.id), str(link.id), label="NOT "+n.condition_str)
-					else:
+					elif not isinstance(n, LabelLoopNode) or not link == n.get_label_child():
 						dot.edge(str(n.id), str(link.id))
 				if isinstance(n, LabelLoopNode):
-					dot.edge(str(n.id), str(n.get_label_child().id), label="PERFORM") #Add the link to the label_child
+					if n.get_label_child():
+						dot.edge(str(n.id), str(n.get_label_child().id), label="PERFORM") #Add the link to the label_child
 					#print(link)
 					if not isinstance(n, BlockLoopNode) and link.get_type() == NODE_LABEL and link.get_label() == n.go_back_label():
 						dot.edge(str(link.id), str(n.id), label="Go back")
 					
-						
+			elif isinstance(n, LabelNode):
+				for link in n.get_childs():
+					if isinstance(link, MultipleLabelLoopNode) and n.get_label() == link.label[-1]:
+						dot.edge(str(n.id), str(link.id), label="Go back")
+					else:
+						dot.edge(str(n.id), str(link.id))
+
 			else:
 				for link in n.get_childs():
 					dot.edge(str(n.id), str(link.id))

@@ -19,7 +19,9 @@ class LabelLoopNode(LoopNode):
 	def __str__(self):
 		return f"Node {self.type} (label) to {self.label}"
 
-	def add_child(self, node, label=False):
+	def add_child(self, node, match=False, label=False):
+		if match:
+			super().add_child(node, match=match)
 		if label:
 			self.label_child = node
 		super().add_child(node)

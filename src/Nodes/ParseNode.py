@@ -1,7 +1,7 @@
 from .Node import Node
 from antlr4 import *
-#from AntlrParser.MySqlLexer import MySqlLexer
-#from AntlrParser.MySqlParser import MySqlParser
+from AntlrParser.MySqlLexer import MySqlLexer
+from AntlrParser.MySqlParser import MySqlParser
 import re
 from contextlib import contextmanager
 import sys, os

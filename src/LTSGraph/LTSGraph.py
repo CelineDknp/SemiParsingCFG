@@ -99,7 +99,8 @@ class LTSGraph:
 						if isinstance(child, LabelNode) and child.get_label() == n.start_label():
 							tag = "PERFORM"  # Tag the in link
 							# Get the out link
-							out_node = n.childs[-1]
+							out_label = n.label[-1] #Get the label of the out link
+							out_node = graph.all_labels[out_label] #Get the corresponding node
 							corr_node = self.corr[out_node]
 							index = self.all_labels.index(corr_node)
 							if index < len(self.all_labels)-1:

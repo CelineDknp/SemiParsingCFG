@@ -95,6 +95,13 @@ def process_file(filename, dir_path):
 	lts.save_as_file(filename)
 	print(f"Done!")
 
+def process_and_create_lts(filename):
+	g = process_and_cleanup(filename)
+	lts = LTSGraph()
+	lts.import_graph(g)
+	lts.save_as_file(filename)
+	return lts
+
 
 def compare_graphs(filename1, filename2):
 	g1 = process_and_cleanup(filename1, label_clean=False)
