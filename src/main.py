@@ -99,7 +99,7 @@ def process_and_create_lts(filename):
 	g = process_and_cleanup(filename)
 	lts = LTSGraph()
 	lts.import_graph(g)
-	lts.save_as_file(filename)
+	#lts.save_as_file(filename) was used to debug
 	return lts
 
 

@@ -46,6 +46,12 @@ class MultipleBranchConditionNode(ConditionNode):
     def get_branch_child(self, condition):
         return self.branch_childs[condition]
 
+    def get_child_condition(self, child):
+        for e in self.branch_childs:
+            if self.branch_childs[e] == child:
+                return e
+        return None
+
     def has_first_condition(self):
         return len(self.branch_childs) > 1
 
