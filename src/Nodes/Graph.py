@@ -275,9 +275,10 @@ class Graph:
 					parents = current_node.get_parent()
 					if len(parents) == 1 and parents[0].get_type() != NODE_LOOP:  # A single parent that is not a GOTO
 						child_node = current_node.get_childs().copy()
-						for c in child_node:
-							self.replace_child(parents[0], current_node, c)
-							cleaned = True
+						if not any(isinstance(child, LabelLoopNode) for child in child_node):
+							for c in child_node:
+								self.replace_child(parents[0], current_node, c)
+								cleaned = True
 
 				for child in current_node.get_childs().copy():  # Look at a node's childrens
 					if child.get_type() == NODE_CONTROL:  # When we find a control node

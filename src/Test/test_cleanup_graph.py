@@ -60,7 +60,7 @@ def test_cleanup_graph_next_sentence():
 # Testing the simple single label goback loop
 def test_cleanup_graph_base_perform_clean_labels():
     graph = process_and_cleanup("TestFiles/pytest/perform_base_test_file.COB", label_clean=True)
-    assert graph.get_size() == 5
+    assert graph.get_size() == 6
 
 
 def test_cleanup_graph_base_perform_no_clean_labels():
@@ -70,7 +70,7 @@ def test_cleanup_graph_base_perform_no_clean_labels():
 
 def test_cleanup_graph_chained_perform_clean_labels():
     graph = process_and_cleanup("TestFiles/pytest/perform_chained_test_file.COB", label_clean=True)
-    assert graph.get_size() == 8
+    assert graph.get_size() == 9
 
 
 def test_cleanup_graph_chained_perform_no_clean_labels():
@@ -80,7 +80,7 @@ def test_cleanup_graph_chained_perform_no_clean_labels():
 
 def test_cleanup_graph_broken_perform_clean_labels():
     graph = process_and_cleanup("TestFiles/pytest/perform_broken_goto_test_file.COB", label_clean=True)
-    assert graph.get_size() == 8
+    assert graph.get_size() == 9
 
 
 def test_cleanup_graph_broken_perform_no_clean_labels():
@@ -91,7 +91,7 @@ def test_cleanup_graph_broken_perform_no_clean_labels():
 # Testing the perform thru (multiple label goback)
 def test_cleanup_graph_base_perform_thru_clean_labels():
     graph = process_and_cleanup("TestFiles/pytest/performThru_base_test_file.COB", label_clean=True)
-    assert graph.get_size() == 6
+    assert graph.get_size() == 7
 
 
 def test_cleanup_graph_base_perform_thru_no_clean_labels():
@@ -101,7 +101,7 @@ def test_cleanup_graph_base_perform_thru_no_clean_labels():
 
 def test_cleanup_graph_chained_perform_thru_clean_label():
     graph = process_and_cleanup("TestFiles/pytest/performThru_chained_test_file.COB", label_clean=True)
-    assert graph.get_size() == 10
+    assert graph.get_size() == 11
 
 
 def test_cleanup_graph_chained_perform_thru_no_clean_label():
@@ -111,7 +111,7 @@ def test_cleanup_graph_chained_perform_thru_no_clean_label():
 
 def test_cleanup_graph_goto_perform_thru_clean_label():
     graph = process_and_cleanup("TestFiles/pytest/performThru_goto_test_file.COB", label_clean=True)
-    assert graph.get_size() == 8
+    assert graph.get_size() == 9
 
 
 def test_cleanup_graph_goto_perform_thru_no_clean_label():
@@ -121,7 +121,7 @@ def test_cleanup_graph_goto_perform_thru_no_clean_label():
 
 def test_cleanup_graph_broken_perform_thru_clean_label():
     graph = process_and_cleanup("TestFiles/pytest/performThru_broken_goto_test_file.COB", label_clean=True)
-    assert graph.get_size() == 9
+    assert graph.get_size() == 10
 
 
 def test_cleanup_graph_broken_perform_thru_no_clean_label():

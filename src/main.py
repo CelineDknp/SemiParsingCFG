@@ -87,6 +87,7 @@ def process_and_squish(filename,label_clean=False):
 
 def process_file(filename, dir_path):
 	#g = process_and_parse(filename)
+	print("Process and cleanup")
 	g = process_and_cleanup(filename,label_clean=False)
 	# g = process_and_squish(filename,label_clean=True)
 	g.save_as_file(os.path.basename(filename), output_dir=dir_path)
@@ -105,8 +106,10 @@ def process_and_create_lts(filename):
 
 def compare_graphs(filename1, filename2):
 	g1 = process_and_cleanup(filename1, label_clean=False)
+	g1.save_as_file(os.path.basename(filename1+"V1"))
 	print("G1 processed")
 	g2 = process_and_cleanup(filename2, label_clean=False)
+	g2.save_as_file(os.path.basename(filename2+"V2"))
 	print("G2 processed")
 	lst_g1 = LTSGraph()
 	lst_g1.import_graph(g1)
