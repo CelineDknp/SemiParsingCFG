@@ -41,8 +41,10 @@ class Graph:
 
 	def match_varying_loops(self):
 		first_block = None
+		print(self.open_loops)
 		if "block" in self.open_loops:
 			for e in self.open_loops["block"]:
+				print(f"Looking at: {e}")
 				if e.is_close_node():
 					e.add_child(first_block)
 					e.set_target(first_block)
@@ -186,7 +188,7 @@ class Graph:
 		elif node.get_type() == "END":  # Adding the end_node
 			self.add_single_node(node)
 			print("Added the last_node")
-			self.match_varying_loops()
+			#self.match_varying_loops()
 		else:
 			print(f"Issue during adding node {node}")
 
@@ -396,12 +398,15 @@ class Graph:
 						if len(link.get_childs()) < 1 or link.get_childs()[0] != n:  # We have an empty perform
 							dot.edge(str(n.id), str(link.id), label="NOT "+link.get_condition_str())
 					elif isinstance(n, BlockLoopNode) and not n.is_close_node():
+						print(f"target is{n.get_target()}")
 						if len(n.get_childs()) == 1 and n.get_childs()[0] == n.get_target():#We have an empty perform
 							dot.edge(str(n.id), str(n.id), label="NOT "+n.condition_str) #Loop link
 							dot.edge(str(n.id), str(link.id), label=n.condition_str)  #Exit link
-						else:
+						elif n.get_target(): #If target is None we have ?
 							dot.edge(str(n.id), str(n.get_target().get_childs()[0].id), label=n.condition_str)
 							dot.edge(str(n.id), str(link.id), label="NOT "+n.condition_str)
+						else:
+							dot.edge(str(n.id), str(link.id))
 					elif not isinstance(n, LabelLoopNode) or not link == n.get_label_child():
 						dot.edge(str(n.id), str(link.id))
 				if isinstance(n, LabelLoopNode):
