@@ -16,5 +16,5 @@ class LabelNode(Node):
         self.label = label
 
     def find_label(self, match):
-        self.label = match.lstrip()[:-1] #Remove trailing spaces and the dot at the end
-        #print(f"Label found: {self.label}")
+        self.label = match[:-1].strip() #Remove trailing spaces and the dot at the end
+        #print(f"Label found: |{self.label}|")

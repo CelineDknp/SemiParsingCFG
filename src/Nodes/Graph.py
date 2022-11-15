@@ -56,8 +56,8 @@ class Graph:
 		to_remove = []
 		# print(f"IN MATCH LOOPS {node}")
 		# print(self.open_loops)
-		if node.get_label() in self.open_loops.keys():
-			label = node.get_label()
+		label = node.get_label()
+		if label in self.open_loops.keys():
 			for loop in self.open_loops[node.get_label()]:
 				# print("MATCH")
 				if isinstance(loop, LabelLoopNode):
@@ -66,15 +66,17 @@ class Graph:
 						last_label = loop.get_label()[-1]
 						if label == first_label:
 							loop.add_child(node, label=True)
+							to_remove.append(loop)
 						elif label == last_label:
 							node.add_child(loop)
+							to_remove.append(loop)
 					elif label == loop.get_label():
 						loop.add_child(node, label=True)
+						to_remove.append(loop)
 				else:
 					if label == loop.get_label():
 						loop.add_child(node)
-				if loop.is_complete():
-					to_remove.append(loop)
+						to_remove.append(loop)
 		for n in to_remove:
 			self.open_loops[node.get_label()].remove(n)
 
@@ -111,7 +113,16 @@ class Graph:
 		if node.is_control():
 			self.open_control_loops.append(node)
 		elif node.is_block():
-			if "block" not in self.open_loops.keys():
+			if node.is_close_node():#We must try to link it
+				if "block" in self.open_loops:
+					prev_block = self.open_loops["block"][-1]
+					node.add_child(prev_block)
+					node.set_target(prev_block)
+					prev_block.set_target(node)
+					self.open_loops["block"].remove(prev_block)
+				else:
+					a=0
+			elif "block" not in self.open_loops.keys():
 				self.open_loops["block"] = [node]
 			else:
 				self.open_loops["block"].append(node)
@@ -394,27 +405,46 @@ class Graph:
 				#print(f"Doing node {n}")
 				for link in n.get_childs():
 					#print(f"Linking to {link}")
-					if isinstance(n, BlockLoopNode) and n.is_close_node() and link == n.get_target():
-						if len(link.get_childs()) < 1 or link.get_childs()[0] != n:  # We have an empty perform
-							dot.edge(str(n.id), str(link.id), label="NOT "+link.get_condition_str())
+					if isinstance(n, BlockLoopNode) and not n.is_close_node() and link == n.get_target():
+						if len(n.get_childs()) == 1 and isinstance(link, BlockLoopNode):  # We have an empty perform
+							dot.edge(str(n.id), str(n.id), label=n.condition_str)
+						dot.edge(str(n.id), str(link.id), label="NOT "+n.condition_str) #We need a link no to the end of the perform
 					elif isinstance(n, BlockLoopNode) and not n.is_close_node():
 						print(f"target is{n.get_target()}")
 						if len(n.get_childs()) == 1 and n.get_childs()[0] == n.get_target():#We have an empty perform
 							dot.edge(str(n.id), str(n.id), label="NOT "+n.condition_str) #Loop link
 							dot.edge(str(n.id), str(link.id), label=n.condition_str)  #Exit link
-						elif n.get_target(): #If target is None we have ?
-							dot.edge(str(n.id), str(n.get_target().get_childs()[0].id), label=n.condition_str)
-							dot.edge(str(n.id), str(link.id), label="NOT "+n.condition_str)
+						elif n.get_target() != link: #We have code inside the perform, just link normally
+							dot.edge(str(n.id), str(link.id), label=n.condition_str)
+							if len(n.get_childs()) == 1: #If we have a single child, we should also add the jump to target if not cond
+								dot.edge(str(n.id), str(n.get_target().id), label="NOT "+n.condition_str)
 						else:
 							dot.edge(str(n.id), str(link.id))
-					elif not isinstance(n, LabelLoopNode) or not link == n.get_label_child():
+					elif isinstance(n, BlockLoopNode) and n.is_close_node(): #We are at the end perform
+						if link == n.get_target():
+							tar_childs = n.get_target().get_childs()
+							if len(tar_childs) == 1 and tar_childs[0] == n: #Single perform, no link
+								pass
+							else:
+								dot.edge(str(n.id), str(n.get_target().id), label=n.get_target().condition_str)
+						else:
+							tar_childs = n.get_target().get_childs()
+							if len(tar_childs) == 1 and tar_childs[0] == n: #Single perform, no link
+								dot.edge(str(n.id), str(link.id))
+							else:
+								dot.edge(str(n.id), str(link.id), label="NOT "+n.get_target().condition_str)
+					elif isinstance(n, LabelLoopNode):
+						if link == n.get_label_child():
+							dot.edge(str(n.id), str(n.get_label_child().id),
+									 label="PERFORM")  # Add the link to the label_child
+						else:
+							dot.edge(str(n.id),str(link.id))
+						# print(link)
+						if not isinstance(n,
+										  BlockLoopNode) and link.get_type() == NODE_LABEL and link.get_label() == n.go_back_label():
+							dot.edge(str(link.id), str(n.id), label="Go back")
+					else:
 						dot.edge(str(n.id), str(link.id))
-				if isinstance(n, LabelLoopNode):
-					if n.get_label_child():
-						dot.edge(str(n.id), str(n.get_label_child().id), label="PERFORM") #Add the link to the label_child
-					#print(link)
-					if not isinstance(n, BlockLoopNode) and link.get_type() == NODE_LABEL and link.get_label() == n.go_back_label():
-						dot.edge(str(link.id), str(n.id), label="Go back")
 					
 			elif isinstance(n, LabelNode):
 				for link in n.get_childs():

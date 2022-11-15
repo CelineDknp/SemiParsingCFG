@@ -320,7 +320,6 @@ class FuzzyParser:
 		#print(f"found loop ! {actual_match}")
 		# print(f"Current state of input is: |{self.input[self.pos:self.pos+150]}|")
 		if n_anchor.is_label_anchor():
-			node = None
 			if n_anchor.is_multiple_anchor():
 				node = MultipleLabelLoopNode(self.depth, NODE_LOOP, n_anchor)
 			else:	
@@ -337,7 +336,7 @@ class FuzzyParser:
 			if actual_val == n_anchor.get_start_pattern():
 				node = BlockLoopNode(self.depth, NODE_LOOP, n_anchor)
 				lot.append(node)
-				node.find_conditions(actual_match)
+				node.find_conditions(actual_match, self.input_str, self.pos)
 			elif actual_val == n_anchor.get_end_pattern():
 				node = BlockLoopNode(self.depth, NODE_LOOP, n_anchor, close=True)
 				lot.append(node)

@@ -66,7 +66,7 @@ class LTSGraph:
 		if input_node.get_type() == "EXEC":
 			tag = input_node.parsable
 		to_add.tag(tag)
-		to_add.set_initial_id(input_node.id)
+		to_add.set_initial_node(input_node)
 		self.add_node(to_add)
 		return to_add
 
@@ -126,7 +126,11 @@ class LTSGraph:
 							tag = "PERFORM"  # Tag the in link
 							# Get the out link
 							out_label = n.label[-1] #Get the label of the out link
-							out_node = graph.all_labels[out_label] #Get the corresponding node
+							if out_label in graph.all_labels:
+								out_node = graph.all_labels[out_label] #Get the corresponding node
+							else:
+								print(f"Error while looking for label {out_label} in {graph.all_labels}")
+								return
 							corr_node = self.corr[out_node]
 							index = self.all_labels.index(corr_node)
 							if index < len(self.all_labels)-1:

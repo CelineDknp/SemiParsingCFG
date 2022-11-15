@@ -4,6 +4,7 @@ class LTSNode:
 		self.id = LTSNode.id
 		self.t = None
 		self.initial_id = None
+		self.initial_node = None
 		self.transition_in = []
 		self.transition_out = []
 		LTSNode.id += 1
@@ -43,3 +44,7 @@ class LTSNode:
 
 	def set_initial_id(self, id):
 		self.initial_id = id
+
+	def set_initial_node(self, node):
+		self.initial_node = node
+		self.set_initial_id(node.id)

@@ -114,8 +114,8 @@ class TraceEquivalence:
 					print("We should branch")
 				elif transition_found == 0:
 					print("Graphs are not equivalent !")
-					print(node1)
-					print(node2)
+					print(node1.initial_node)
+					print(node2.initial_node)
 					self.equivalent = False
 					return
 				else:
