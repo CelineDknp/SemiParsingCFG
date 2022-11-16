@@ -62,14 +62,21 @@ class FuzzyParser:
 				if self.get_next_or_ban(current_anchor.get_pattern()):
 					go = False
 				else:
-
 					if self.next_pos[current_anchor.get_pattern()][0] >= self.skip_max:
 						go = False
 					else:
 						end_match = val + len(self.next_pos[current_anchor.get_pattern()][1].rstrip())
-
-
 			return False
+
+	def overlap_ignore(self, val): #Does not solve the problem
+		for key in self.next_pos.keys():
+			anchor = self.next_pos[key][2]
+			if anchor.get_type() == IGNORE:  #Look at every ignore anchor
+				ignore_val = self.next_pos[key][0]
+				ignore_match = self.next_pos[key][1]
+				if ignore_val <= val <= ignore_match: #If our anchor is on the ignore
+					return True
+
 
 	def pick_next_anchor(self):
 		# print("PICKING")
@@ -97,7 +104,7 @@ class FuzzyParser:
 				temp_length = len(self.next_pos[key][1])
 				t_anchor = self.next_pos[key][2]
 				if (val < min_val or (val == min_val and temp_length > curr_length)) and val != -1:
-					if self.useful_anchor(t_anchor, val):
+					if self.useful_anchor(t_anchor, val) and not self.overlap_ignore(t_anchor, val):
 						min_val = val
 						min_key = key
 						anchor = self.next_pos[key][2]
