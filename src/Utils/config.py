@@ -38,12 +38,12 @@ end: regex for the end of the structure
 """
 parsable = [{"start":r"EXEC\sSQL", "end":r"END-EXEC"}]
 
+#Language special case (first in this list to speedup parsing)
+special = [{"regex":r"(\s)*PROCEDURE\sDIVISION", "effect":"start_parse"}, {"regex":r"\.(\s)*$", "effect":"close_all"}]
+
 #All structures that can contain code but should be ignored (typically, strings and comments)
 to_ignore = [
-    {"regex": r"(('(.)*$\s{7}-\s*))?('(.)*')", "type":"string"}, 
+    {"regex": r"('.*$\s{7}-\s*)?'[^\n']*'", "type":"string"}, 
     {"regex":r"^\s{6}((\s)*\*(.)*$)+", "type":"comment"}
 ]
-
-#Language special case
-special = [{"regex":r"(\s)*PROCEDURE\sDIVISION", "effect":"start_parse"}, {"regex":r"\.(\s)*$", "effect":"close_all"}]
 
