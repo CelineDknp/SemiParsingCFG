@@ -15,6 +15,9 @@ class Node:
 	def __repr__(self):
 		return f"Node {self.id} {self.type}"
 
+	def get_str_code(self):
+		return self.type
+
 	def get_depth(self):
 		return self.depth
 

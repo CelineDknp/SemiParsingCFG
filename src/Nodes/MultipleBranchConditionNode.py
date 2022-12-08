@@ -19,6 +19,12 @@ class MultipleBranchConditionNode(ConditionNode):
         else:
             return super().__str__()
 
+    def get_str_code(self):
+        if self.type == NODE_COND_START:
+            return f"EVALUATE {self.condition}"
+        else:
+            return super().get_str_code()
+
     def close_branch(self, end=False): #Closing branches
         self.current_child = None
 

@@ -41,10 +41,8 @@ class Graph:
 
 	def match_varying_loops(self):
 		first_block = None
-		print(self.open_loops)
 		if "block" in self.open_loops:
 			for e in self.open_loops["block"]:
-				print(f"Looking at: {e}")
 				if e.is_close_node():
 					e.add_child(first_block)
 					e.set_target(first_block)
@@ -162,7 +160,7 @@ class Graph:
 			self.add_single_node(node)
 			#print(f"Loop node {node}")
 			if not node.is_goback_node(): #If we don't need to go back to this node, don't
-				print("Node was a GOTO, cancel last node")
+				#print("Node was a GOTO, cancel last node")
 				self.last_node = None
 			self.update_open_loops(node)
 		elif node.get_type() == NODE_COND_BRANCH:
@@ -198,7 +196,6 @@ class Graph:
 			self.all_nodes.append(temp)
 		elif node.get_type() == "END":  # Adding the end_node
 			self.add_single_node(node)
-			print("Added the last_node")
 			#self.match_varying_loops()
 		else:
 			print(f"Issue during adding node {node}")
@@ -253,7 +250,6 @@ class Graph:
 		#		print(f"Found open loop: {o}, {self.open_loops[o]}")
 		cleaned = True
 		while cleaned == True:
-			print("cleaning")
 			visited = []
 			cleaned = False
 			start_node = self.all_nodes.copy()
@@ -410,7 +406,6 @@ class Graph:
 							dot.edge(str(n.id), str(n.id), label=n.condition_str)
 						dot.edge(str(n.id), str(link.id), label="NOT "+n.condition_str) #We need a link no to the end of the perform
 					elif isinstance(n, BlockLoopNode) and not n.is_close_node():
-						print(f"target is{n.get_target()}")
 						if len(n.get_childs()) == 1 and n.get_childs()[0] == n.get_target():#We have an empty perform
 							dot.edge(str(n.id), str(n.id), label="NOT "+n.condition_str) #Loop link
 							dot.edge(str(n.id), str(link.id), label=n.condition_str)  #Exit link

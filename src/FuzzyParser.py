@@ -192,7 +192,7 @@ class FuzzyParser:
 				lot.append(node)
 				node.find_conditions(actual_match, self.input_str, self.pos)
 			elif anchorMatched.get_regex() == anchor.get_end_pattern():
-				node = BlockLoopNode(self.depth, NODE_LOOP, n_anchor, close=True)
+				node = BlockLoopNode(self.depth, NODE_LOOP, anchor, close=True)
 				lot.append(node)
 		self.pos = start_index + len(actual_match.strip()) - 1
 

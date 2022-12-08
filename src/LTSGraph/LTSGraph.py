@@ -35,6 +35,9 @@ class LTSGraph:
 			result += n.__repr__() + "\n"
 		return result
 
+	def has_node(self, node):
+		return node in self.all_states
+
 	def get_start(self):
 		return self.start
 

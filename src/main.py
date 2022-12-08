@@ -69,7 +69,7 @@ def process_and_cleanup(filename, label_clean=False):
 	g = process_and_create(filename)
 	g.cleanup(label_clean)
 	print(f"Graph cleaned!", flush=True)
-	# print(f"Final size of graph: {g.get_size()}")
+	print(f"Final size of graph: {g.get_size()}")
 	return g
 
 def create_and_cleanup(lot, label_clean=False):
@@ -91,6 +91,7 @@ def process_file(filename, dir_path):
 	g = process_and_cleanup(filename,label_clean=False)
 	# g = process_and_squish(filename,label_clean=True)
 	g.save_as_file(os.path.basename(filename), output_dir=dir_path)
+	print("CFG saved", flush=True)
 	lts = LTSGraph()
 	lts.import_graph(g)
 	lts.save_as_file(filename)
@@ -104,13 +105,17 @@ def process_and_create_lts(filename):
 	return lts
 
 
-def compare_graphs(filename1, filename2):
+def compare_graphs(filename1, filename2, draw=False):
 	g1 = process_and_cleanup(filename1, label_clean=False)
-	g1.save_as_file(os.path.basename(filename1+"V1"))
 	print("G1 processed")
+	if draw:
+		g1.save_as_file(os.path.basename(filename1+"V1"), output_dir='compare_tests')
+		print(f"G1 saved as file in {os.path.basename(filename1+'V1')}")
 	g2 = process_and_cleanup(filename2, label_clean=False)
-	g2.save_as_file(os.path.basename(filename2+"V2"))
 	print("G2 processed")
+	if draw:
+		g2.save_as_file(os.path.basename(filename2+"V2"), output_dir='compare_tests')
+		print(f"G2 saved as file in {os.path.basename(filename2+'V2')}")
 	lst_g1 = LTSGraph()
 	lst_g1.import_graph(g1)
 	lst_g2 = LTSGraph()
@@ -155,8 +160,10 @@ def main(argv):
 		process_file(argv[1],"")
 	elif len(argv) == 3:
 		compare_graphs(argv[1], argv[2])
+	elif len(argv) == 4 and argv[3] == "-draw":
+		compare_graphs(argv[1], argv[2], draw=True)
 	else:
-		cProfile.run("process_and_parse('raincodeData/Delivery/V1/ALCB018.COB')")
+		print("Unrecognized command")
 
 
 

@@ -21,8 +21,27 @@ class LTSNode:
 		else:
 			return self.transition_in
 
-	def has_single_out(self):
-		return len(self.transition_out) == 1
+	def has_single_out(self, go_back_list=[]):
+		if len(self.transition_out) == 1:
+			return True
+		available_count = 0
+		for elem in self.transition_out:
+			if elem.label == "GOBACK" and elem.to in go_back_list:
+				available_count += 1
+			elif elem.label != "GOBACK":
+				available_count += 1
+		return available_count == 1
+
+	def get_single_transition(self, go_back_list=[]):
+		if len(self.transition_out) == 1:
+			return self.transition_out[0]
+		else:
+			for elem in self.transition_out:
+				if elem.label == "GOBACK" and elem.to in go_back_list:
+					return elem
+				elif elem.label != "GOBACK":
+					return elem
+
 
 	def next(self):
 		if self.has_single_out():

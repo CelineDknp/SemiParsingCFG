@@ -19,6 +19,12 @@ class SimpleBranchConditionNode(ConditionNode):
         else:
             return super().__str__()
 
+    def get_str_code(self):
+        if self.type == NODE_COND_START:
+            return f"IF {self.condition}"
+        else:
+            return super().get_str_code()
+
     def true_branch_open(self): #Return true if the node's "true" branch is closed
         return self.branch_open[0]
 

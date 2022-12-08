@@ -64,7 +64,7 @@ class AnchorHandler:
 		if regex in self.anchors_dict:
 			return self.anchors_dict[regex]
 		else:
-			print("Error !")
+			print(f"Error, looking for anchor {regex} but was not in anchor handler !")
 
 	def get_special_anchor(self, tag):
 		return self.special_anchors[tag]
