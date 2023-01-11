@@ -14,10 +14,10 @@ class ConditionNode(Node):
 
 
     def __str__(self):
-        if self.type == NODE_COND_START:
-            return self.depth * "\t" + f"Node {self.regex} {self.condition}"
-        else:
-            return super().__str__()
+        #if self.type == NODE_COND_START:
+        #   return self.depth * "\t" + f"Node {self.regex} {self.condition}"
+        #else:
+        return super().__str__()
 
     def is_anchor(self, input):
         if not any(substring in input for substring in self.statements_str):

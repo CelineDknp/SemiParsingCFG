@@ -14,10 +14,16 @@ class SimpleBranchConditionNode(ConditionNode):
         self.false_child = None
 
     def __str__(self):
+        #if self.type == NODE_COND_START:
+        #    return self.depth*"\t"+f"Node IF {self.condition}"
+        #else:
+        #    return super().__str__()
         if self.type == NODE_COND_START:
-            return self.depth*"\t"+f"Node IF {self.condition}"
+            return f"IF {self.condition}"
+        elif self.type == NODE_COND_BRANCH:
+            return "ELSE"
         else:
-            return super().__str__()
+            return super().get_str_code()
 
     def get_str_code(self):
         if self.type == NODE_COND_START:

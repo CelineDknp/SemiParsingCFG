@@ -55,7 +55,10 @@ class LTSGraph:
 			self.start = n
 		self.all_states.append(n)
 
-	def has_node(self, tag):
+	def has_node(self, node):
+		return node in self.all_states
+
+	def has_tag(self, tag):
 		for s in self.all_states:
 			if s.get_tag() == tag:
 				return s
@@ -132,7 +135,6 @@ class LTSGraph:
 							if out_label in graph.all_labels:
 								out_node = graph.all_labels[out_label] #Get the corresponding node
 							else:
-								print(f"Error while looking for label {out_label} in {graph.all_labels}")
 								return
 							corr_node = self.corr[out_node]
 							index = self.all_labels.index(corr_node)
@@ -158,6 +160,7 @@ class LTSGraph:
 					cancel_link = True
 				if not cancel_link:
 					self.link(f, t, tag)
+		print("Done!")
 
 	def save_as_file(self, filename, output_dir='doctest-output'):
 		dot = graphviz.Digraph(filename)

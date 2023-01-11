@@ -16,7 +16,8 @@ class ControlLoopNode(LoopNode):
 		return cls(depth, node_type, anchor)
 
 	def __str__(self):
-		return f"Node {self.type} to {self.control_node}"
+		#return f"Node {self.type} to {self.control_node}"
+		return super().__str__()
 
 	def is_control(self):
 		return True

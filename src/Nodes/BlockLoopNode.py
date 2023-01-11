@@ -16,13 +16,13 @@ class BlockLoopNode(LoopNode):
 		if not close:
 			self.branch = anchor.branch
 			self.condition = anchor.condition
-
 			self.condition_str = ""
+
 	def __str__(self):
 		if self.is_close_node():
-			return f"Node {self.type} (block end)"
+			return f"END PERFORM"
 		else:
-			return f"Node {self.type} (block) {self.get_condition_str()}"
+			return f"PERFORM {self.get_branch_str()} {self.get_condition_str()}"
 
 	def is_block(self):
 		return True

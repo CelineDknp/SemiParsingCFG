@@ -105,15 +105,15 @@ def process_and_create_lts(filename):
 	return lts
 
 
-def compare_graphs(filename1, filename2, draw=False):
+def compare_graphs(filename1, filename2, draw_target="", draw=False):
 	g1 = process_and_cleanup(filename1, label_clean=False)
 	print("G1 processed")
-	if draw:
+	if draw and draw_target == "":
 		g1.save_as_file(os.path.basename(filename1+"V1"), output_dir='compare_tests')
 		print(f"G1 saved as file in {os.path.basename(filename1+'V1')}")
 	g2 = process_and_cleanup(filename2, label_clean=False)
 	print("G2 processed")
-	if draw:
+	if draw and draw_target == "":
 		g2.save_as_file(os.path.basename(filename2+"V2"), output_dir='compare_tests')
 		print(f"G2 saved as file in {os.path.basename(filename2+'V2')}")
 	lst_g1 = LTSGraph()
@@ -122,7 +122,14 @@ def compare_graphs(filename1, filename2, draw=False):
 	lst_g2.import_graph(g2)
 	print("LTSs created !")
 	teq = TraceEquivalence(lst_g1, lst_g2)
-	teq.compare()
+	print("Trace equivalence done")
+	if draw_target == "":
+		teq.compare(draw=draw, filepath="trace_equivalence_test/", name1=filename1, name2=filename2)
+	elif draw:
+		teq.compare(draw=draw, filepath=draw_target, name1=filename1, name2=filename2)
+		print("Files drawed")
+	else:
+		teq.compare(name1=filename1, name2=filename2)
 
 
 def main(argv):
@@ -162,8 +169,10 @@ def main(argv):
 		compare_graphs(argv[1], argv[2])
 	elif len(argv) == 4 and argv[3] == "-draw":
 		compare_graphs(argv[1], argv[2], draw=True)
+	elif len(argv) == 5 and argv[4] == "-draw":
+		compare_graphs(argv[1], argv[2], draw_target=argv[3], draw=True)
 	else:
-		print("Unrecognized command")
+		print(f"Unrecognized command with args {argv}")
 
 
 

@@ -15,7 +15,8 @@ class MultipleLabelLoopNode(LabelLoopNode):
 		return cls(depth, node_type, anchor)
 
 	def __str__(self):
-		return f"Node {self.type} (multiple labels) to {self.label}"
+		#return f"Node {self.type} (multiple labels) to {self.label}"
+		return f"PERFORM {self.label[0]} THRU {self.label[-1]}"
 
 	def go_back_label(self):
 		if self.go_back:

@@ -10,7 +10,17 @@ class LoopNode(Node):
 		self.go_back = anchor.is_goback_anchor()
 
 	def __str__(self):
-		return f"Node {self.type} (simple) to {self.label}"
+		#return f"Node {self.type} (simple) to {self.label}"
+		if self.is_goback_node():
+			return f"PERFORM {self.label}"
+		elif self.is_control():
+			return "NEXT SENTENCE"
+		elif not self.is_goback_node():
+			return f"GO TO {self.label}"
+		elif self.is_block():
+			return "Bloc ?"
+		else:
+			return super().__str__()
 
 	def is_goback_node(self):
 		return self.go_back

@@ -41,7 +41,8 @@ class ParseNode(Node):
         self.parse_tree = None
 
     def __str__(self):
-        return f"Node {self.type} ({self.parsable})"
+        #return f"Node {self.type} ({self.parsable})"
+        return self.parsable
 
     def find_parse_text(self, input_str, pos):
         res = re.search("END-EXEC", input_str[pos + 8:], flags=re.IGNORECASE)

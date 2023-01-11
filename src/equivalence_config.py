@@ -7,11 +7,17 @@ ignore = "INTERNAL"
 # Straight equivalences
 equiv = [('" "', "SPACE"), ("' '", "SPACE"), ("0", "ZERO"), ("+", "", r"\+(\d)+")]
 
+# Bool negation
+bool = "NOT "
+
 # Structure transformations
 struct = [("IF", "EVALUATE")]
 
 # Factorisation
-fact = {False: "OR", True: "AND"}  # Join with OR on true branch and with OR on false ??
+fact = {False: "OR", True: "AND"}  # Join with OR on true branch and with AND on false
+
+# Rematch after no match
+rematch = 5
 
 
 def try_simple_equivalence(str1, str2):
@@ -29,7 +35,11 @@ def try_simple_equivalence(str1, str2):
 				new_cond = str2.replace(tup[0], tup[1])
 		if new_cond == str2 or new_cond == str1:
 			return True
-	return False
+	if str1.count(bool) == 2: #We have two negation, remove them
+		str1 = str1.replace(bool, "").strip()
+	elif str2.count(bool) == 2:
+		str2 = str2.replace(bool, "").strip()
+	return str1 == str2
 
 
 def evaluate_equivalence(node_evaluate, node_if):
@@ -72,7 +82,7 @@ def try_transformations(node1, node2):
 def try_factorize(goal, node2):  # Try and factorize node 2 to node 1
 	true_cond = node2.initial_node.condition
 	false_cond = node2.initial_node.condition
-	if true_cond not in goal: #If we have no way to ceate a correct factorization, exit
+	if true_cond not in goal and false_cond not in goal: #If we have no way to ceate a correct factorization, exit
 		return False, true_cond, [], []
 	next = node2
 	found = True
@@ -93,11 +103,13 @@ def try_factorize(goal, node2):  # Try and factorize node 2 to node 1
 					if curr_init == next_init.false_child:
 						false_cond += " " + fact[False] + " " + transition.to.initial_node.condition
 			else:
-				branch_out.append(transition.to)
+				if transition.to not in branch_out:
+					branch_out.append(transition.to)
 		if goal == true_cond or try_simple_equivalence(goal, true_cond) or goal == false_cond or try_simple_equivalence(goal, false_cond):  # Check if we are not done
 			if len(branch_out) == 0:
 				for t in next.get_transition():
 					branch_out.append(t.to)
+			fact_nodes.append(next)
 			if goal == false_cond or try_simple_equivalence(goal, false_cond):
 				return false_cond != node2.initial_node.condition, false_cond, fact_nodes, branch_out
 			if goal == true_cond or try_simple_equivalence(goal, true_cond):

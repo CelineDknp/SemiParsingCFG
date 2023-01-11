@@ -17,7 +17,8 @@ class LabelLoopNode(LoopNode):
 		return cls(depth, node_type, anchor)
 
 	def __str__(self):
-		return f"Node {self.type} (label) to {self.label}"
+		#return f"Node {self.type} (label) to {self.label}"
+		return super().__str__()
 
 	def add_child(self, node, match=False, label=False):
 		if match:

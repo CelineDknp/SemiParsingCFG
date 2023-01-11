@@ -14,14 +14,17 @@ class MultipleBranchConditionNode(ConditionNode):
         self.closed = False
 
     def __str__(self):
-        if self.type == NODE_COND_START:
-            return self.depth*"\t"+f"Node EVALUATE {self.condition}"
-        else:
-            return super().__str__()
+        #if self.type == NODE_COND_START:
+        #    return self.depth*"\t"+f"Node EVALUATE {self.condition}"
+        #else:
+        #    return super().__str__()
+        return self.get_str_code()
 
     def get_str_code(self):
         if self.type == NODE_COND_START:
             return f"EVALUATE {self.condition}"
+        elif self.type == NODE_COND_BRANCH:
+            return f"WHEN {self.condition}"
         else:
             return super().get_str_code()
 
