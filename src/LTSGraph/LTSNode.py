@@ -15,6 +15,9 @@ class LTSNode:
 	def __repr__(self):
 		return f"Node {self.id} {self.t}"
 
+	def has_condition(self):
+		return self.initial_node.has_condition()
+
 	def get_transition(self, out=True):
 		if out:
 			return self.transition_out

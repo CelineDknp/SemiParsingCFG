@@ -17,6 +17,9 @@ class Node:
 	def __repr__(self):
 		return f"Node {self.id} {self.type}"
 
+	def has_condition(self):
+		return False
+
 	def get_str_code(self):
 		return self.type
 
@@ -54,7 +57,7 @@ class Node:
 
 	def add_child(self, node):
 		if node == self: #Don't add yourself as a child ! #Dirtyfix
-			print(">>> Trying to add myself as child (Node)")
+			#print(">>> Trying to add myself as child (Node)")
 			return
 		if node in self.childs: #Dirty
 			return

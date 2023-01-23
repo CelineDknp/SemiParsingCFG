@@ -19,6 +19,9 @@ class ConditionNode(Node):
         #else:
         return super().__str__()
 
+    def has_condition(self):
+        return True
+
     def is_anchor(self, input):
         if not any(substring in input for substring in self.statements_str):
             return -1

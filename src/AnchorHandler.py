@@ -66,6 +66,9 @@ class AnchorHandler:
 		else:
 			print(f"Error, looking for anchor {regex} but was not in anchor handler !")
 
+	def remove_anchor(self, anchor):
+		self.anchors_dict.pop(anchor.get_pattern())
+
 	def get_special_anchor(self, tag):
 		return self.special_anchors[tag]
 

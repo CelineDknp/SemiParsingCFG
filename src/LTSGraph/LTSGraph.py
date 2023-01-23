@@ -80,7 +80,8 @@ class LTSGraph:
 		t = LTSTransition(node_from, node_to, cond_tag)
 		self.all_transitions.append(t)
 		node_from.add_transition(t)
-		node_to.add_transition(t)
+		if node_to != node_from:
+			node_to.add_transition(t)
 
 
 	def import_graph(self, graph):
@@ -101,9 +102,9 @@ class LTSGraph:
 				elif n.get_type() == "COND_START" and child == n.true_child:
 					tag = n.get_condition()
 					if child == n.false_child: #Node pointing to a single child
-						self.link(f, t, "NOT " + n.get_condition()) #Add false link
+						self.link(f, t, "NOT (" + n.get_condition()+")") #Add false link
 				elif n.get_type() == "COND_START" and child == n.false_child:
-					tag = "NOT " + n.get_condition()
+					tag = "NOT (" + n.get_condition() + ")"
 				elif n.get_type() == "EXEC": #SQL node, add the text
 					tag = n.parsable
 				elif isinstance(n, BlockLoopNode): #Block end
@@ -113,18 +114,22 @@ class LTSGraph:
 						if n.is_close_node() and child != n.get_target():
 							if n.get_target().get_childs()[0] != n: #If not, out of a single perform, don't repeat cond !
 								tag = n.get_target().get_condition_str()
+						elif n.is_close_node() and n.get_target().condition is not None:
+							#We have found an END PERFORM
+							init_t = n.get_target().get_childs()[0] #Put the to to the perform's child
+							t = self.corr[init_t]
+							tag = "NOT (" + n.get_target().get_condition_str() + ")"
 						elif n.is_close_node() and child == n.get_target():
-							tag = "NOT " + n.get_target().get_condition_str()
-
+							tag = "NOT (" + n.get_target().get_condition_str() + ")"
 						elif not n.is_close_node():
 							if len(n.get_childs()) == 1 and n.get_childs()[0] == n.get_target():  # We have an empty perform
 								t = f
 								end = self.corr[n.get_target()]
 								self.link(f, end, n.get_condition_str())  # Add link to end_perform
 							else:
-								end = self.corr[n.get_target().get_childs()[0]]
+								end = self.corr[n.get_target().get_non_target_child()]
 								self.link(f, end, n.get_condition_str())  # Add link to end_perform
-							tag = "NOT " + n.condition_str  # Loop link
+							tag = "NOT (" + n.condition_str + ")"  # Loop link
 
 				elif isinstance(n, LabelLoopNode) and n.is_goback_node(): #Link perform to its label
 					if n.is_multiple_labels():
@@ -160,7 +165,6 @@ class LTSGraph:
 					cancel_link = True
 				if not cancel_link:
 					self.link(f, t, tag)
-		print("Done!")
 
 	def save_as_file(self, filename, output_dir='doctest-output'):
 		dot = graphviz.Digraph(filename)

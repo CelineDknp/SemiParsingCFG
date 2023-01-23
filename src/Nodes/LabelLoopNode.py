@@ -25,6 +25,8 @@ class LabelLoopNode(LoopNode):
 			super().add_child(node, match=match)
 		if label:
 			self.label_child = node
+			if node in self.childs: #If the node was already a child, add it again
+				self.childs.append(node)
 		super().add_child(node)
 
 	def get_label_child(self):

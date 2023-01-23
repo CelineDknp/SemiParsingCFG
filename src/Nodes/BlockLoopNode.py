@@ -24,6 +24,9 @@ class BlockLoopNode(LoopNode):
 		else:
 			return f"PERFORM {self.get_branch_str()} {self.get_condition_str()}"
 
+	def has_condition(self):
+		return True
+
 	def is_block(self):
 		return True
 
@@ -108,6 +111,11 @@ class BlockLoopNode(LoopNode):
 
 	def set_condition_str(self, cond):
 		self.condition_str = cond
+
+	def get_non_target_child(self):
+		for f in self.childs:
+			if f != self.get_target():
+				return f
 
 	def get_end_block(self):
 		for e in self.parents:

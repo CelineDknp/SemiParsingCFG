@@ -5,7 +5,7 @@ def test_construct_lts_base_if():
 	graph = process_and_create_lts("TestFiles/pytest/if_normal_test_file.COB")
 	assert graph.get_size() == 3
 	assert graph.get_link_size() == 3
-	assert graph.get_transition(1).get_label() == "NOT A > 0"
+	assert graph.get_transition(1).get_label() == "NOT (A > 0)"
 	assert graph.get_transition(2).get_label() == "A > 0"
 
 #Testing simple branches for if/else
@@ -14,14 +14,14 @@ def test_construct_lts_base_if_left_branch():
 	assert graph.get_size() == 4
 	assert graph.get_link_size() == 4
 	assert graph.get_transition(1).get_label() == "A > 0"
-	assert graph.get_transition(2).get_label() == "NOT A > 0"
+	assert graph.get_transition(2).get_label() == "NOT (A > 0)"
 	assert graph.get_transition(3).get_label() == "OPEN DB"
 
 def test_construct_lts_base_if_right_branch():
 	graph = process_and_create_lts("TestFiles/pytest/if_right_branch_test_file.COB")
 	assert graph.get_size() == 4
 	assert graph.get_link_size() == 4
-	assert graph.get_transition(1).get_label() == "NOT A > 0"
+	assert graph.get_transition(1).get_label() == "NOT (A > 0)"
 	assert graph.get_transition(2).get_label() == "A > 0"
 	assert graph.get_transition(3).get_label() == "OPEN DB"
 
@@ -30,7 +30,7 @@ def test_construct_lts_base_if_both_branch():
 	assert graph.get_size() == 5
 	assert graph.get_link_size() == 5
 	assert graph.get_transition(1).get_label() == "A > 0"
-	assert graph.get_transition(2).get_label() == "NOT A > 0"
+	assert graph.get_transition(2).get_label() == "NOT (A > 0)"
 	assert graph.get_transition(3).get_label() == "OPEN DB"
 	assert graph.get_transition(4).get_label() == "OPEN DB"
 
@@ -40,17 +40,17 @@ def test_construct_lts_base_if_nested_left_branch():
 	assert graph.get_size() == 4
 	assert graph.get_link_size() == 5
 	assert graph.get_transition(1).get_label() == "A > 0"
-	assert graph.get_transition(2).get_label() == "NOT A > 0"
-	assert graph.get_transition(3).get_label() == "NOT B > 0"
+	assert graph.get_transition(2).get_label() == "NOT (A > 0)"
+	assert graph.get_transition(3).get_label() == "NOT (B > 0)"
 	assert graph.get_transition(4).get_label() == "B > 0"
 
 def test_construct_lts_base_if_nested_right_branch():
 	graph = process_and_create_lts("TestFiles/pytest/if_nested_right_branch_test_file.COB")
 	assert graph.get_size() == 4
 	assert graph.get_link_size() == 5
-	assert graph.get_transition(1).get_label() == "NOT A > 0"
+	assert graph.get_transition(1).get_label() == "NOT (A > 0)"
 	assert graph.get_transition(2).get_label() == "A > 0"
-	assert graph.get_transition(3).get_label() == "NOT B > 0"
+	assert graph.get_transition(3).get_label() == "NOT (B > 0)"
 	assert graph.get_transition(4).get_label() == "B > 0"
 
 def test_construct_lts_base_if_nested_both_branch():
@@ -58,10 +58,10 @@ def test_construct_lts_base_if_nested_both_branch():
 	assert graph.get_size() == 5
 	assert graph.get_link_size() == 7
 	assert graph.get_transition(1).get_label() == "A > 0"
-	assert graph.get_transition(2).get_label() == "NOT A > 0"
-	assert graph.get_transition(3).get_label() == "NOT B > 0"
+	assert graph.get_transition(2).get_label() == "NOT (A > 0)"
+	assert graph.get_transition(3).get_label() == "NOT (B > 0)"
 	assert graph.get_transition(4).get_label() == "B > 0"
-	assert graph.get_transition(5).get_label() == "NOT C > 0"
+	assert graph.get_transition(5).get_label() == "NOT (C > 0)"
 	assert graph.get_transition(6).get_label() == "C > 0"
 
 #Testing evaluates
@@ -84,9 +84,9 @@ def test_construct_lts_mixed_evaluate():
 	assert graph.get_transition(2).get_label() == "A < 0"
 	assert graph.get_transition(3).get_label() == "A = 0"
 	assert graph.get_transition(4).get_label() == "B > 1"
-	assert graph.get_transition(5).get_label() == "NOT B > 1"
+	assert graph.get_transition(5).get_label() == "NOT (B > 1)"
 	assert graph.get_transition(6).get_label() == "OPEN DB1"
-	assert graph.get_transition(7).get_label() == "NOT B > 2"
+	assert graph.get_transition(7).get_label() == "NOT (B > 2)"
 	assert graph.get_transition(8).get_label() == "B > 2"
 	assert graph.get_transition(9).get_label() == "OPEN DB2"
 	assert graph.get_transition(10).get_label() == "OPEN DB3"
@@ -97,9 +97,9 @@ def test_construct_lts_next_sentence():
 	assert graph.get_size() == 5
 	assert graph.get_link_size() == 6
 	assert graph.get_transition(1).get_label() == "A > 0"
-	assert graph.get_transition(2).get_label() == "NOT A > 0"
+	assert graph.get_transition(2).get_label() == "NOT (A > 0)"
 	assert graph.get_transition(3).get_label() == "INTERNAL"
-	assert graph.get_transition(4).get_label() == "NOT B = 0"
+	assert graph.get_transition(4).get_label() == "NOT (B = 0)"
 	assert graph.get_transition(5).get_label() == "B = 0"
 
 #Testing the simple single label goback loop

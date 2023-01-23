@@ -36,8 +36,9 @@ class FuzzyParser:
 			iter = anchor.pattern.finditer(self.input_str[self.pos:])
 			match = next(iter, None)
 			if match:
-				elem = AnchorMatch(self.input_str.find(match.group(0), self.pos), anchor, match.group(0), self.anchorHandler.get_anchor(anchor))
+				elem = AnchorMatch(self.input_str.find(match.group(0), self.pos), anchor, match.group(0), anchor)
 				self.pos = elem.get_start_index() + len(elem.get_actual_match())
+			self.anchorHandler.remove_anchor(anchor)
 
 	def get_anchorMatch(self, match, val):
 		return AnchorMatch(self.input_str.find(match.group(0), self.pos), val, match.group(0), self.anchorHandler.get_anchor(val))

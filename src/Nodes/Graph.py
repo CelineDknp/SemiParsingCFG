@@ -190,8 +190,9 @@ class Graph:
 			if corr_if is not None:
 				corr_if.close(temp)
 				self.open_ifs.remove(corr_if)
-			elif self.last_node is not None:
-				self.last_node.add_child(temp)
+			if self.last_node is not None:
+				if not isinstance(self.last_node, SimpleBranchConditionNode) or self.last_node.false_branch_open():
+					self.last_node.add_child(temp)
 			self.last_node = temp
 			self.all_nodes.append(temp)
 		elif node.get_type() == "END":  # Adding the end_node
@@ -245,9 +246,6 @@ class Graph:
 		return True
 
 	def cleanup(self, label_clean=False):
-		#for o in self.open_loops:
-		#	if self.open_loops[o] != []:
-		#		print(f"Found open loop: {o}, {self.open_loops[o]}")
 		cleaned = True
 		while cleaned == True:
 			visited = []
@@ -399,6 +397,8 @@ class Graph:
 					dot.edge(str(n.id), str(n.get_branch_child(condition).id), label=condition)
 			elif n.get_type() == NODE_LOOP and n.is_goback_node():
 				#print(f"Doing node {n}")
+				perform_edge = False
+				go_back_edge = False
 				for link in n.get_childs():
 					#print(f"Linking to {link}")
 					if isinstance(n, BlockLoopNode) and not n.is_close_node() and link == n.get_target():
@@ -429,15 +429,18 @@ class Graph:
 							else:
 								dot.edge(str(n.id), str(link.id), label="NOT "+n.get_target().condition_str)
 					elif isinstance(n, LabelLoopNode):
-						if link == n.get_label_child():
+						if link == n.get_label_child() and not perform_edge:
 							dot.edge(str(n.id), str(n.get_label_child().id),
 									 label="PERFORM")  # Add the link to the label_child
+							perform_edge = True
 						else:
 							dot.edge(str(n.id),str(link.id))
 						# print(link)
 						if not isinstance(n,
-										  BlockLoopNode) and link.get_type() == NODE_LABEL and link.get_label() == n.go_back_label():
+										  BlockLoopNode) and link.get_type() == NODE_LABEL \
+								and link.get_label() == n.go_back_label() and not go_back_edge:
 							dot.edge(str(link.id), str(n.id), label="Go back")
+							go_back_edge = True
 					else:
 						dot.edge(str(n.id), str(link.id))
 					
