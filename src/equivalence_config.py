@@ -56,7 +56,7 @@ def try_simple_equivalence(str1, str2):
 
 
 def evaluate_equivalence(node_evaluate, node_if):
-	var = node_evaluate.initial_node.get_str_code().split()[-1]  # Var on which we do the evaluate
+	var = node_evaluate.initial_node.condition  # Var on which we do the evaluate
 	if_matched = []
 	couples = []
 	all_transition = []
@@ -67,7 +67,10 @@ def evaluate_equivalence(node_evaluate, node_if):
 			couples.append(t_m)
 			all_transition.append(t2)
 			return if_matched, couples, all_transition
-		cond = var + " = " + t2.label
+		if var == "TRUE":#EVALUATE TRUE means condition will be fully on branches
+			cond = t2.label
+		else:
+			cond = var + " = " + t2.label
 		if len(node_if.get_transition()) == 2:  # Only possible if the node has two transitions
 			matched = False
 			new_if = None

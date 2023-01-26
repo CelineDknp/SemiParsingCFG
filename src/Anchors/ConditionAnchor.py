@@ -18,6 +18,8 @@ class ConditionAnchor(Anchor):
 				self.condition_delimiter = re.compile(elem[key], flags=re.MULTILINE|re.IGNORECASE)
 			elif key == "mandatory_delimiter":
 				self.delimiter_mandatory = elem[key]
+			elif key == "special_case": #Skip the special case key
+				continue
 			else:
 				self.branch_regex = elem[key]
 				self.branch_pattern = re.compile(elem[key], flags=re.MULTILINE|re.IGNORECASE)

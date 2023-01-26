@@ -20,6 +20,26 @@ class MultipleBranchConditionNode(ConditionNode):
         #    return super().__str__()
         return self.get_str_code()
 
+    def get_branches(self):
+        result = []
+        for e in self.branch_childs:
+            result.append((e, self.branch_childs[e]))
+        return result
+
+    def find_condition_double(self, input, pos):
+        input_n = input[pos:]
+        when1 = input[pos:].find("WHEN")
+        new_pos = pos+when1
+        end1 = input[new_pos:].find("\n")
+        str1 = input[new_pos+4:new_pos+end1]
+        new_pos += len(str1)
+        when2 = input[new_pos:].find("WHEN")
+        new_pos += when2
+        end2 = input[new_pos:].find("\n")
+        str2 = input[new_pos+4:new_pos+end2]
+        self.condition = str1.strip()+" OR "+str2.strip()
+        return new_pos + len(str2)
+
     def get_str_code(self):
         if self.type == NODE_COND_START:
             return f"EVALUATE {self.condition}"

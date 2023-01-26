@@ -92,79 +92,83 @@ class LTSGraph:
 			if n.get_type() == "LABEL":
 				self.all_labels.append(to_add)
 		for n in graph.all_nodes:
-			for child in n.get_childs():
+			if isinstance(n, MultipleBranchConditionNode): #Special case for EVALUATE
 				f = self.corr[n]
-				t = self.corr[child]
-				cancel_link = False
-				tag = "INTERNAL"
-				if isinstance(n, MultipleBranchConditionNode):
-					tag = n.get_child_condition(child) #n.get_condition()+" "+ n.get_child_condition(child)
-				elif n.get_type() == "COND_START" and child == n.true_child:
-					tag = n.get_condition()
-					if child == n.false_child: #Node pointing to a single child
-						self.link(f, t, "NOT (" + n.get_condition()+")") #Add false link
-				elif n.get_type() == "COND_START" and child == n.false_child:
-					tag = "NOT (" + n.get_condition() + ")"
-				elif n.get_type() == "EXEC": #SQL node, add the text
-					tag = n.parsable
-				elif isinstance(n, BlockLoopNode): #Block end
-					if n.is_close_node() and n.get_target().get_childs()[0] == n and child == n.get_target():
+				for tup in f.initial_node.get_branches():
+					t = self.corr[tup[1]]
+					self.link(f, t, tup[0])
+			else:
+				for child in n.get_childs():
+					f = self.corr[n]
+					t = self.corr[child]
+					cancel_link = False
+					tag = "INTERNAL"
+					if n.get_type() == "COND_START" and child == n.true_child:
+						tag = n.get_condition()
+						if child == n.false_child: #Node pointing to a single child
+							self.link(f, t, "NOT (" + n.get_condition()+")") #Add false link
+					elif n.get_type() == "COND_START" and child == n.false_child:
+						tag = "NOT (" + n.get_condition() + ")"
+					elif n.get_type() == "EXEC": #SQL node, add the text
+						tag = n.parsable
+					elif isinstance(n, BlockLoopNode): #Block end
+						if n.is_close_node() and n.get_target().get_childs()[0] == n and child == n.get_target():
+							cancel_link = True
+						else:
+							if n.is_close_node() and child != n.get_target():
+								if n.get_target().get_childs()[0] != n: #If not, out of a single perform, don't repeat cond !
+									tag = n.get_target().get_condition_str()
+							elif n.is_close_node() and n.get_target().condition is not None:
+								#We have found an END PERFORM
+								init_t = n.get_target().get_childs()[0] #Put the to to the perform's child
+								t = self.corr[init_t]
+								tag = "NOT (" + n.get_target().get_condition_str() + ")"
+							elif n.is_close_node() and child == n.get_target():
+								tag = "NOT (" + n.get_target().get_condition_str() + ")"
+							elif not n.is_close_node():
+								if len(n.get_childs()) == 1 and n.get_childs()[0] == n.get_target():  # We have an empty perform
+									t = f
+									end = self.corr[n.get_target()]
+									self.link(f, end, n.get_condition_str())  # Add link to end_perform
+								else:
+									end = self.corr[n.get_target().get_non_target_child()]
+									self.link(f, end, n.get_condition_str())  # Add link to end_perform
+								tag = "NOT (" + n.condition_str + ")"  # Loop link
+
+					elif isinstance(n, LabelLoopNode) and n.is_goback_node(): #Link perform to its label
+						if n.is_multiple_labels():
+							if isinstance(child, LabelNode) and child.get_label() == n.start_label():
+								tag = "PERFORM"  # Tag the in link
+								# Get the out link
+								out_label = n.label[-1] #Get the label of the out link
+								if out_label in graph.all_labels:
+									out_node = graph.all_labels[out_label] #Get the corresponding node
+								else:
+									return
+								corr_node = self.corr[out_node]
+								index = self.all_labels.index(corr_node)
+								if index < len(self.all_labels)-1:
+									next_label = self.all_labels[index + 1]  # Corner case with end Node !
+								else:
+									next_label = self.all_states[-1] #Link to last node (end)
+								self.link(next_label, f, "GOBACK")
+								if len(n.get_childs()) == 1: #If we have one single child in the perform, we probaby point only to the label
+									self.link(f, t, "")
+
+						else:
+							if isinstance(child, LabelNode) and child.get_label() == n.go_back_label():
+								tag = "PERFORM" #Tag the in link
+								#Get the out link
+								index = self.all_labels.index(t)
+								if index < len(self.all_labels)-1:
+									next_label = self.all_labels[index + 1]  # Corner case with end Node !
+								else:
+									next_label = self.all_states[-1] #Link to last node (end)
+								self.link(next_label, f, "GOBACK")
+					elif isinstance(n, LabelNode) and isinstance(child, MultipleLabelLoopNode) and n.get_label() == child.go_back_label():  # Pointing towards perform, ignore link
 						cancel_link = True
-					else:
-						if n.is_close_node() and child != n.get_target():
-							if n.get_target().get_childs()[0] != n: #If not, out of a single perform, don't repeat cond !
-								tag = n.get_target().get_condition_str()
-						elif n.is_close_node() and n.get_target().condition is not None:
-							#We have found an END PERFORM
-							init_t = n.get_target().get_childs()[0] #Put the to to the perform's child
-							t = self.corr[init_t]
-							tag = "NOT (" + n.get_target().get_condition_str() + ")"
-						elif n.is_close_node() and child == n.get_target():
-							tag = "NOT (" + n.get_target().get_condition_str() + ")"
-						elif not n.is_close_node():
-							if len(n.get_childs()) == 1 and n.get_childs()[0] == n.get_target():  # We have an empty perform
-								t = f
-								end = self.corr[n.get_target()]
-								self.link(f, end, n.get_condition_str())  # Add link to end_perform
-							else:
-								end = self.corr[n.get_target().get_non_target_child()]
-								self.link(f, end, n.get_condition_str())  # Add link to end_perform
-							tag = "NOT (" + n.condition_str + ")"  # Loop link
-
-				elif isinstance(n, LabelLoopNode) and n.is_goback_node(): #Link perform to its label
-					if n.is_multiple_labels():
-						if isinstance(child, LabelNode) and child.get_label() == n.start_label():
-							tag = "PERFORM"  # Tag the in link
-							# Get the out link
-							out_label = n.label[-1] #Get the label of the out link
-							if out_label in graph.all_labels:
-								out_node = graph.all_labels[out_label] #Get the corresponding node
-							else:
-								return
-							corr_node = self.corr[out_node]
-							index = self.all_labels.index(corr_node)
-							if index < len(self.all_labels)-1:
-								next_label = self.all_labels[index + 1]  # Corner case with end Node !
-							else:
-								next_label = self.all_states[-1] #Link to last node (end)
-							self.link(next_label, f, "GOBACK")
-							if len(n.get_childs()) == 1: #If we have one single child in the perform, we probaby point only to the label
-								self.link(f, t, "")
-
-					else:
-						if isinstance(child, LabelNode) and child.get_label() == n.go_back_label():
-							tag = "PERFORM" #Tag the in link
-							#Get the out link
-							index = self.all_labels.index(t)
-							if index < len(self.all_labels)-1:
-								next_label = self.all_labels[index + 1]  # Corner case with end Node !
-							else:
-								next_label = self.all_states[-1] #Link to last node (end)
-							self.link(next_label, f, "GOBACK")
-				elif isinstance(n, LabelNode) and isinstance(child, MultipleLabelLoopNode) and n.get_label() == child.go_back_label():  # Pointing towards perform, ignore link
-					cancel_link = True
-				if not cancel_link:
-					self.link(f, t, tag)
+					if not cancel_link:
+						self.link(f, t, tag)
 
 	def save_as_file(self, filename, output_dir='doctest-output'):
 		dot = graphviz.Digraph(filename)

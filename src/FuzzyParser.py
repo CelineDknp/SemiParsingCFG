@@ -12,6 +12,7 @@ from Nodes.LabelNode import LabelNode
 from Nodes.Node import Node
 from AnchorHandler import AnchorHandler
 from Anchors.AnchorMatch import AnchorMatch
+from Anchors.ConditionAnchor import ConditionAnchor
 
 
 class FuzzyParser:
@@ -171,6 +172,11 @@ class FuzzyParser:
 			self.pos = start_index+1
 		elif anchor.get_effect() == "start_parse":
 			self.pos = self.len_next_match(anchor.get_pattern())
+		elif anchor.get_effect() == "special_case": #Special case to treat
+			if anchor.info == ConditionAnchor: #We have a double EVALUATE
+				node = MultipleBranchConditionNode(self.depth - 1, NODE_COND_BRANCH, '\sEVALUATE(\s)+')
+				self.pos = node.find_condition_double(self.input_str, self.pos)
+				lot.append(node)
 
 	def consume_loop(self, anchorMatched, lot):
 		anchor = anchorMatched.get_anchor()

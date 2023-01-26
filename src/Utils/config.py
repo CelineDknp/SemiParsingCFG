@@ -10,7 +10,7 @@ end: regex for the end of the condition
 """
 conditions = [
     {"start":r"\sIF(\s)+", "condition_delimiter":r"\sTHEN(\s)+", "mandatory_delimiter":False, "single_branch":r"ELSE\s", "end":r"\sEND-IF"}, 
-    {"start":r"\sEVALUATE(\s)+", "multiple_branch":r"\sWHEN", "end":r"\sEND-EVALUATE"}
+    {"start":r"\sEVALUATE(\s)+", "multiple_branch":r"\sWHEN", "end":r"\sEND-EVALUATE", "special_case":r"\sWHEN\s*.*\n\s+WHEN"}
 ]
 
 """Loops structures

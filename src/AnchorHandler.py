@@ -23,6 +23,8 @@ class AnchorHandler:
 	def anchors_creation(self):
 		for elem in conditions:
 			self.anchors.append(ConditionAnchor(elem))
+			if "special_case" in elem:
+				self.anchors.append(SpecialAnchor(elem, special_case=True, info=ConditionAnchor))
 		for elem in parsable:
 			self.anchors.append(Anchor(elem["start"], PARSABLE))
 		for elem in special:

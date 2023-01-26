@@ -143,6 +143,8 @@ class TraceEquivalence:
 					self.matched_transition_g1.append(t1)
 					self.matched_transition_g2.append(t2)
 					transition_found += 1
+					break #We found a match for the transition, no need to explore further !!! skip backtracking ???
+					#TODO: list like we do with the backtracks ? : opti
 				else:
 					if not self.backtracking:
 						t_m = TraceMatch(t1.label, node1, node2, t1.to, t2.to, match=False, other_label=t2.label)
