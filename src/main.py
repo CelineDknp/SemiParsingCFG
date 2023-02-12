@@ -131,6 +131,26 @@ def compare_graphs(filename1, filename2, draw_target="", draw=False):
 	else:
 		teq.compare(name1=filename1, name2=filename2)
 
+def compare_and_return(filename1, filename2, draw_target="", draw=False):
+	g1 = process_and_cleanup(filename1, label_clean=False)
+	print("G1 processed")
+	if draw and draw_target == "":
+		g1.save_as_file(os.path.basename(filename1+"V1"), output_dir='compare_tests')
+		print(f"G1 saved as file in {os.path.basename(filename1+'V1')}")
+	g2 = process_and_cleanup(filename2, label_clean=False)
+	print("G2 processed")
+	if draw and draw_target == "":
+		g2.save_as_file(os.path.basename(filename2+"V2"), output_dir='compare_tests')
+		print(f"G2 saved as file in {os.path.basename(filename2+'V2')}")
+	lst_g1 = LTSGraph()
+	lst_g1.import_graph(g1)
+	lst_g2 = LTSGraph()
+	lst_g2.import_graph(g2)
+	print("LTSs created !")
+	teq = TraceEquivalence(lst_g1, lst_g2)
+	teq.compare(name1=filename1, name2=filename2)
+	return lst_g1, lst_g2, teq
+
 
 def main(argv):
 	if len(argv) == 1:#manual example

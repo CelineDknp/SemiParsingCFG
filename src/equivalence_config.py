@@ -19,22 +19,24 @@ bool = "NOT "
 
 # Structure transformations
 struct = [("IF", "EVALUATE")]
+auto_cast_evaluate = True #Option to allow auto-cast of int to str in evaluate WHEN
 
 # Factorisation
 fact = {False: "OR", True: "AND"}  # Join with OR on true branch and with AND on false
 
 # Rematch after no match
-rematch = 0
+rematch = 5
+# Values: skip_right (skip one from the right graph) skip_left (skip one from the left right)
+# skip_both (try to skip one from the right and/or one from the left)
+rematch_mode = "skip_left"
 
 
 def try_simple_equivalence(str1, str2):
 	new_cond = ""
 	for tup in equiv:
 		if len(tup) == 2:
-			if tup[0] in str1:
-				new_cond = str2.replace(tup[1], tup[0])
-			elif tup[1] in str1:
-				new_cond = str2.replace(tup[0], tup[1])
+			if tup[1] in str1 and tup[0] in str2:
+				new_cond = str1.replace(tup[1], tup[0])
 			elif len(tup) == 3:  # We need to regex match
 				if search(tup[2], str1):
 					new_cond = str1.replace(tup[0], tup[1])
@@ -43,16 +45,19 @@ def try_simple_equivalence(str1, str2):
 				elif search(tup[2], str2):
 					new_cond = str2.replace(tup[0], tup[1])
 	if new_cond != "":
-		vadim_parsing = diff(new_cond, str1)
+		return diff(new_cond, str2)
 	else:
-		vadim_parsing = diff(str1, str2)
-	if vadim_parsing:
-		return True
-	if str1.count(bool) == 2: #We have two negation, remove them
-		str1 = str1.replace(bool, "").strip()
-	elif str2.count(bool) == 2:
-		str2 = str2.replace(bool, "").strip()
-	return str1 == str2
+		return diff(str1, str2)
+
+
+def cast_equivalence(str1, str2):
+	if "'" in str1:
+		other = str1.replace("'", "")
+		return other == str2
+	elif "'" in str2:
+		other = str2.replace("'", "")
+		return other == str1
+	return False
 
 
 def evaluate_equivalence(node_evaluate, node_if):
@@ -75,7 +80,7 @@ def evaluate_equivalence(node_evaluate, node_if):
 			matched = False
 			new_if = None
 			for t1 in node_if.get_transition():
-				if t1.label == cond or try_simple_equivalence(t1.label, cond):
+				if t1.label == cond or try_simple_equivalence(t1.label, cond) or (auto_cast_evaluate and cast_equivalence(t1.label, cond)):
 					matched = True
 					t_m = TraceMatch(t1.label, node_if, node_evaluate, t1.to, t2.to)
 					couples.append(t_m)
@@ -86,6 +91,8 @@ def evaluate_equivalence(node_evaluate, node_if):
 					new_if = t1.to
 			if matched:
 				if_matched.append(node_if)
+				if couples[-1].node1_to == new_if: #We are pointing to the next if, that won't do
+					couples.pop()
 				node_if = new_if
 			else:
 				return (None, None, all_transition)
@@ -117,7 +124,7 @@ def try_factorize(goal, node2):  # Try and factorize node 2 to node 1
 		for transition in next.get_transition():
 			curr_init = transition.to.initial_node
 			next_init = next.initial_node
-			if isinstance(curr_init, ConditionNode):
+			if isinstance(curr_init, SimpleBranchConditionNode):
 				if curr_init == next_init.true_child or curr_init == next_init.false_child:
 					fact_nodes.append(next)
 					next = transition.to

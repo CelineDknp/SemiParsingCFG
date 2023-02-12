@@ -44,6 +44,13 @@ class LTSGraph:
 	def get_size(self):
 		return len(self.all_states)
 
+	def get_matches(self):
+		res = 0 
+		for e in self.all_transitions:
+			if e.match == 1:
+				res += 1
+		return res
+
 	def get_link_size(self):
 		return len(self.all_transitions)
 
@@ -138,7 +145,8 @@ class LTSGraph:
 					elif isinstance(n, LabelLoopNode) and n.is_goback_node(): #Link perform to its label
 						if n.is_multiple_labels():
 							if isinstance(child, LabelNode) and child.get_label() == n.start_label():
-								tag = "PERFORM"  # Tag the in link
+								if not f.has_perform_transition():
+									tag = "PERFORM"  # Tag the in link
 								# Get the out link
 								out_label = n.label[-1] #Get the label of the out link
 								if out_label in graph.all_labels:
@@ -151,7 +159,8 @@ class LTSGraph:
 									next_label = self.all_labels[index + 1]  # Corner case with end Node !
 								else:
 									next_label = self.all_states[-1] #Link to last node (end)
-								self.link(next_label, f, "GOBACK")
+								if not f.has_goback_transition():
+									self.link(next_label, f, "GOBACK")
 								if len(n.get_childs()) == 1: #If we have one single child in the perform, we probaby point only to the label
 									self.link(f, t, "")
 

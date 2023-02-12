@@ -24,12 +24,28 @@ class LTSNode:
 		else:
 			return self.transition_in
 
+	def has_perform_transition(self):
+		for t in self.transition_out:
+			if t.get_label() == "PERFORM":
+				return True
+		return False
+
+	def has_goback_transition(self):
+		for t in self.transition_out:
+			if t.get_label() == "GOBACK":
+				return True
+		return False
+
 	def has_single_out(self, go_back_list=[]):
 		if len(self.transition_out) == 1:
 			return True
 		available_count = 0
+		if len(go_back_list) > 0:
+			last_perform = go_back_list[-1]  # Can we only goback to the last perform ?
+		else:
+			last_perform = None
 		for elem in self.transition_out:
-			if elem.label == "GOBACK" and elem.to in go_back_list:
+			if elem.label == "GOBACK" and elem.to == last_perform:
 				available_count += 1
 			elif elem.label != "GOBACK":
 				available_count += 1
@@ -39,8 +55,12 @@ class LTSNode:
 		if len(self.transition_out) == 1:
 			return self.transition_out[0]
 		else:
+			if len(go_back_list) > 0:
+				last_perform = go_back_list[-1]  # Can we only goback to the last perform ?
+			else:
+				last_perform = None
 			for elem in self.transition_out:
-				if elem.label == "GOBACK" and elem.to in go_back_list:
+				if elem.label == "GOBACK" and elem.to == last_perform:
 					return elem
 				elif elem.label != "GOBACK":
 					return elem
