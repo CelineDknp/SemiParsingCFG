@@ -229,9 +229,10 @@ class Graph:
 			grand_child.add_parent(target)
 		if old_child in self.all_nodes:
 			self.all_nodes.remove(old_child)
+		return old_child
 
 	def cleanup_triangle(self, current_node, new_child):
-		self.replace_child(current_node.get_parent()[0], current_node, new_child)
+		return self.replace_child(current_node.get_parent()[0], current_node, new_child)
 
 	def one_parent(self, node):
 		if len(node.get_parent()) == 0:
@@ -254,6 +255,7 @@ class Graph:
 			while len(start_node) != 0:
 				current_node = start_node[0]
 				visited.append(current_node)
+				deleted = []
 				if current_node.get_type() == NODE_CONTROL:
 					children = current_node.get_childs()
 					# print(f">>> Found control node ! len children: {len(children)} len grand_children: {len(children[0].get_childs())}")
@@ -263,17 +265,17 @@ class Graph:
 							cleaned = True
 						# We are dealing with a triangle (V1)
 						elif len(children[0].get_childs()) > 0 and children[1] == children[0].get_childs()[0]:
-							self.cleanup_triangle(current_node, children[1])
+							deleted.append(self.cleanup_triangle(current_node, children[1]))
 							cleaned = True
 						# We are dealing with a triangle (V2)
 						elif len(children[1].get_childs()) > 0 and children[0] == children[1].get_childs()[0]:
-							self.cleanup_triangle(current_node, children[0])
+							deleted.append(self.cleanup_triangle(current_node, children[0]))
 							cleaned = True
 					elif len(children) == 1:
 						# We are in a control node having a single child of a control node
 						parent_node = current_node.get_parent().copy()
 						for p in parent_node:
-							self.replace_child(p, current_node, children[0])
+							deleted.append(self.replace_child(p, current_node, children[0]))
 						if len(parent_node) > 0:
 							cleaned = True
 						elif current_node in self.all_nodes:
@@ -284,16 +286,19 @@ class Graph:
 						child_node = current_node.get_childs().copy()
 						if not any(isinstance(child, LabelLoopNode) for child in child_node):
 							for c in child_node:
-								self.replace_child(parents[0], current_node, c)
+								deleted.append(self.replace_child(parents[0], current_node, c))
 								cleaned = True
 
 				for child in current_node.get_childs().copy():  # Look at a node's childrens
 					if child.get_type() == NODE_CONTROL:  # When we find a control node
 						if len(child.get_childs()) == 1 and self.one_parent(child):  # Only one parent and one child
-							self.replace_child(current_node, child, child.get_childs()[0])
+							deleted.append(self.replace_child(current_node, child, child.get_childs()[0]))
 							cleaned = True
-
-				start_node.remove(current_node)
+				for e in deleted:
+					if e in start_node:
+						start_node.remove(e)
+				if current_node in start_node:
+					start_node.remove(current_node)
 
 	def fuse(self, node_up, node_down):
 		if node_down.get_type() == NODE_FUSED:

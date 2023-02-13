@@ -35,10 +35,13 @@ class Node:
 	def point_to_one(self):
 		return len(self.childs) == 1
 
+	def loops_to_visited_target(self, visited):
+		return False
+
 	def get_last_childs_helper(self, visited):
 		if self not in visited:
 			visited.append(self)
-		if len(self.get_childs()) == 0 or set(self.get_childs()).issubset(set(visited)):
+		if len(self.get_childs()) == 0 or self.loops_to_visited_target(visited):
 			return [self]
 		else:
 			return [child.get_last_childs_helper(visited) for child in self.get_childs() if child not in visited]
