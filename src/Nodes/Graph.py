@@ -262,11 +262,11 @@ class Graph:
 							current_node.remove_child(children[0])
 							cleaned = True
 						# We are dealing with a triangle (V1)
-						elif children[1] == children[0].get_childs()[0]:
+						elif len(children[0].get_childs()) > 0 and children[1] == children[0].get_childs()[0]:
 							self.cleanup_triangle(current_node, children[1])
 							cleaned = True
 						# We are dealing with a triangle (V2)
-						elif children[0] == children[1].get_childs()[0]:
+						elif len(children[1].get_childs()) > 0 and children[0] == children[1].get_childs()[0]:
 							self.cleanup_triangle(current_node, children[0])
 							cleaned = True
 					elif len(children) == 1:

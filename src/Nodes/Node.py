@@ -38,7 +38,7 @@ class Node:
 	def get_last_childs_helper(self, visited):
 		if self not in visited:
 			visited.append(self)
-		if len(self.get_childs()) == 0:
+		if len(self.get_childs()) == 0 or set(self.get_childs()).issubset(set(visited)):
 			return [self]
 		else:
 			return [child.get_last_childs_helper(visited) for child in self.get_childs() if child not in visited]
