@@ -112,14 +112,12 @@ class Graph:
 			self.open_control_loops.append(node)
 		elif node.is_block():
 			if node.is_close_node():#We must try to link it
-				if "block" in self.open_loops:
+				if "block" in self.open_loops and len(self.open_loops["block"]) > 0:
 					prev_block = self.open_loops["block"][-1]
 					node.add_child(prev_block)
 					node.set_target(prev_block)
 					prev_block.set_target(node)
 					self.open_loops["block"].remove(prev_block)
-				else:
-					a=0
 			elif "block" not in self.open_loops.keys():
 				self.open_loops["block"] = [node]
 			else:

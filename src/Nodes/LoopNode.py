@@ -9,6 +9,9 @@ class LoopNode(Node):
 		super().__init__(depth, node_type, anchor.get_regex())
 		self.go_back = anchor.is_goback_anchor()
 
+	def is_go_to(self):
+		return not self.is_goback_node()
+
 	def __str__(self):
 		#return f"Node {self.type} (simple) to {self.label}"
 		if self.is_goback_node():

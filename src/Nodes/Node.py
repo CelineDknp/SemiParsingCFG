@@ -1,5 +1,6 @@
 class Node:
 	id = 0
+
 	def __init__(self, depth, type, regex=None):
 		self.depth = depth
 		self.type = type
@@ -32,6 +33,9 @@ class Node:
 	def is_goback_node(self):
 		return False
 
+	def is_go_to(self):
+		return False
+
 	def point_to_one(self):
 		return len(self.childs) == 1
 
@@ -41,10 +45,12 @@ class Node:
 	def get_last_childs_helper(self, visited):
 		if self not in visited:
 			visited.append(self)
+		if len(visited) > 150:
+			a=5
 		if len(self.get_childs()) == 0 or self.loops_to_visited_target(visited):
 			return [self]
 		else:
-			return [child.get_last_childs_helper(visited) for child in self.get_childs() if child not in visited]
+			return [child.get_last_childs_helper(visited) for child in self.get_childs() if child not in visited and not child.is_go_to()]
 
 
 	def get_last_childs(self):
