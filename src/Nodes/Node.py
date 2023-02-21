@@ -42,13 +42,16 @@ class Node:
 	def loops_to_visited_target(self, visited):
 		return False
 
+	def get_childs_h(self):
+		return self.get_childs()
+
 	def get_last_childs_helper(self, visited):
 		if self not in visited:
 			visited.append(self)
 		if len(self.get_childs()) == 0 or self.loops_to_visited_target(visited):
 			return [self]
 		else:
-			return [child.get_last_childs_helper(visited) for child in self.get_childs() if child not in visited and not child.is_go_to()]
+			return [child.get_last_childs_helper(visited) for child in self.get_childs_h() if child not in visited and not child.is_go_to()]
 
 
 	def get_last_childs(self):

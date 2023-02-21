@@ -51,15 +51,22 @@ class FuzzyParser:
 			match = next(iter, None)
 			if match:
 				elem = self.get_anchorMatch(match, val)
+				current_match = self.input_str[self.pos+elem.get_start_index()-1:self.pos+elem.get_start_index()+len(elem.get_actual_match())+1]
 			while match is not None and elem is not None:
-				if elem.get_anchor().get_type() == IGNORE:
-					self.all_ignore.append(elem)
+				if len(current_match) == 3:
+					bug = re.search("\d*\.\d*", current_match)
 				else:
+					bug = False
+				if elem.get_anchor().get_type() == IGNORE and not bug:
+					self.all_ignore.append(elem)
+				elif not bug:
 					self.all_matches.append(elem)
 				self.pos = elem.get_start_index() + len(elem.get_actual_match())
 				match = next(iter, None)
 				if match is not None:
 					elem = self.get_anchorMatch(match, val)
+					current_match = self.input_str[self.start_pos + elem.get_start_index() - 1:self.start_pos + elem.get_start_index() + len(elem.get_actual_match()) + 1]
+
 		self.all_matches.sort() #Sort all the matches in order
 		self.all_ignore.sort()
 		self.pos = self.start_pos
@@ -71,7 +78,7 @@ class FuzzyParser:
 			start_ignore, end_ignore = elem.get_start_end()
 			if end_ignore < start_match: #If we found something that ends before our match starts
 				to_remove.append(elem) #Remove it
-			elif start_ignore < start_match: #We have an overlap
+			elif start_ignore < start_match and end_ignore > start_match: #We have an overlap
 				return True
 		for elem in to_remove:
 			self.all_ignore.remove(elem)

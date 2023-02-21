@@ -40,6 +40,13 @@ class BlockLoopNode(LoopNode):
 	def get_target(self):
 		return self.target_node
 
+	def get_childs_h(self):
+		res = []
+		for c in self.get_childs():
+			if c != self.get_target():
+				res.append(c)
+		return res
+
 	def loops_to_visited_target(self, visited):
 		# I am a close node, my target is my only child and it was visited already
 		return self.is_close_node() and self.get_target() in visited and len(self.get_childs()) == 1
