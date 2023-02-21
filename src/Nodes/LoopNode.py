@@ -10,7 +10,7 @@ class LoopNode(Node):
 		self.go_back = anchor.is_goback_anchor()
 
 	def is_go_to(self):
-		return not self.is_goback_node() or not self.is_control()
+		return not self.is_goback_node()
 
 	def __str__(self):
 		#return f"Node {self.type} (simple) to {self.label}"
