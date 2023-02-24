@@ -1,4 +1,5 @@
 from .LoopNode import LoopNode
+from .LabelNode import LabelNode
 from Anchors import LoopAnchor
 from Utils.config import *
 
@@ -28,6 +29,20 @@ class LabelLoopNode(LoopNode):
 			if node in self.childs: #If the node was already a child, add it again
 				self.childs.append(node)
 		super().add_child(node)
+
+	def find_label_child(self):
+		for c in self.get_childs():
+			if isinstance(c, LabelNode) and c.get_label() == self.label:
+				self.label_child = c
+				break
+
+	def get_childs_h(self):
+		self.find_label_child()
+		res = []
+		for c in self.get_childs():
+			if c != self.label_child:
+				res.append(c)
+		return res
 
 	def get_label_child(self):
 		return self.label_child

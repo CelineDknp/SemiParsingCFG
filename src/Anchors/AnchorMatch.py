@@ -2,11 +2,12 @@ from Utils.config import *
 
 
 class AnchorMatch:
-	def __init__(self, val, regex, match, anchor):
+	def __init__(self, val, regex, match, anchor, temp_match=""):
 		self.input_start_index = val
 		self.regex_matched = regex
 		self.actual_match = match
 		self.anchor_matched = anchor
+		self.temp_match = temp_match
 
 	def __lt__(self, other):
 		if self.get_start_index() == other.get_start_index():

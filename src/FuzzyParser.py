@@ -42,30 +42,25 @@ class FuzzyParser:
 			self.anchorHandler.remove_anchor(anchor)
 
 	def get_anchorMatch(self, match, val):
-		return AnchorMatch(self.input_str.find(match.group(0), self.pos), val, match.group(0), self.anchorHandler.get_anchor(val))
+		start = self.start_pos+match.start(0)
+		return AnchorMatch(start, val, match.group(0), self.anchorHandler.get_anchor(val), temp_match = match.string[match.start(0)-40:match.end(0)+40])
 
 	def next_pos_init(self):
 		for val in self.anchorHandler.get_anchors():
-			self.pos = self.start_pos
-			iter = val.finditer(self.input_str[self.pos:])
+			iter = val.finditer(self.input_str[self.start_pos:])
 			match = next(iter, None)
 			if match:
 				elem = self.get_anchorMatch(match, val)
-				current_match = self.input_str[self.pos+elem.get_start_index()-1:self.pos+elem.get_start_index()+len(elem.get_actual_match())+1]
+				#current_match =
 			while match is not None and elem is not None:
-				if len(current_match) == 3:
-					bug = re.search("\d*\.\d*", current_match)
-				else:
-					bug = False
-				if elem.get_anchor().get_type() == IGNORE and not bug:
+				if elem.get_anchor().get_type() == IGNORE:
 					self.all_ignore.append(elem)
-				elif not bug:
+				else:
 					self.all_matches.append(elem)
-				self.pos = elem.get_start_index() + len(elem.get_actual_match())
 				match = next(iter, None)
 				if match is not None:
 					elem = self.get_anchorMatch(match, val)
-					current_match = self.input_str[self.start_pos + elem.get_start_index() - 1:self.start_pos + elem.get_start_index() + len(elem.get_actual_match()) + 1]
+					#current_match = match.string[match.start(0)-10:match.end(0)+10]
 
 		self.all_matches.sort() #Sort all the matches in order
 		self.all_ignore.sort()

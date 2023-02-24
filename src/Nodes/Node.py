@@ -50,6 +50,8 @@ class Node:
 			visited.append(self)
 		if len(self.get_childs()) == 0 or self.loops_to_visited_target(visited):
 			return [self]
+		elif self.is_go_to():
+			return []
 		else:
 			return [child.get_last_childs_helper(visited) for child in self.get_childs_h() if child not in visited and not child.is_go_to()]
 
