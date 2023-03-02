@@ -53,6 +53,10 @@ class Node:
 		elif self.is_go_to():
 			return []
 		else:
+			#res = []
+			#for child in self.get_childs_h():
+			#	if child not in visited and not child.is_go_to():
+			#		res.append(child.get_last_childs_helper(visited))
 			return [child.get_last_childs_helper(visited) for child in self.get_childs_h() if child not in visited and not child.is_go_to()]
 
 

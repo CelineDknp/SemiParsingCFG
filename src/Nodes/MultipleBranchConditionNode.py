@@ -150,7 +150,8 @@ class MultipleBranchConditionNode(ConditionNode):
 
     def close(self, control_node): #Function to close an IF node
         for child in self.get_childs():
-            for sub_child in flatten(child.get_last_childs()):
+            test = flatten(child.get_last_childs())
+            for sub_child in test:
                 sub_child.add_child(control_node)
         self.closed = True
         self.current_child = []

@@ -41,6 +41,8 @@ class BlockLoopNode(LoopNode):
 		return self.target_node
 
 	def get_childs_h(self):
+		if len(self.get_childs()) == 1:
+			return self.get_childs()
 		res = []
 		for c in self.get_childs():
 			if c != self.get_target():

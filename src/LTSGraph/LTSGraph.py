@@ -133,12 +133,13 @@ class LTSGraph:
 							elif n.is_close_node() and child == n.get_target():
 								tag = "NOT (" + n.get_target().get_condition_str() + ")"
 							elif not n.is_close_node():
-								if len(n.get_childs()) == 1 and n.get_childs()[0] == n.get_target():  # We have an empty perform
+								target = n.get_target()
+								if len(n.get_childs()) == 1 and n.get_childs()[0] == target:  # We have an empty perform
 									t = f
-									end = self.corr[n.get_target()]
+									end = self.corr[target]
 									self.link(f, end, n.get_condition_str())  # Add link to end_perform
 								else:
-									end = self.corr[n.get_target().get_non_target_child()]
+									end = self.corr[target.get_non_target_child()]
 									self.link(f, end, n.get_condition_str())  # Add link to end_perform
 								tag = "NOT (" + n.condition_str + ")"  # Loop link
 
