@@ -1,4 +1,5 @@
 from .LabelLoopNode import LabelLoopNode
+from .LabelNode import LabelNode
 from Anchors import LoopAnchor
 
 
@@ -31,6 +32,12 @@ class MultipleLabelLoopNode(LabelLoopNode):
 
 	def is_label(self):
 		return True
+
+	def find_label_child(self):
+		for c in self.get_childs():
+			if isinstance(c, LabelNode) and c.get_label() in self.label:
+				self.label_child = c
+				break
 
 	def is_complete(self):
 		if self.go_back:

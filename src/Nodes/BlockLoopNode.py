@@ -1,4 +1,5 @@
 from .LoopNode import LoopNode
+from .LabelNode import LabelNode
 from Anchors import LoopAnchor
 from Utils.config import *
 from Utils.utils import *
@@ -41,6 +42,8 @@ class BlockLoopNode(LoopNode):
 		return self.target_node
 
 	def get_childs_h(self):
+		if len(self.get_childs()) == 1 and not isinstance(self.childs[0], LabelNode):
+			return self.get_childs()
 		res = []
 		for c in self.get_childs():
 			if c != self.get_target():
