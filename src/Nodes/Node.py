@@ -48,8 +48,6 @@ class Node:
 	def get_last_childs_helper(self, visited):
 		if self not in visited:
 			visited.append(self)
-		if len(visited) > 250:
-			a=0
 		if len(self.get_childs()) == 0 or self.loops_to_visited_target(visited):
 			return [self]
 		elif self.is_go_to():
