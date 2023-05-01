@@ -27,18 +27,30 @@ class MultipleBranchConditionNode(ConditionNode):
         return result
 
     def find_condition_double(self, input, pos):
-        input_n = input[pos:]
-        when1 = input[pos:].find("WHEN")
-        new_pos = pos+when1
-        end1 = input[new_pos:].find("\n")
-        str1 = input[new_pos+4:new_pos+end1]
-        new_pos += len(str1)
-        when2 = input[new_pos:].find("WHEN")
-        new_pos += when2
-        end2 = input[new_pos:].find("\n")
-        str2 = input[new_pos+4:new_pos+end2]
-        self.condition = str1.strip()+" OR "+str2.strip()
-        return new_pos + len(str2)
+        self.condition = ""
+        first = True
+        go = True
+        tot_end = input[pos:].find("END-EVALUATE")
+        init_str = input[pos:pos+50]
+        while go:
+            go = False
+            when = input[pos:].find("WHEN")
+            next_end = input[pos:].find("\n")
+            real_end = (input[pos+next_end+1:].find("\n"))+next_end+1
+            if (when < tot_end and when < real_end) or first:
+                if first:
+                    first = False
+                new_pos = pos+when
+                end = input[new_pos:].find("\n")
+                str = input[new_pos+4:new_pos+end]
+                new_pos += len(str)
+                pos = new_pos
+                if len(self.condition) > 0:
+                    self.condition += " OR "+ str.strip()
+                else:
+                    self.condition = str.strip()
+                go = True
+        return pos
 
     def get_str_code(self):
         if self.type == NODE_COND_START:

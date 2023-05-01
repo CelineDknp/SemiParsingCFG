@@ -1,12 +1,14 @@
 class TraceMatch:
 
-	def __init__(self, followed_label, node1_f, node2_f, node1_t, node2_t, match=True, other_label=None):
+	def __init__(self, followed_label, node1_f, node2_f, node1_t, node2_t, perform_g1, perform_g2, match=True, other_label=None):
 		self.followed_label = followed_label
 		self.node1_from = node1_f
 		self.node1_to = node1_t
 		self.node2_from = node2_f
 		self.node2_to = node2_t
 		self.match = match
+		self.perform_g1 = perform_g1.copy()
+		self.perform_g2 = perform_g2.copy()
 		if other_label is None:
 			self.other_label = followed_label
 		else:
@@ -38,6 +40,12 @@ class TraceMatch:
 	def node2(self):
 		return self.node2_to
 
+	def node1_f(self):
+		return self.node1_from
+
+	def node2_f(self):
+		return self.node2_from
+
 	def was_match(self):
 		return self.match
 
@@ -52,3 +60,7 @@ class TraceMatch:
 
 	def followed_perform_node2(self):
 		return self.other_label == "PERFORM"
+
+	def __eq__(self, other):
+		nodes = (self.node1() == other.node1() and self.node2() == other.node2() and self.node1_f() == other.node1_f() and self.node2_f() == other.node2_f()) or (self.node1() == other.node2() and self.node2() == other.node1() and self.node1_f() == other.node2_f() and self.node2_f() == other.node1_f())
+		return nodes and self.perform_g1 == other.perform_g1 and self.perform_g2 == other.perform_g2

@@ -27,6 +27,15 @@ class Graph:
 	def get_last_node(self):
 		return self.all_nodes[-1]
 
+	def get_size(self):
+		return len(self.all_nodes)
+
+	def get_link_size(self):
+		total = 0
+		for e in self.all_nodes:
+			total += len(e.childs)
+		return total
+
 	def match_if(self, branch_node):
 		res = None
 		# print(f"Searching corr node for: {branch_node}")

@@ -167,14 +167,15 @@ class LTSGraph:
 
 						else:
 							if isinstance(child, LabelNode) and child.get_label() == n.go_back_label():
-								tag = "PERFORM" #Tag the in link
-								#Get the out link
-								index = self.all_labels.index(t)
-								if index < len(self.all_labels)-1:
-									next_label = self.all_labels[index + 1]  # Corner case with end Node !
-								else:
-									next_label = self.all_states[-1] #Link to last node (end)
-								self.link(next_label, f, "GOBACK")
+								if len(f.get_transition(out=True)) < 1:
+									tag = "PERFORM" #Tag the in link
+									#Get the out link
+									index = self.all_labels.index(t)
+									if index < len(self.all_labels)-1:
+										next_label = self.all_labels[index + 1]  # Corner case with end Node !
+									else:
+										next_label = self.all_states[-1] #Link to last node (end)
+									self.link(next_label, f, "GOBACK")
 					elif isinstance(n, LabelNode) and isinstance(child, MultipleLabelLoopNode) and n.get_label() == child.go_back_label():  # Pointing towards perform, ignore link
 						cancel_link = True
 					if not cancel_link:
