@@ -25,10 +25,11 @@ auto_cast_evaluate = True #Option to allow auto-cast of int to str in evaluate W
 fact = {False: "OR", True: "AND"}  # Join with OR on true branch and with AND on false
 
 # Rematch after no match
-rematch = 0
+rematch = 20
 # Values: skip_right (skip one from the right graph) skip_left (skip one from the left right)
 # skip_both (try to skip one from the right and/or one from the left)
 rematch_mode = "skip_left"
+rematch_type = 3 #All rematches
 
 
 def try_simple_equivalence(str1, str2):
@@ -60,7 +61,7 @@ def cast_equivalence(str1, str2):
 	return False
 
 
-def evaluate_equivalence(node_evaluate, node_if):
+def evaluate_equivalence(node_evaluate, node_if, perform_g1, perform_g2):
 	var = node_evaluate.initial_node.condition  # Var on which we do the evaluate
 	if_matched = []
 	couples = []
@@ -68,7 +69,7 @@ def evaluate_equivalence(node_evaluate, node_if):
 	new_if = None
 	for t2 in node_evaluate.get_transition():
 		if t2.label == "OTHER":  # End of matching the EVALUATE
-			t_m = TraceMatch(t2.label, if_matched[-1], node_evaluate, node_if, t2.to) #Last match between last if and exit of evaluate
+			t_m = TraceMatch(t2.label, if_matched[-1], node_evaluate, node_if, t2.to, perform_g1, perform_g2) #Last match between last if and exit of evaluate
 			couples.append(t_m)
 			all_transition.append(t2)
 			return if_matched, couples, all_transition
@@ -82,7 +83,7 @@ def evaluate_equivalence(node_evaluate, node_if):
 			for t1 in node_if.get_transition():
 				if t1.label == cond or try_simple_equivalence(t1.label, cond) or (auto_cast_evaluate and cast_equivalence(t1.label, cond)):
 					matched = True
-					t_m = TraceMatch(t1.label, node_if, node_evaluate, t1.to, t2.to)
+					t_m = TraceMatch(t1.label, node_if, node_evaluate, t1.to, t2.to, perform_g1, perform_g2)
 					couples.append(t_m)
 					all_transition.append(t1)
 					all_transition.append(t2)
@@ -99,14 +100,14 @@ def evaluate_equivalence(node_evaluate, node_if):
 	return (None, None, all_transition)
 
 
-def try_transformations(node1, node2):
+def try_transformations(node1, node2, perform_g1, perform_g2):
 	str1 = node1.initial_node.get_str_code()
 	str2 = node2.initial_node.get_str_code()
 	for tup in struct:
 		if tup[1] in str1:
-			return evaluate_equivalence(node1, node2), False
+			return evaluate_equivalence(node1, node2, perform_g1, perform_g2), False
 		if tup[1] in str2:
-			return evaluate_equivalence(node2, node1), True
+			return evaluate_equivalence(node2, node1, perform_g1, perform_g2), True
 	return (None, None, None), True
 
 

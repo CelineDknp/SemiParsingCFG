@@ -3,13 +3,13 @@ class LTSTransition:
 		self.fr = fr
 		self.to = to
 		self.label = label
-		self.match = -1
+		self.match = -2
 
 	def get_label(self):
 		return self.label
 
 	def set_match(self, value):
-		self.match = value # 1 = sure match 0 = unsure and -1 = unmatch
+		self.match = value # 1 = sure match 0 = unsure, -1 = unmatch, -2 = unexplored
 
 	def __str__(self):
 		return f"Transition '{self.label}' {self.fr.__repr__()} -> {self.to.__repr__()} [{self.match}]"

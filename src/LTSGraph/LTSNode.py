@@ -1,3 +1,4 @@
+from Nodes.LabelLoopNode import LabelLoopNode
 class LTSNode:
 	id = 0
 	def __init__(self):
@@ -39,6 +40,8 @@ class LTSNode:
 	def has_single_out(self, go_back_list=[]):
 		if len(self.transition_out) == 1:
 			return True
+		if isinstance(self.initial_node, LabelLoopNode):
+			return True #BlockLoopNodes always have one available out link
 		available_count = 0
 		if len(go_back_list) > 0:
 			last_perform = go_back_list[-1]  # Can we only goback to the last perform ?
@@ -51,10 +54,15 @@ class LTSNode:
 				available_count += 1
 		return available_count == 1
 
-	def get_single_transition(self, go_back_list=[]):
+	def get_single_transition(self, go_back_list=[], all_performs = []):
 		if len(self.transition_out) == 1:
 			return self.transition_out[0]
 		else:
+			if isinstance(self.initial_node, LabelLoopNode):
+				if self in all_performs:
+					return self.transition_out[1]
+				else:
+					return self.transition_out[0]
 			if len(go_back_list) > 0:
 				last_perform = go_back_list[-1]  # Can we only goback to the last perform ?
 			else:

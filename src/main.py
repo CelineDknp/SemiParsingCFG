@@ -104,6 +104,12 @@ def process_and_create_lts(filename):
 	#lts.save_as_file(filename) was used to debug
 	return lts
 
+def process_and_create_cfg_lts(filename):
+	g = process_and_cleanup(filename)
+	lts = LTSGraph()
+	lts.import_graph(g)
+	return g, lts
+
 
 def compare_graphs(filename1, filename2, draw_target="", draw=False):
 	g1 = process_and_cleanup(filename1, label_clean=False)

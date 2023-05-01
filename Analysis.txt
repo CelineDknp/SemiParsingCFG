@@ -1,0 +1,231 @@
+Analysis:
+1. DABP120.COB
+	1.0: Sizes
+		V1: 51 nodes/55 links 175 LOC
+		V2: 18 nodes/22 links 121 LOC
+	1.1 No error-recovery
+		Detected trace equivalent
+	1.2 Error-recovery
+		Unapplicable
+
+2. RTRU008.COB
+	1.0 Sizes
+		V1: 40 nodes/46 links 126 LOC
+		V2: 14 nodes/23 links 75 LOC
+	1.1 No error-recovery
+		IF WW00-SMF-ID = 'K2RC' OR WW00-SMF-ID = 'K2QU' OR WW00-SMF-ID = 'K2PR' OR WW00-SMF-ID = 'WW6D' OR WW00-SMF-ID = 'WW6R' OR WW00-SMF-ID = 'WREX' OR WW00-SMF-ID = 'WHF1' OR WW00-SMF-ID = 'WHF2' OR WW00-SMF-ID = 'W6P1' OR WW00-SMF-ID = 'W6P2'
+		IF WW00-SMF-ID = 'K2PR' OR 'K2QU' OR 'K2RC' OR 'W6P1' OR 'W6P2' OR 'WHF1' OR 'WHF2' OR 'WREX' OR 'WW6D' OR 'WW6R'
+		-> Not detected because order of conditions was altered
+	1.2 Error-recovery
+		Detected as equivalent by skipping both IFs
+
+3. RTCU065.COB
+	1.0 Sizes
+		V1: 101 nodes/117 links 207 LOC
+		V2: 25 nodes/43 links 113 LOC
+	1.1 No error-recovery
+		Almost everything matches, nothing to report except detached node END
+	1.2 Error-recovery
+		Same ?
+
+4. SETU900.COB
+	1.0 Size
+		V1: 83 nodes/95 links 239 LOC
+		V2: 25 nodes/37 links 124 LOC
+	1.1 No error-recovery
+		Not everything looks to have been explored but is declared equivalent
+	1.2 Error-recovery
+		Unapplicatble
+
+5. PRCP720.COB
+	1.0 Size
+		V1: 27 nodes/35 links 220 LOC
+		V2: 7 nodes/10 links 81 LOC
+	1.1 No error-recovery
+		Not equivalent BC added IF
+	1.2 Error-recovery
+		Detected equivalent by skipping IF
+
+
+1. AMPP423.COB
+	1.0 Size
+		V1: 920 nodes
+		V2: 
+	1.1 No error-recovery
+		Cannot match if
+	1.2 20 Error-recovery
+		Still no match but further
+
+2. NOAVK21.COB
+	1.0 Size
+		V1: 144 nodes
+		V2: 47 nodes
+	1.1 No error-recovery
+		If not factorized bc of next sentence in between
+	1.2 20 Error-recovery
+		We do skip 20 nodes but there is so much going on
+	
+3. ALCB581.COB
+	1.0 Size
+		884
+		320
+	1.1 No error-recovery
+		One condition was dropped, check with Raincode ?
+	1.2 20 Error-recovery
+		Backtrack goes further
+
+4. OFCS309.COB
+	1.0 Size
+		606
+		171
+	1.1 No error-recovery
+		Lots of first condition in after (more than before ?)
+	1.2 20 Error-recovery
+		Not helpful, still lots of changes
+	
+5. LITU011.COB
+	1.0 Size
+		543
+		174
+	1.1 No error-recovery
+		Evaluate True not matching -> Stupid IF condition with duplicated stuff
+	1.2 20 Error-recovery
+		Now detected equivalent
+
+1. RTCC107.COB
+	1.0 Size
+	506
+	139
+	1.1 No error-recovery
+	Clearly if will be removed
+	1.2 20 Error-recovery
+	Fixed the first issue, failed the other
+
+2. NOAVN37.COB
+	1.0 Size
+	153
+	58
+	1.1 No error-recovery
+	Probably another if fact issue
+	1.2 20 Error-recovery
+	Almost fully equivalent, managed the fact
+
+3. PRCS060.COB
+	1.0 Size
+	905
+	344
+	1.1 No error-recovery
+	Different IFs
+	1.2 20 Error-recovery
+	Backtrack didn't manage
+
+4. PRCB050.COB
+	1.0 Size
+	838
+	334
+	1.1 No error-recovery
+	Probably if removed
+	1.2 20 Error-recovery
+	Backtrack didn't manage
+
+5. ALCB661.COB
+	1.0 Size
+	225
+	81
+	1.1 No error-recovery
+	Different IFs
+	1.2 20 Error-recovery
+	Further but not fully
+
+1. LITVA38.COB
+	1.0 Size
+	208
+	113
+	1.1 No error-recovery
+	If fact again
+	1.2 20 Error-recovery
+	Two sucesses
+
+2. HSPB035.COB
+	1.0 Size
+	553
+	161
+	1.1 No error-recovery
+	Seems to be almost there, if/eval
+	1.2 20 Error-recovery
+	Not helpful
+
+3. DABP423.COB
+	1.0 Size
+	625
+	206
+	1.1 No error-recovery
+	Var rename ?
+	1.2 20 Error-recovery
+	Backtrack helped a lot
+
+4. LITP165.COB
+	1.0 Size
+	256
+	69
+	1.1 No error-recovery
+	Diff if
+	1.2 20 Error-recovery
+	Trace equiv !
+
+5. NOAP413.COB
+	1.0 Size
+	293
+	46
+	1.1 No error-recovery
+	Rename again ?
+	1.2 20 Error-recovery
+	Mix of rename and if fact
+
+1. OFCB225.COB
+	1.0 Size
+	310
+	108
+	1.1 No error-recovery
+	If instead of sql
+	1.2 20 Error-recovery
+	Backtrack not helpful
+
+2. PRCB445.COB
+	1.0 Size
+	237
+	97
+	1.1 No error-recovery
+	Var rename again ?
+	1.2 20 Error-recovery
+	Wut ?
+	
+3. SDFS002.COB
+	1.0 Size
+	652
+	220
+	1.1 No error-recovery
+	Very different ifs
+	1.2 20 Error-recovery
+	backtrack not helpful
+	
+4. DABP217.COB
+	1.0 Size
+	197
+	59
+	1.1 No error-recovery
+	Trace equivalent
+	1.2 20 Error-recovery
+	
+5. PRCP052.COB
+	1.0 Size
+	27
+	7
+	1.1 No error-recovery
+	Almost but not END
+	1.2 20 Error-recovery
+	Trace equivalent
+
+	
+
+
