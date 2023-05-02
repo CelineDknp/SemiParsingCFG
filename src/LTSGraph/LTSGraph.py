@@ -51,6 +51,13 @@ class LTSGraph:
 				res += 1
 		return res
 
+	def get_unsure(self):
+		res = 0 
+		for e in self.all_transitions:
+			if e.match == 0:
+				res += 1
+		return res
+
 	def get_link_size(self):
 		return len(self.all_transitions)
 

@@ -19,11 +19,11 @@ def calculate_metrics(directory, output_file):
 					sizeV1 = len(f1.readlines())
 				with open(fileV2) as f2:
 					sizeV2 = len(f2.readlines())
-				
-				ltsV1, ltsV2, teq = compare_and_return(fileV1, fileV2)
-				f.write(f"{file} ; {sizeV1} ; {sizeV2} ; {ltsV1.get_link_size()} ; {ltsV2.get_link_size()}; {teq.is_equivalent()};{len(teq.matched_transition_g1)} ; {len(teq.matched_transition_g2)} ; {ltsV1.get_matches()}; {ltsV2.get_matches()}\n")
-				
-				#	f.write(f"{file} ; {sizeV1} ; {sizeV2} ; ERROR; ERROR; ERROR; ERROR; ERROR; ERROR; ERROR\n")
+				try:
+					ltsV1, ltsV2, teq = compare_and_return(fileV1, fileV2)
+					f.write(f"{file} ; {sizeV1} ; {sizeV2} ; {ltsV1.get_link_size()} ; {ltsV2.get_link_size()}; {teq.is_equivalent()};{len(teq.matched_transition_g1)} ; {len(teq.matched_transition_g2)} ; {ltsV1.get_matches()}; {ltsV2.get_matches()};  {ltsV1.get_unsure()}; {ltsV2.get_unsure()}\n")
+				except:
+					f.write(f"{file} ; {sizeV1} ; {sizeV2} ; ERROR; ERROR; ERROR; ERROR; ERROR; ERROR; ERROR; ERROR; ERROR\n")
 
 
 def main(argv):
@@ -33,7 +33,7 @@ def main(argv):
 	else: #More options were given
 		sys.setrecursionlimit(10000)
 		f = open(argv[2], "w")
-		f.write("filename; file size V1; file size V2; LTS size V1; LTS size V2; Equivalent ?; Explored V1 ; Explored V2 ; matches V1; matches V2\n")
+		f.write("filename; file size V1; file size V2; LTS size V1; LTS size V2; Equivalent; Explored V1 ; Explored V2 ; matches V1; matches V2; skipped V1; skipped V2\n")
 		f.close()
 		calculate_metrics(argv[1], argv[2])
 
