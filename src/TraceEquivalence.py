@@ -11,6 +11,8 @@ class TraceEquivalence:
 	def __init__(self, g1, g2):
 		self.g1 = g1
 		self.g2 = g2
+		self.bag_g1 = set()
+		self.bag_g2 = set()
 		self.all_paths_g1 = []
 		self.all_paths_g2 = []
 		self.current_path_g1 = []
@@ -57,8 +59,13 @@ class TraceEquivalence:
 	def mark_transition(self, transition):
 		if self.g1.has_node(transition.fr) and transition not in self.matched_transition_g1:
 			self.matched_transition_g1.append(transition)
-		elif transition not in self.matched_transition_g2:
+		elif self.g2.has_node(transition.fr) and transition not in self.matched_transition_g2:
 			self.matched_transition_g2.append(transition)
+		#Else, already matched transition
+
+	def mark_group_match(self, node1, node2):
+		node1.group_match(node2)
+		node2.group_match(node1)
 
 	def mark_and_move(self, node, transition, force_match=False):
 		if not self.backtracking or force_match:
@@ -87,16 +94,19 @@ class TraceEquivalence:
 			if t is not None:
 				keep_walking = True
 				new_node1 = self.mark_and_move(node1, t)
+				self.bag_g1.add(node1)
 		if len(self.performs_G2) > 0:
 			t = self.relevant_goback(node2, self.performs_G2)
 			if t is not None:
 				keep_walking = True
 				new_node2 = self.mark_and_move(node2, t)
+				self.bag_g2.add(node2)
 		if new_node1 is None and node1.has_single_out(self.performs_G1):  # A single transition out will be ignored (TODO: check)
 			node1_t = node1.get_single_transition(self.performs_G1, self.temp_performs_G1)
 			if node1_t.get_label() == ignore or node1_t.get_label() == perform:
 				keep_walking = True
 				new_node1 = self.mark_and_move(node1, node1_t)
+				self.bag_g1.add(node1)
 				if node1_t.get_label() == perform and node1 not in self.temp_performs_G1:
 					self.performs_G1.append(node1)
 					self.temp_performs_G1.append(node1)
@@ -105,6 +115,7 @@ class TraceEquivalence:
 			if node2_t.get_label() == ignore or node2_t.get_label() == perform:
 				keep_walking = True
 				new_node2 = self.mark_and_move(node2, node2_t)
+				self.bag_g2.add(node2)
 				if node2_t.get_label() == perform and node2 not in self.temp_performs_G2:
 					self.performs_G2.append(node2)
 					self.temp_performs_G2.append(node2)
@@ -148,6 +159,7 @@ class TraceEquivalence:
 					else:
 						t1.set_match(1) #Perfect match
 						t2.set_match(1)
+						self.mark_group_match(node1, node2)
 					if t2.label == perform: #If we are following a double perform, take node
 						t_m = TraceMatch(t1.label, node1, node2, t1.to, t2.to, self.performs_G1, self.performs_G2, other_label = t2.label)
 					else:
@@ -173,8 +185,12 @@ class TraceEquivalence:
 			self.mark_as_visited(array)
 			if was_node_2:
 				self.mark_as_visited([node2])
+				for e in array:
+					self.mark_group_match(node2, e)
 			else:
 				self.mark_as_visited([node1])
+				for e in array:
+					self.mark_group_match(node1, e)
 			for t in transitions_to_match:
 				self.mark_transition(t)
 				t.set_match(1)
@@ -218,6 +234,10 @@ class TraceEquivalence:
 					self.mark_all_transition_as_matched(node2)
 					for n in fact_nodes:
 						self.mark_all_transition_as_matched(n)
+						if cond == node1.initial_node.condition:
+							self.mark_group_match(node1, n)
+						else:
+							self.mark_group_match(node2, n)
 					if self.backtracking:
 						self.valid_backtrack()
 					if t1.label == cond or try_simple_equivalence(t1.label, cond):
@@ -410,7 +430,14 @@ class TraceEquivalence:
 			keep_walking, new_trace_match = self.consume_internal_transitions(trace_match)
 			if keep_walking:
 				self.walk(new_trace_match)
-			elif len(node1.get_transition()) == len(node2.get_transition()) == 0 or (node1.get_tag() == "END" and node2.get_tag()=="END"): #Try and stop at the end
+			else:
+				for n in self.bag_g1:
+					n.group_match_set(self.bag_g2)
+				for n in self.bag_g2:
+					n.group_match_set(self.bag_g1)
+				self.bag_g1 = set()
+				self.bag_g2 = set()
+			if not keep_walking and len(node1.get_transition()) == len(node2.get_transition()) == 0 or (node1.get_tag() == "END" and node2.get_tag()=="END"): #Try and stop at the end
 				if self.backtracking:
 					self.valid_backtrack()
 				print("This path is equivalent")
@@ -471,7 +498,11 @@ class TraceEquivalence:
 			file.write("digraph "+file1+"V1 {\n")
 			for node in self.g1.all_states:
 				file.write("node\n")
-				file.write(f"{node.id} [{str(node.initial_node)}]\n")
+				str_match = "" 
+				for i in node.matches:
+					str_match += str(i)+" "
+				str_match = str_match.strip()
+				file.write(f"{node.id} [{str(node.initial_node)}] |{str_match}|\n")
 			for transition in self.g1.all_transitions:
 				file.write(f"{transition.fr.id} -> {transition.to.id} [match:{transition.match}]\n")
 
@@ -479,7 +510,11 @@ class TraceEquivalence:
 			file.write("digraph "+file2+"V2 {\n")
 			for node in self.g2.all_states:
 				file.write("node\n")
-				file.write(f"{node.id} [{str(node.initial_node)}]\n")
+				str_match = "" 
+				for i in node.matches:
+					str_match += str(i)+" "
+				str_match = str_match.strip()
+				file.write(f"{node.id} [{str(node.initial_node)}] |{str_match}|\n")
 			for transition in self.g2.all_transitions:
 				file.write(f"{transition.fr.id} -> {transition.to.id} [match:{transition.match}]\n")
 

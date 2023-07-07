@@ -1,0 +1,9 @@
+filename; file size V1; file size V2; LTS size V1; LTS size V2; Equivalent ?; Explored V1 ; Explored V2 ; matches V1; matches V2
+ALCB018.COB ; 1523 ; 987 ; 377 ; 166; False;57 ; 54 ; 45; 30
+ALCB025.COB ; 1205 ; 914 ; 310 ; 162; False;126 ; 110 ; 118; 63
+ALCB044.COB ; 7678 ; 3099 ; 1297 ; 646; False;135 ; 123 ; 125; 66
+ALCB073.COB ; 1291 ; 1070 ; 342 ; 181; False;171 ; 145 ; 161; 78
+ALCB517.COB ; 13160 ; 7830 ; 3978 ; 1566; False;87 ; 75 ; 57; 28
+ALCP084.COB ; 3690 ; 1257 ; 405 ; 195; False;108 ; 99 ; 90; 42
+ALCP519.COB ; 6619 ; 3743 ; ERROR; ERROR; ERROR; ERROR; ERROR
+DABP120.COB ; 271 ; 265 ; 55 ; 22; True;47 ; 32 ; 47; 22

@@ -51,6 +51,12 @@ class LTSGraph:
 				res += 1
 		return res
 
+	def count_transition(self):
+		count = 0
+		for e in self.all_states:
+			count += len(e.get_transition(out=True))
+		return count
+
 	def get_unsure(self):
 		res = 0 
 		for e in self.all_transitions:

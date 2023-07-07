@@ -4,6 +4,7 @@ class LTSNode:
 	def __init__(self):
 		self.id = LTSNode.id
 		self.t = None
+		self.matches = []
 		self.initial_id = None
 		self.initial_node = None
 		self.transition_in = []
@@ -15,6 +16,15 @@ class LTSNode:
 
 	def __repr__(self):
 		return f"Node {self.id} {self.t}"
+
+	def group_match_set(self, set):
+		for node in set:
+			if node.id not in self.matches:
+				self.matches.append(node.id)
+
+	def group_match(self, node):
+		if node.id not in self.matches:
+			self.matches.append(node.id)
 
 	def has_condition(self):
 		return self.initial_node.has_condition()
