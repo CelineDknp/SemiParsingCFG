@@ -14,6 +14,8 @@ class TraceEquivalence:
 		self.g2 = g2
 		self.bag_g1 = set()
 		self.bag_g2 = set()
+		self.back_bag_g1 = set()
+		self.back_bag_g2 = set()
 		self.all_paths_g1 = []
 		self.all_paths_g2 = []
 		self.current_path_g1 = []
@@ -88,6 +90,18 @@ class TraceEquivalence:
 				return t
 		return None
 
+	def add_bag_g1(self, node):
+		if self.backtracking:
+			self.back_bag_g1.add(node)
+		else:
+			self.bag_g1.add(node)
+
+	def add_bag_g2(self, node):
+		if self.backtracking:
+			self.back_bag_g2.add(node)
+		else:
+			self.bag_g2.add(node)
+
 	def consume_internal_transitions(self, trace_match):
 		node1 = trace_match.node1()
 		node2 = trace_match.node2()
@@ -99,19 +113,19 @@ class TraceEquivalence:
 			if t is not None:
 				keep_walking = True
 				new_node1 = self.mark_and_move(node1, t)
-				self.bag_g1.add(node1)
+				self.add_bag_g1(node1)
 		if len(self.performs_G2) > 0:
 			t = self.relevant_goback(node2, self.performs_G2)
 			if t is not None:
 				keep_walking = True
 				new_node2 = self.mark_and_move(node2, t)
-				self.bag_g2.add(node2)
+				self.add_bag_g2(node2)
 		if new_node1 is None and node1.has_single_out(self.performs_G1):  # A single transition out will be ignored (TODO: check)
 			node1_t = node1.get_single_transition(self.performs_G1, self.temp_performs_G1)
 			if node1_t.get_label() == ignore or node1_t.get_label() == perform:
 				keep_walking = True
 				new_node1 = self.mark_and_move(node1, node1_t)
-				self.bag_g1.add(node1)
+				self.add_bag_g1(node1)
 				if node1_t.get_label() == perform and node1 not in self.temp_performs_G1:
 					self.performs_G1.append(node1)
 					self.temp_performs_G1.append(node1)
@@ -120,7 +134,7 @@ class TraceEquivalence:
 			if node2_t.get_label() == ignore or node2_t.get_label() == perform:
 				keep_walking = True
 				new_node2 = self.mark_and_move(node2, node2_t)
-				self.bag_g2.add(node2)
+				self.add_bag_g2(node2)
 				if node2_t.get_label() == perform and node2 not in self.temp_performs_G2:
 					self.performs_G2.append(node2)
 					self.temp_performs_G2.append(node2)
@@ -284,7 +298,6 @@ class TraceEquivalence:
 			self.mark_unmatch(t1)
 		for t2 in node2.get_transition():
 			self.mark_unmatch(t2)
-		self.error += 1
 
 	def transition_number(self, node1, node2, rematch_mode="None"):
 		len_right = len(node1.get_transition())
@@ -331,6 +344,12 @@ class TraceEquivalence:
 			self.correct_backtrack = 0
 			self.backtrack_goal = 0
 			self.rematch_type = rematch_type
+			for n in self.back_bag_g1:
+				n.group_match_set(self.back_bag_g2)
+			for n in self.back_bag_g2:
+				n.group_match_set(self.back_bag_g1)
+			self.back_bag_g1 = set()
+			self.back_bag_g1 = set()
 			if len(self.permutations) > 0:
 				self.walk_trace_match(self.permutations.pop())
 			return
@@ -508,6 +527,7 @@ class TraceEquivalence:
 						print(node1.initial_node)
 						print(node2.initial_node)
 						self.equivalent = False
+						self.error += 1
 					else:
 						self.rematch += 1
 						self.backtrack(node1, node2)
