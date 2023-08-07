@@ -1,6 +1,7 @@
 from LTSGraph.LTSGraph import LTSGraph
 from Nodes.ConditionNode import ConditionNode
 from Nodes.ParseNode import ParseNode
+from Nodes.BlockLoopNode import BlockLoopNode
 from TraceMatch import TraceMatch
 from equivalence_config import *
 import os
@@ -22,14 +23,18 @@ class TraceEquivalence:
 		self.matched_transition_g2 = []
 		self.backG1 = []
 		self.backG2 = []
+		self.skipped_links = []
 		self.permutations = []
+		self.error = 0
 		self.temp_permutations =[]
 		self.back_permutations = []
+		self.tried_permutations = []
 		self.backtracking = False
 		self.current_back_track = None
 		self.starting_backtrack = None
 		self.backtrack_mode = ""
 		self.rematch = 0
+		self.loc_rematch = 0
 		self.performs_G1 = []
 		self.temp_performs_G1 = []
 		self.performs_G2 = []
@@ -69,7 +74,7 @@ class TraceEquivalence:
 
 	def mark_and_move(self, node, transition, force_match=False):
 		if not self.backtracking or force_match:
-			transition.set_match(1)
+			transition.set_match(self.error, 1)
 			self.mark_transition(transition)
 		else:
 			self.temp_links_matched.append(transition)
@@ -157,8 +162,8 @@ class TraceEquivalence:
 						self.temp_links_matched.append(t1)
 						self.temp_links_matched.append(t2)
 					else:
-						t1.set_match(1) #Perfect match
-						t2.set_match(1)
+						t1.set_match(self.error, 1) #Perfect match
+						t2.set_match(self.error,1)
 						self.mark_group_match(node1, node2)
 					if t2.label == perform: #If we are following a double perform, take node
 						t_m = TraceMatch(t1.label, node1, node2, t1.to, t2.to, self.performs_G1, self.performs_G2, other_label = t2.label)
@@ -175,7 +180,7 @@ class TraceEquivalence:
 					break #We found a match for the transition, no need to explore further !!! skip backtracking ???
 					#TODO: list like we do with the backtracks ? : opti
 		match = transition_found >= self.transition_number(node1, node2)
-		if not match:
+		if not match and not self.backtracking:
 			self.total_unmatch(node1, node2)
 		return match, transition_found #Change this to match the expected number of transition
 
@@ -193,7 +198,7 @@ class TraceEquivalence:
 					self.mark_group_match(node1, e)
 			for t in transitions_to_match:
 				self.mark_transition(t)
-				t.set_match(1)
+				t.set_match(self.error, 1)
 			self.back_permutations = []
 			if self.backtracking:
 				self.valid_backtrack()
@@ -261,25 +266,30 @@ class TraceEquivalence:
 
 	def mark_unsure(self, node):
 		for t in node.get_transition():
-			t.set_match(0)
+			t.set_match(self.error, 0)
+			self.skipped_links.append(t)
 
 	def mark_matched(self, node):
 		for t in node.get_transition():
-			t.set_match(1)
+			t.set_match(self.error, 1)
 
 	def mark_unmatch(self, link):
-		link.set_match(-1)
+		link.set_match(self.error, -1)
+
+	def unmatch(self, link):
+		link.set_match(self.error, -1, remove=True)
 
 	def total_unmatch(self, node1, node2):
 		for t1 in node1.get_transition():
 			self.mark_unmatch(t1)
 		for t2 in node2.get_transition():
 			self.mark_unmatch(t2)
+		self.error += 1
 
 	def transition_number(self, node1, node2, rematch_mode="None"):
 		len_right = len(node1.get_transition())
 		len_left = len(node2.get_transition())
-		return len_right if len_right >= len_left else len_right
+		return len_right if len_right >= len_left else len_left
 
 	def launch_permutations(self, node1, node2):
 		current_rematch = ""
@@ -293,7 +303,7 @@ class TraceEquivalence:
 				current_rematch = "skip_right"
 			self.mark_unsure(node2)
 		self.rematch_type -= 1
-		self.rematch = 0
+		self.loc_rematch = 0
 		goal = self.transition_number(node1, node2, current_rematch)
 		print(f"Trying backtrack with {current_rematch}")
 		if current_rematch == "skip_left":
@@ -303,13 +313,16 @@ class TraceEquivalence:
 			for t in node2.get_transition():
 				self.back_permutations.append(TraceMatch("Skipped", node1, node2, node1, t.to, self.performs_G1, self.performs_G2, match=False))
 		elif current_rematch == "skip_both":
-			for t1 in node2.get_transition():
-				for t2 in node1.get_transition():
+			for t1 in node1.get_transition():
+				for t2 in node2.get_transition():
 					self.back_permutations.append(TraceMatch("Skipped", node1, node2, t1.to, t2.to, self.performs_G1, self.performs_G2, match=False))
 		self.backtrack_mode = current_rematch
 		self.backtracking = True
-		self.current_back_track = self.back_permutations.pop()
-		return goal
+		self.backtrack_goal = goal
+		if len(self.back_permutations) > 0:
+			self.current_back_track = self.back_permutations.pop()
+		else:
+			self.backtrack(node1, node2)
 
 	def backtrack(self, node1, node2):
 		if self.backtracking and self.correct_backtrack >= self.backtrack_goal: #Did the backtrack work ?
@@ -319,32 +332,47 @@ class TraceEquivalence:
 			self.backtrack_goal = 0
 			self.rematch_type = rematch_type
 			if len(self.permutations) > 0:
-				self.walk_trace_match(self.permutations.pop(0))
+				self.walk_trace_match(self.permutations.pop())
 			return
-		else:
-			if self.rematch_type == 0:
-				self.equivalent = False
-				print("Backtrack couldn't work !")
-				print(self.current_back_track.node1_from.initial_node)
-				print(self.current_back_track.node2_from.initial_node)
-				self.correct_backtrack = 0
-				self.rematch = 0
-				return
-		if len(self.back_permutations) == 0:
-			self.backtrack_goal = self.launch_permutations(node1, node2)
+		elif self.backtracking: #If we are backtraching but it's not worked yet
+			if len(self.back_permutations) == 0: #No more permutations ?
+				if self.rematch_type == 0: #No more available, we filed
+					self.equivalent = False
+					print("Backtrack couldn't work !")
+					print(self.current_back_track.node1_from.initial_node)
+					print(self.current_back_track.node2_from.initial_node)
+					self.error += 1
+					self.correct_backtrack = 0
+					self.rematch = 0
+					self.loc_rematch = 0
+					self.rematch_type = rematch_type
+					self.backtracking = False
+					if len(self.permutations) > 0: #Should we do this ?
+						self.walk(self.permutations.pop())
+					return
+				else:#recreate more permutations
+					self.launch_permutations(node1, node2)
+					self.tried_permutations.append(self.current_back_track)
+					self.walk_trace_match(self.current_back_track)
+
+			else:
+				while len(self.back_permutations) > 0 and self.correct_backtrack < self.backtrack_goal:
+					self.backtracking = True
+					self.current_back_track = self.back_permutations.pop()
+					self.tried_permutations.append(self.current_back_track)
+					self.walk_trace_match(self.current_back_track)
+		else: #We are not backtracking yet, launch it
+			self.launch_permutations(node1, node2)
 			self.starting_backtrack = self.current_back_track
+			self.tried_permutations.append(self.current_back_track)
 			self.walk_trace_match(self.current_back_track)
-		else:
-			while len(self.back_permutations) > 0 and self.correct_backtrack < self.backtrack_goal:
-				self.backtracking = True
-				self.current_back_track = self.back_permutations.pop(0)
-				self.walk_trace_match(self.current_back_track)
+
 
 
 	def valid_backtrack(self):
 		#self.backtracking = False
 		self.rematch = 0 #We found our way so reset rematches
-		#self.permutations = []
+		self.loc_rematch = 0
 		for elem in self.temp_visited:
 			self.append_to_visited(elem)
 		self.temp_visited = []
@@ -377,7 +405,9 @@ class TraceEquivalence:
 		self.temp_visited = []
 		self.temp_links_matched = []
 		for link in self.temp_links_matched:
-			self.mark_unmatch(link)
+			self.unmatch(link)
+		for link in self.skipped_links:
+			self.unmatch(link)
 		self.back_permutations = []
 		self.backtrack(self.starting_backtrack.node1_f(), self.starting_backtrack.node2_f())
 
@@ -422,67 +452,74 @@ class TraceEquivalence:
 		if not self.backtracking:
 			self.current_path_g1.append(node1)
 			self.current_path_g2.append(node2)
-		if self.equivalent != False:
-			if self.backtracking:
-				self.temp_visited.append(trace_match)
-			else:
-				self.append_to_visited(trace_match)
-			keep_walking, new_trace_match = self.consume_internal_transitions(trace_match)
-			if keep_walking:
-				self.walk(new_trace_match)
-			else:
+		#if self.equivalent != False:
+		if self.backtracking:
+			self.temp_visited.append(trace_match)
+		else:
+			self.append_to_visited(trace_match)
+		keep_walking, new_trace_match = self.consume_internal_transitions(trace_match)
+		if keep_walking:
+			self.walk(new_trace_match)
+		else:
+			if not self.backtracking:
 				for n in self.bag_g1:
 					n.group_match_set(self.bag_g2)
 				for n in self.bag_g2:
 					n.group_match_set(self.bag_g1)
 				self.bag_g1 = set()
 				self.bag_g2 = set()
-			if not keep_walking and len(node1.get_transition()) == len(node2.get_transition()) == 0 or (node1.get_tag() == "END" and node2.get_tag()=="END"): #Try and stop at the end
-				if self.backtracking:
-					self.valid_backtrack()
-				print("This path is equivalent")
-				self.all_paths_g1.append(self.current_path_g1)
-				self.all_paths_g2.append(self.current_path_g2)
-				self.current_path_g1 = []
-				self.current_path_g2 = []
-				if self.equivalent is None or self.equivalent:
-					self.equivalent = True
+		if not keep_walking and len(node1.get_transition()) == len(node2.get_transition()) == 0 or (node1.get_tag() == "END" and node2.get_tag()=="END"): #Try and stop at the end
+			if self.backtracking:
+				self.valid_backtrack()
+			print("This path is equivalent")
+			node1.group_match(node2)
+			node2.group_match(node1)
+			self.all_paths_g1.append(self.current_path_g1)
+			self.all_paths_g2.append(self.current_path_g2)
+			self.current_path_g1 = []
+			self.current_path_g2 = []
+			if self.equivalent is None or self.equivalent:
+				self.equivalent = True
+				return
+		elif not keep_walking:
+			# print("We need to compare two branches")
+			match, transition_found = self.compare_and_match(node1, node2)
+			if not match and isinstance(node1.initial_node, ConditionNode) and isinstance(node2.initial_node, ConditionNode): #First try special cases
+				if self.try_if_to_evaluate(node1, node2):
+					self.back_permutations = []
 					return
-			else:
-				# print("We need to compare two branches")
-				match, transition_found = self.compare_and_match(node1, node2)
-				if not match and isinstance(node1.initial_node, ConditionNode) and isinstance(node2.initial_node, ConditionNode): #First try special cases
-					if self.try_if_to_evaluate(node1, node2):
-						self.back_permutations = []
-						return
-					if self.try_factorize_ifs(node1, node2):
-						self.back_permutations = []
-						return
-				if not match:
-					if self.backtracking:
-						if self.rematch >= rematch:#We have tried everything
+				if self.try_factorize_ifs(node1, node2):
+					self.back_permutations = []
+					return
+			if not match:
+				if self.backtracking:
+					if self.loc_rematch >= rematch:#No more path creation
+						if len(self.back_permutations) == 0:
 							self.invalid_backtrack()
 						else:
-							self.rematch += 1 #Skip more nodes
-							self.keep_moving(node1, node2)
+							self.current_back_track = self.back_permutations.pop()
+							self.walk_trace_match(self.current_back_track)
 					else:
-						if self.rematch >= rematch:#We have tried everything
-							print("Graphs are not equivalent !")
-							print(node1.initial_node)
-							print(node2.initial_node)
-							self.equivalent = False
-						else:
-							self.rematch += 1
-							self.backtrack(node1, node2)
-				else: #Looks like we found our way
-					if not self.backtracking:
-						self.back_permutations = []
-					if self.backtracking: #We were backtracking but we found a match on this path !
-						self.valid_backtrack()
-					while len(self.permutations) > 0:
-						t_m = self.permutations.pop(0)
-						if not self.already_seen(t_m):
-							self.walk_trace_match(t_m)
+						self.loc_rematch += 1 #Skip more nodes
+						self.keep_moving(node1, node2)
+				else:
+					if self.rematch >= rematch:#We have tried everything
+						print("Graphs are not equivalent !")
+						print(node1.initial_node)
+						print(node2.initial_node)
+						self.equivalent = False
+					else:
+						self.rematch += 1
+						self.backtrack(node1, node2)
+			else: #Looks like we found our way
+				if not self.backtracking:
+					self.back_permutations = []
+				if self.backtracking: #We were backtracking but we found a match on this path !
+					self.valid_backtrack()
+				while len(self.permutations) > 0:
+					t_m = self.permutations.pop()
+					if not self.already_seen(t_m):
+						self.walk_trace_match(t_m)
 
 	def output_to_file(self, filepath, file1, file2):
 		file1 = file1.split("/")[-1][:-4]+"_V1.gv"

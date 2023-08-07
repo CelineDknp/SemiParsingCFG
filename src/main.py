@@ -136,6 +136,7 @@ def compare_graphs(filename1, filename2, draw_target="", draw=False):
 		print("Files drawed")
 	else:
 		teq.compare(name1=filename1, name2=filename2)
+	return teq
 
 def compare_and_return(filename1, filename2, draw_target="", draw=False):
 	g1 = process_and_cleanup(filename1, label_clean=False)

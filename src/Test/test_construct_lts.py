@@ -68,13 +68,14 @@ def test_construct_lts_base_if_nested_both_branch():
 def test_construct_lts_simple_evaluate():
 	graph = process_and_create_lts("TestFiles/pytest/evaluate_simple_test_file.COB")
 	assert graph.get_size() == 6
-	assert graph.get_link_size() == 7
+	assert graph.get_link_size() == 8
 	assert graph.get_transition(1).get_label() == "A > 0"
 	assert graph.get_transition(2).get_label() == "A < 0"
 	assert graph.get_transition(3).get_label() == "A = 0"
-	assert graph.get_transition(4).get_label() == "OPEN DB1"
-	assert graph.get_transition(5).get_label() == "OPEN DB2"
-	assert graph.get_transition(6).get_label() == "OPEN DB3"
+	assert graph.get_transition(4).get_label() == "OTHER"
+	assert graph.get_transition(5).get_label() == "OPEN DB1"
+	assert graph.get_transition(6).get_label() == "OPEN DB2"
+	assert graph.get_transition(7).get_label() == "OPEN DB3"
 
 def test_construct_lts_mixed_evaluate():
 	graph = process_and_create_lts("TestFiles/pytest/evaluate_if_mix_test_file.COB")

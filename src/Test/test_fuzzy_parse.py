@@ -130,7 +130,7 @@ def test_fuzzy_parse_if_condition_three_lines():
 	assert len(node_array) == 2
 	assert node_array[0].get_type() == NODE_COND_START
 	assert node_array[1].get_type() == NODE_COND_END
-	assert node_array[0].get_condition() == "A > 0 AND B = 10 AND C"
+	assert node_array[0].get_condition() == "A > 0 AND B = 10 AND C > 10"
 
 def test_fuzzy_parse_if_condition_case_insensitive():
 	node_array = process_and_parse("TestFiles/pytest/if_condition_case_insensitive_test_file.COB")
@@ -142,7 +142,7 @@ def test_fuzzy_parse_if_condition_case_insensitive():
 #Tests for evaluate (multiple branch conditions)
 def test_fuzzy_parse_simple_evaluate():
 	node_array = process_and_parse("TestFiles/pytest/evaluate_simple_test_file.COB")
-	assert len(node_array) == 8
+	assert len(node_array) == 9
 	assert node_array[0].get_type() == NODE_COND_START
 	assert node_array[0].get_condition() == "TRUE"
 	assert node_array[1].get_type() == NODE_COND_BRANCH
@@ -151,7 +151,9 @@ def test_fuzzy_parse_simple_evaluate():
 	assert node_array[3].get_condition() == "A < 0"
 	assert node_array[5].get_type() == NODE_COND_BRANCH
 	assert node_array[5].get_condition() == "A = 0"
-	assert node_array[7].get_type() == NODE_COND_END
+	assert node_array[7].get_type() == NODE_COND_BRANCH
+	assert node_array[7].get_condition() == "OTHER"
+	assert node_array[8].get_type() == NODE_COND_END
 
 def test_fuzzy_parse_mixed_evaluate():
 	node_array = process_and_parse("TestFiles/pytest/evaluate_if_mix_test_file.COB")

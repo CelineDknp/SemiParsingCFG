@@ -13,7 +13,7 @@ class Node:
 	def __str__(self):
 		#Old version of str
 		#return self.depth*"\t"+f"Node {self.id} {self.type} at depth {self.depth}"
-		return f"Node {self.id} {self.type}"
+		return f"Node {self.type}"
 
 	def __repr__(self):
 		return f"Node {self.id} {self.type}"

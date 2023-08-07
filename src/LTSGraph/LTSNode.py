@@ -51,7 +51,7 @@ class LTSNode:
 		if len(self.transition_out) == 1:
 			return True
 		if isinstance(self.initial_node, LabelLoopNode):
-			return True #BlockLoopNodes always have one available out link
+			return True #LabelLoopNodes always have one available out link, either the label if we meet them, or the out if we come back
 		available_count = 0
 		if len(go_back_list) > 0:
 			last_perform = go_back_list[-1]  # Can we only goback to the last perform ?
@@ -70,9 +70,13 @@ class LTSNode:
 		else:
 			if isinstance(self.initial_node, LabelLoopNode):
 				if self in all_performs:
-					return self.transition_out[1]
+					for t in self.transition_out:
+						if t.to.initial_node != self.initial_node.label:
+							return t
 				else:
-					return self.transition_out[0]
+					for t in self.transition_out:
+						if t.to.initial_node == self.initial_node.label_child:
+							return t
 			if len(go_back_list) > 0:
 				last_perform = go_back_list[-1]  # Can we only goback to the last perform ?
 			else:

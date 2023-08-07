@@ -180,8 +180,12 @@ class LTSGraph:
 
 						else:
 							if isinstance(child, LabelNode) and child.get_label() == n.go_back_label():
-								if len(f.get_transition(out=True)) < 1:
-									tag = "PERFORM" #Tag the in link
+								tag = "PERFORM" #Tag the in link
+								go = True
+								for tr in f.transition_out:
+									if isinstance(tr.to, LabelNode) and tr.to.get_label() == n.go_back_label():
+										go = False
+								if go:
 									#Get the out link
 									index = self.all_labels.index(t)
 									if index < len(self.all_labels)-1:

@@ -35,7 +35,7 @@ def test_construct_graph_base_if_nested_both_branch():
 #Testing evaluates
 def test_construct_graph_simple_evaluate():
 	graph = process_and_create("TestFiles/pytest/evaluate_simple_test_file.COB")
-	assert graph.get_size() == 10
+	assert graph.get_size() == 11
 
 def test_construct_graph_mixed_evaluate():
 	graph = process_and_create("TestFiles/pytest/evaluate_if_mix_test_file.COB")
