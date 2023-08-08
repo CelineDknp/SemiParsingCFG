@@ -43,6 +43,7 @@ class TraceEquivalence:
 		self.temp_performs_G2 = []
 		self.temp_visited = []
 		self.temp_links_matched = []
+		self.temp_unsure = []
 		self.correct_backtrack = 0
 		self.backtrack_goal = 0
 		self.equivalent = True
@@ -309,12 +310,16 @@ class TraceEquivalence:
 		if (rematch_mode == "skip_left" and self.rematch_type == 3) or (rematch_type == 3 and self.rematch_type == 2):
 			current_rematch = "skip_left"
 			self.mark_unsure(node1)
+			if node1 not in self.temp_unsure:
+				self.temp_unsure.append(node1)
 		if rematch_mode == "skip_right" or (rematch_type == 3 and self.rematch_type == 2 or self.rematch_type == 1):
 			if current_rematch == "skip_left":
 				current_rematch = "skip_both"
 			else:
 				current_rematch = "skip_right"
 			self.mark_unsure(node2)
+			if node2 not in self.temp_unsure:
+				self.temp_unsure.append(node2)
 		self.rematch_type -= 1
 		self.loc_rematch = 0
 		goal = self.transition_number(node1, node2, current_rematch)
@@ -344,6 +349,11 @@ class TraceEquivalence:
 			self.correct_backtrack = 0
 			self.backtrack_goal = 0
 			self.rematch_type = rematch_type
+			for node in self.temp_unsure:
+				for t_out in node.get_transition():
+					if -1 in t_out.match:
+						t_out.match.remove(-1)
+			self.temp_unsure = []
 			for n in self.back_bag_g1:
 				n.group_match_set(self.back_bag_g2)
 			for n in self.back_bag_g2:
@@ -366,6 +376,11 @@ class TraceEquivalence:
 					self.loc_rematch = 0
 					self.rematch_type = rematch_type
 					self.backtracking = False
+					for node in self.temp_unsure:
+						for t_out in node.get_transition():
+							if 0 in t_out.match:
+								t_out.match.remove(0)
+					self.temp_unsure = []
 					if len(self.permutations) > 0: #Should we do this ?
 						self.walk(self.permutations.pop())
 					return

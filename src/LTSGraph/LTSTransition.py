@@ -3,7 +3,7 @@ class LTSTransition:
 		self.fr = fr
 		self.to = to
 		self.label = label
-		self.match = {0: -2}
+		self.match = [-2]
 
 	def get_label(self):
 		return self.label
@@ -22,7 +22,13 @@ class LTSTransition:
 		#			array.append(value) # 1 = sure match 0 = unsure, -1 = unmatch, -2 = unexplored
 		#else:
 		#	self.match[number] = [value]
-		self.match[number] = value
+		#self.match[number] = value
+		if self.match == [-2]: #First add, just remove the -2
+			self.match = [value]
+		elif value not in self.match:
+			self.match.append(value)
+			if len(self.match) == 3:
+				a = 0
 
 	def __eq__(self, other):
 		if not isinstance(other, LTSTransition):
