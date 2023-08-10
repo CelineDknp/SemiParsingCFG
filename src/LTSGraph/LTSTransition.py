@@ -27,8 +27,13 @@ class LTSTransition:
 			self.match = [value]
 		elif value not in self.match:
 			self.match.append(value)
-			if len(self.match) == 3:
-				a = 0
+
+	def match_str(self):
+		res = ""
+		for e in self.match:
+			res += str(e)+" "
+		res = res.strip()
+		return res
 
 	def __eq__(self, other):
 		if not isinstance(other, LTSTransition):

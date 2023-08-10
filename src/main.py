@@ -160,7 +160,7 @@ def compare_and_return(filename1, filename2, draw_target="", draw=False):
 
 
 def main(argv):
-	sys.setrecursionlimit(3000)
+	sys.setrecursionlimit(5000)
 	if len(argv) == 1:#manual example
 		lst_g1 = LTSGraph()
 		node1 = LTSNode()
