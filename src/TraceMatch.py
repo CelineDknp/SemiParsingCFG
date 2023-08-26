@@ -61,6 +61,6 @@ class TraceMatch:
 	def followed_perform_node2(self):
 		return self.other_label == "PERFORM"
 
-	def __eq__(self, other):
-		nodes = (self.node1() == other.node1() and self.node2() == other.node2() and self.node1_f() == other.node1_f() and self.node2_f() == other.node2_f()) or (self.node1() == other.node2() and self.node2() == other.node1() and self.node1_f() == other.node2_f() and self.node2_f() == other.node1_f())
-		return nodes and self.perform_g1 == other.perform_g1 and self.perform_g2 == other.perform_g2
+	#def __eq__(self, other):
+	#	nodes = (self.node1() == other.node1() and self.node2() == other.node2() and self.node1_f() == other.node1_f() and self.node2_f() == other.node2_f()) or (self.node1() == other.node2() and self.node2() == other.node1() and self.node1_f() == other.node2_f() and self.node2_f() == other.node1_f())
+	#	return nodes and self.perform_g1 == other.perform_g1 and self.perform_g2 == other.perform_g2

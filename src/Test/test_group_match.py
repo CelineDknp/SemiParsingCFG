@@ -134,8 +134,7 @@ def test_base_no_match_case():
         if n.id == 183: #If 1
             assert len(n.matches) == 0
         if n.id == 184: #End
-            assert len(n.matches) == 1
-            assert n.matches[0] == 188
+            assert len(n.matches) == 0
 
     for n in g2.all_states:
         if n.id == 185: #Start node
@@ -146,5 +145,4 @@ def test_base_no_match_case():
         if n.id == 187: #If 2
             assert len(n.matches) == 0
         if n.id == 188: #End node
-            assert len(n.matches) == 1
-            assert n.matches[0] == 184
+            assert len(n.matches) == 0

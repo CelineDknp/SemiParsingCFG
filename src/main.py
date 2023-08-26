@@ -126,6 +126,8 @@ def compare_graphs(filename1, filename2, draw_target="", draw=False):
 	lst_g1.import_graph(g1)
 	lst_g2 = LTSGraph()
 	lst_g2.import_graph(g2)
+	lst_g1.save_as_file("IF_V1")
+	lst_g2.save_as_file("IF_V2")
 	print("LTSs created !")
 	teq = TraceEquivalence(lst_g1, lst_g2)
 	print("Trace equivalence done")
@@ -160,7 +162,7 @@ def compare_and_return(filename1, filename2, draw_target="", draw=False):
 
 
 def main(argv):
-	sys.setrecursionlimit(5000)
+	sys.setrecursionlimit(10000)
 	if len(argv) == 1:#manual example
 		lst_g1 = LTSGraph()
 		node1 = LTSNode()

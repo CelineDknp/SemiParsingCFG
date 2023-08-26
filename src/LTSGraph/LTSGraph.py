@@ -179,11 +179,16 @@ class LTSGraph:
 									self.link(f, t, "")
 
 						else:
+							has_perf_t = False
+							for tr in f.transition_out:
+								if tr.get_label() == "PERFORM":
+									has_perf_t = True
 							if isinstance(child, LabelNode) and child.get_label() == n.go_back_label():
-								tag = "PERFORM" #Tag the in link
+								if not has_perf_t:
+									tag = "PERFORM" #Tag the in link
 								go = True
 								for tr in f.transition_out:
-									if isinstance(tr.to, LabelNode) and tr.to.get_label() == n.go_back_label():
+									if isinstance(tr.to.initial_node, LabelNode) and tr.to.initial_node.get_label() == n.go_back_label():
 										go = False
 								if go:
 									#Get the out link

@@ -200,7 +200,7 @@ class TraceEquivalence:
 		return match, transition_found #Change this to match the expected number of transition
 
 	def try_if_to_evaluate(self, node1, node2):
-		(array, couple_array, transitions_to_match), was_node_2 = try_transformations(node1, node2, self.performs_G1, self.performs_G2)
+		(array, couple_array, transitions_to_match, exit_transitions), was_node_2 = try_transformations(node1, node2, self.performs_G1, self.performs_G2)
 		if array is not None:
 			self.mark_as_visited(array)
 			if was_node_2:
@@ -237,6 +237,8 @@ class TraceEquivalence:
 
 	def mark_all_transition_as_matched(self, node):
 		for t in node.get_transition():
+			if -1 in t.match:#If we marked it wrong, remove
+				t.match.remove(-1)
 			self.mark_and_move(node, t)
 
 	def try_factorize_ifs(self, node1, node2):
@@ -245,8 +247,8 @@ class TraceEquivalence:
 				if len(t1.label) >= len(t2.label):  # Check which node should be factorized
 					#print(f"Trying to match {t1.label}")
 					res, cond, fact_nodes, branch_out = try_factorize(t1.label, node2)
-					for t in node1.get_transition():
-						self.mark_and_move(node1, t)
+					#for t in node1.get_transition():
+					#	self.mark_and_move(node1, t)
 				else:
 					#print(f"Trying to match {t2.label}")
 					res, cond, fact_nodes, branch_out = try_factorize(t2.label, node1)
@@ -313,9 +315,15 @@ class TraceEquivalence:
 		for t2 in node2.get_transition():
 			self.mark_unmatch(t2)
 
+	def different_to(self, transition):
+		tot = set()
+		for t in transition:
+			tot.add(t.to)
+		return len(tot)
+
 	def transition_number(self, node1, node2, rematch_mode="None"):
-		len_right = len(node1.get_transition())
-		len_left = len(node2.get_transition())
+		len_right = self.different_to(node1.get_transition())
+		len_left = self.different_to(node2.get_transition())
 		return len_right if len_right >= len_left else len_left
 
 	def has_tried_permutation(self, trace_match):
@@ -404,6 +412,7 @@ class TraceEquivalence:
 					self.loc_rematch = 0
 					self.rematch_type = rematch_type
 					self.backtracking = False
+					self.equivalent = False
 					for node in self.temp_unsure:
 						for t_out in node.get_transition():
 							if 0 in t_out.match:
@@ -413,7 +422,11 @@ class TraceEquivalence:
 						self.walk(self.permutations.pop())
 					return
 				else:#recreate more permutations
-					self.launch_permutations(self.starting_backtrack.node1_from, self.starting_backtrack.node2_from)
+					if self.starting_backtrack:
+						self.launch_permutations(self.starting_backtrack.node1_from, self.starting_backtrack.node2_from)
+					else:
+						self.launch_permutations(node1, node2)
+						self.starting_backtrack = self.current_back_track
 					self.tried_permutations.append(self.current_back_track)
 					self.walk_trace_match(self.current_back_track)
 

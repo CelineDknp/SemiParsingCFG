@@ -9,9 +9,9 @@ def test_base_case():
     g1 = teq.g1
     g2 = teq.g2
     for l in g1.all_transitions:
-        assert l.match == 1
+        assert l.match == [1]
     for l in g2.all_transitions:
-        assert l.match == 1
+        assert l.match == [1]
 
 #Testing special case with if fact
 def test_if_fact():
@@ -20,9 +20,9 @@ def test_if_fact():
     g1 = teq.g1
     g2 = teq.g2
     for l in g1.all_transitions:
-        assert l.match == 1
+        assert l.match == [1]
     for l in g2.all_transitions:
-        assert l.match == 1
+        assert l.match == [1]
 
 #Testing special case with if eval
 #def test_if_eval():
@@ -37,36 +37,36 @@ def test_if_fact():
 
 # Testing the base matching with a skip
 def test_base_skip_case():
+    rematch = 1
     teq = compare_graphs("raincodeData/VisualisationExamples/V1/if_skip.COB", "raincodeData/VisualisationExamples/V2/if_skip.COB")
     assert teq.equivalent == True 
     g1 = teq.g1
     g2 = teq.g2
     for l in g1.all_transitions:
-        assert l.match == 1
+        assert l.match == [1]
     for l in g2.all_transitions:
         if "B" in l.label:
-            assert l.match == 0 #Both IF branches should be skipped
+            assert l.match == [0] #Both IF branches should be skipped
         else:
-            assert l.match == 1 #All other should be matched
+            assert l.match == [1] #All other should be matched
 
 # Testing the base matching with a non-equivalent file
 def test_base_no_match_case():
+    rematch = 0
     teq = compare_graphs("raincodeData/VisualisationExamples/V1/if_no_match.COB", "raincodeData/VisualisationExamples/V2/if_no_match.COB")
     assert teq.equivalent == False 
     g1 = teq.g1
     g2 = teq.g2
     for l in g1.all_transitions:
         if l.label == "INTERNAL":
-            assert l.match == 1
+            assert l.match == [1]
         else:
-            assert l.match == -1
+            assert l.match == [-1]
 
     for l in g2.all_transitions:
         if l.label == "INTERNAL":
-            assert l.match == 1
+            assert l.match == [1]
         elif "C" in l.label: #No match
-            assert l.match == -1
-        elif "D" in l.label: #neither
-            assert l.match == -1
+            assert l.match == [-1]
         else: #Did not explore further
-            assert l.match == -2
+            assert l.match == [-2]

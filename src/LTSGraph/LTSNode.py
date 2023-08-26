@@ -72,23 +72,14 @@ class LTSNode:
 		if len(self.transition_out) == 1:
 			return self.transition_out[0]
 		else:
-			if isinstance(self.initial_node, MultipleLabelLoopNode):
-				if self in all_performs:
-					for t in self.transition_out:
-						if not isinstance(t.to.initial_node, LabelNode) or t.to.initial_node.label not in self.initial_node.label:
-							return t
-				else:
-					for t in self.transition_out:
-						if isinstance(t.to.initial_node, LabelNode) and t.to.initial_node.label in self.initial_node.label:
-							return t
 			if isinstance(self.initial_node, LabelLoopNode):
 				if self in all_performs:
 					for t in self.transition_out:
-						if not isinstance(t.to.initial_node, LabelNode) or t.to.initial_node.label != self.initial_node.label:
+						if t.get_label() == "INTERNAL":
 							return t
 				else:
 					for t in self.transition_out:
-						if isinstance(t.to.initial_node, LabelNode) and t.to.initial_node.label == self.initial_node.label:
+						if t.get_label() == "PERFORM":
 							return t
 			if len(go_back_list) > 0:
 				last_perform = go_back_list[-1]  # Can we only goback to the last perform ?
@@ -108,10 +99,14 @@ class LTSNode:
 			return None
 
 	def add_transition(self, t):
+		if self.id == 21:
+			a=0
 		if t.fr == self:
-			self.transition_out.append(t)
+			if t not in self.transition_out:
+				self.transition_out.append(t)
 		elif t.to == self:
-			self.transition_in.append(t)
+			if t not in self.transition_in:
+				self.transition_in.append(t)
 
 	def tag(self, t):
 		self.t = t

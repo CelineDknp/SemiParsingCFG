@@ -25,7 +25,7 @@ auto_cast_evaluate = True #Option to allow auto-cast of int to str in evaluate W
 fact = {False: "OR", True: "AND"}  # Join with OR on true branch and with AND on false
 
 # Rematch after no match
-rematch = 1
+rematch = 3
 # Values: skip_right (skip one from the right graph) skip_left (skip one from the left right)
 # skip_both (try to skip one from the right and/or one from the left)
 rematch_mode = "skip_left"
@@ -66,13 +66,19 @@ def evaluate_equivalence(node_evaluate, node_if, perform_g1, perform_g2):
 	if_matched = []
 	couples = []
 	all_transition = []
+	exit_transitions = []
 	new_if = None
 	for t2 in node_evaluate.get_transition():
 		if t2.label == "OTHER":  # End of matching the EVALUATE
-			t_m = TraceMatch(t2.label, if_matched[-1], node_evaluate, node_if, t2.to, perform_g1, perform_g2) #Last match between last if and exit of evaluate
-			couples.append(t_m)
-			all_transition.append(t2)
-			return if_matched, couples, all_transition
+			if len(if_matched) > 0:
+				next_couples = []
+				t_m = TraceMatch(t2.label, if_matched[-1], node_evaluate, node_if, t2.to, perform_g1, perform_g2) #Last match between last if and exit of evaluate
+				next_couples.append(t_m)
+				for elem in exit_transitions: #match all exit transitions with correct last exit
+					t_m = TraceMatch(t2.label, elem.fr, node_evaluate, node_if, t2.to, perform_g1, perform_g2)
+					next_couples.append(t_m)
+				all_transition.append(t2)
+				return if_matched, next_couples, all_transition, exit_transitions
 		if var == "TRUE":#EVALUATE TRUE means condition will be fully on branches
 			cond = t2.label
 		else:
@@ -89,6 +95,7 @@ def evaluate_equivalence(node_evaluate, node_if, perform_g1, perform_g2):
 					all_transition.append(t2)
 				else:
 					all_transition.append(t1)
+					exit_transitions.append(t1)
 					new_if = t1.to
 			if matched:
 				if_matched.append(node_if)
@@ -96,8 +103,8 @@ def evaluate_equivalence(node_evaluate, node_if, perform_g1, perform_g2):
 					couples.pop()
 				node_if = new_if
 			else:
-				return (None, None, all_transition)
-	return (None, None, all_transition)
+				return None, None, all_transition, exit_transitions
+	return None, None, all_transition, exit_transitions
 
 
 def try_transformations(node1, node2, perform_g1, perform_g2):
@@ -108,7 +115,7 @@ def try_transformations(node1, node2, perform_g1, perform_g2):
 			return evaluate_equivalence(node1, node2, perform_g1, perform_g2), False
 		if tup[1] in str2:
 			return evaluate_equivalence(node2, node1, perform_g1, perform_g2), True
-	return (None, None, None), True
+	return (None, None, None, None), True
 
 
 def try_factorize(goal, node2):  # Try and factorize node 2 to node 1
