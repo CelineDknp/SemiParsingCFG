@@ -53,14 +53,17 @@ class TraceEquivalence:
 		return self.equivalent
 
 	def compare(self, draw=False, filepath="trace_equivalence_output/", name1="V1", name2="V2"):
+		print("HELLO ?", flush=True)
 		g1_walker = self.g1.get_start()
 		g2_walker = self.g2.get_start()
+		print("In compare", flush=True)
 		t_m = TraceMatch("", None, None, g1_walker, g2_walker, self.performs_G1, self.performs_G2)
 		self.walk(t_m)
+		print("After", flush=True)
 		if self.equivalent:
-			print("The graphs are trace equivalent !")
+			print("The graphs are trace equivalent !", flush=True)
 		else:
-			print("The graphs are not trace equivalent")
+			print("The graphs are not trace equivalent", flush=True)
 		if draw:
 			self.output_to_file(filepath, name1, name2)
 
@@ -353,7 +356,7 @@ class TraceEquivalence:
 		self.rematch_type -= 1
 		self.loc_rematch = 0
 		goal = self.transition_number(node1, node2, current_rematch)
-		print(f"Trying backtrack with {current_rematch}")
+		print(f"Trying backtrack with {current_rematch}", flush=True)
 		if current_rematch == "skip_left":
 			for t in node1.get_transition():
 				t_m = TraceMatch("Skipped", node1, node2, t.to, node2, self.performs_G1, self.performs_G2, match=False)
@@ -380,7 +383,7 @@ class TraceEquivalence:
 
 	def backtrack(self, node1, node2):
 		if self.backtracking and self.correct_backtrack >= self.backtrack_goal: #Did the backtrack work ?
-			print("Backtrack fully worked !")
+			print("Backtrack fully worked !", flush=True)
 			self.backtracking = False
 			self.correct_backtrack = 0
 			self.backtrack_goal = 0
@@ -403,9 +406,9 @@ class TraceEquivalence:
 			if len(self.back_permutations) == 0: #No more permutations ?
 				if self.rematch_type < 1: #No more available, we failed
 					self.equivalent = False
-					print("Backtrack couldn't work !")
+					print("Backtrack couldn't work !", flush=True)
 					print(self.current_back_track.node1_from.initial_node)
-					print(self.current_back_track.node2_from.initial_node)
+					print(self.current_back_track.node2_from.initial_node, flush=True)
 					self.error += 1
 					self.correct_backtrack = 0
 					self.rematch = 0
@@ -472,12 +475,12 @@ class TraceEquivalence:
 			for elem in to_remove: #Remove all elems that have no chance to be a good backtrack
 				if elem in self.back_permutations:
 					self.back_permutations.remove(elem)
-		print(f"Backtrack worked ! {self.starting_backtrack}")
+		print(f"Backtrack worked ! {self.starting_backtrack}", flush=True)
 		self.backtrack(self.starting_backtrack.node1_f(), self.starting_backtrack.node2_f())
 
 	def invalid_backtrack(self):
 		#self.backtracking = False
-		print(f"Backtrack failed ! {self.starting_backtrack}")
+		print(f"Backtrack failed ! {self.starting_backtrack}", flush=True)
 		self.temp_visited = []
 		self.temp_links_matched = []
 		for link in self.temp_links_matched:
@@ -517,7 +520,7 @@ class TraceEquivalence:
 		node1 = trace_match.node1()
 		node2 = trace_match.node2()
 		if not self.backtracking and self.already_seen(trace_match):
-			print("This path is equivalent")
+			print("This path is equivalent", flush=True)
 			self.all_paths_g1.append(self.current_path_g1)
 			self.all_paths_g2.append(self.current_path_g2)
 			self.current_path_g1 = []
@@ -548,7 +551,7 @@ class TraceEquivalence:
 		if not keep_walking and len(node1.get_transition()) == len(node2.get_transition()) == 0 or (node1.get_tag() == "END" and node2.get_tag()=="END"): #Try and stop at the end
 			if self.backtracking:
 				self.valid_backtrack()
-			print("This path is equivalent")
+			print("This path is equivalent", flush=True)
 			node1.group_match(node2)
 			node2.group_match(node1)
 			self.all_paths_g1.append(self.current_path_g1)
@@ -582,9 +585,9 @@ class TraceEquivalence:
 						self.keep_moving(node1, node2)
 				else:
 					if self.rematch >= rematch:#We have tried everything
-						print("Graphs are not equivalent !")
+						print("Graphs are not equivalent !", flush=True)
 						print(node1.initial_node)
-						print(node2.initial_node)
+						print(node2.initial_node, flush=True)
 						self.equivalent = False
 						self.error += 1
 					else:

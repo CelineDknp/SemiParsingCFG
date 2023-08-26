@@ -25,7 +25,7 @@ auto_cast_evaluate = True #Option to allow auto-cast of int to str in evaluate W
 fact = {False: "OR", True: "AND"}  # Join with OR on true branch and with AND on false
 
 # Rematch after no match
-rematch = 3
+rematch = 20
 # Values: skip_right (skip one from the right graph) skip_left (skip one from the left right)
 # skip_both (try to skip one from the right and/or one from the left)
 rematch_mode = "skip_left"

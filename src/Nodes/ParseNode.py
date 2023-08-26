@@ -1,7 +1,7 @@
 from .Node import Node
-from antlr4 import *
-from AntlrParser.MySqlLexer import MySqlLexer
-from AntlrParser.MySqlParser import MySqlParser
+#from antlr4 import *
+#from AntlrParser.MySqlLexer import MySqlLexer
+#from AntlrParser.MySqlParser import MySqlParser
 import re
 from contextlib import contextmanager
 import sys, os
@@ -36,9 +36,9 @@ class ParseNode(Node):
 
     def __init__(self, depth, node_type, regex):
         super().__init__(depth, node_type, regex)
-        self.SQLL = MySqlLexer
-        self.SQLP = MySqlParser
-        self.parse_tree = None
+        #self.SQLL = MySqlLexer
+        #self.SQLP = MySqlParser
+        #self.parse_tree = None
 
     def __str__(self):
         #return f"Node {self.type} ({self.parsable})"

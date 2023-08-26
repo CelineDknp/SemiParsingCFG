@@ -47,7 +47,7 @@ class LTSGraph:
 	def get_matches(self):
 		res = 0 
 		for e in self.all_transitions:
-			if e.match == 1:
+			if 1 in e.match:
 				res += 1
 		return res
 
@@ -60,7 +60,7 @@ class LTSGraph:
 	def get_unsure(self):
 		res = 0 
 		for e in self.all_transitions:
-			if e.match == 0:
+			if 0 in e.match:
 				res += 1
 		return res
 

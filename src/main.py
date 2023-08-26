@@ -68,8 +68,8 @@ def create(lot):
 def process_and_cleanup(filename, label_clean=False):
 	g = process_and_create(filename)
 	g.cleanup(label_clean)
-	print(f"Graph cleaned!", flush=True)
-	print(f"Final size of graph: {g.get_size()}")
+	print(f"Graph cleaned!")
+	print(f"Final size of graph: {g.get_size()}", flush=True)
 	return g
 
 def create_and_cleanup(lot, label_clean=False):
@@ -118,19 +118,18 @@ def compare_graphs(filename1, filename2, draw_target="", draw=False):
 		g1.save_as_file(os.path.basename(filename1+"V1"), output_dir='compare_tests')
 		print(f"G1 saved as file in {os.path.basename(filename1+'V1')}")
 	g2 = process_and_cleanup(filename2, label_clean=False)
-	print("G2 processed")
+	print("G2 processed", flush=True)
 	if draw and draw_target == "":
 		g2.save_as_file(os.path.basename(filename2+"V2"), output_dir='compare_tests')
 		print(f"G2 saved as file in {os.path.basename(filename2+'V2')}")
 	lst_g1 = LTSGraph()
 	lst_g1.import_graph(g1)
+	print("LTS1 imported", flush=True)
 	lst_g2 = LTSGraph()
 	lst_g2.import_graph(g2)
-	lst_g1.save_as_file("IF_V1")
-	lst_g2.save_as_file("IF_V2")
-	print("LTSs created !")
+	print("LTSs created !", flush=True)
 	teq = TraceEquivalence(lst_g1, lst_g2)
-	print("Trace equivalence done")
+	print("Trace equivalence done", flush=True)
 	if draw_target == "":
 		teq.compare(draw=draw, filepath="trace_equivalence_test/", name1=filename1, name2=filename2)
 	elif draw:
@@ -147,22 +146,23 @@ def compare_and_return(filename1, filename2, draw_target="", draw=False):
 		g1.save_as_file(os.path.basename(filename1+"V1"), output_dir='compare_tests')
 		print(f"G1 saved as file in {os.path.basename(filename1+'V1')}")
 	g2 = process_and_cleanup(filename2, label_clean=False)
-	print("G2 processed")
+	print("G2 processed", flush=True)
 	if draw and draw_target == "":
 		g2.save_as_file(os.path.basename(filename2+"V2"), output_dir='compare_tests')
 		print(f"G2 saved as file in {os.path.basename(filename2+'V2')}")
 	lst_g1 = LTSGraph()
 	lst_g1.import_graph(g1)
+	print("LTS1 imported", flush=True)
 	lst_g2 = LTSGraph()
 	lst_g2.import_graph(g2)
-	print("LTSs created !")
+	print("LTSs created !", flush=True)
 	teq = TraceEquivalence(lst_g1, lst_g2)
 	teq.compare(name1=filename1, name2=filename2)
 	return lst_g1, lst_g2, teq
 
 
 def main(argv):
-	sys.setrecursionlimit(10000)
+	sys.setrecursionlimit(20000)
 	if len(argv) == 1:#manual example
 		lst_g1 = LTSGraph()
 		node1 = LTSNode()
